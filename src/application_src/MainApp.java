@@ -65,7 +65,7 @@ public class MainApp extends Application implements ObserveWormGUIDES {
         loadImages();
 
         MainApp.primaryStage = primaryStage;
-        MainApp.primaryStage.setTitle("WormGUIDES");
+        MainApp.primaryStage.setTitle("WormGUIDESteachingDev");
 
         final Instant start = now();
         initRootLayout();

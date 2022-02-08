@@ -845,7 +845,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
         if (defaultEmbryoFlag) {
             // initial start at movie end (builds subscene automatically)
-            timeProperty.set(endTime);
+            timeProperty.set(1);
         } else if (MainApp.externallySetStartTime != -1) {
             timeProperty.set(MainApp.externallySetStartTime);
         } else {
