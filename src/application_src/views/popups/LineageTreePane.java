@@ -16,7 +16,6 @@ import java.util.Random;
 
 import application_src.application_model.annotation.AnnotationManager;
 import application_src.application_model.search.SearchConfiguration.SearchOption;
-import com.sun.tools.javah.Gen;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.binding.DoubleBinding;

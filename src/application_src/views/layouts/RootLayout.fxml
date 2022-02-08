@@ -36,7 +36,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<fx:root fx:id="rootBorderPane" prefHeight="800.0" prefWidth="1100.0" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root fx:id="rootBorderPane" prefHeight="1000.0" prefWidth="1800.0" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <top>
         <MenuBar fx:id="menu" translateZ="100.0" BorderPane.alignment="CENTER">
             <menus>
@@ -79,19 +79,17 @@
         </MenuBar>
     </top>
     <center>
-        <GridPane fx:id="mainGridPane" pickOnBounds="false" BorderPane.alignment="CENTER">
+        <GridPane fx:id="mainGridPane" pickOnBounds="true" BorderPane.alignment="CENTER">
             <columnConstraints>
-                <ColumnConstraints hgrow="NEVER" maxWidth="330.0" minWidth="330.0" prefWidth="330.0" />
+                <ColumnConstraints hgrow="ALWAYS" maxWidth="0" minWidth="330.0" prefWidth="330.0" />
                 <ColumnConstraints hgrow="ALWAYS" prefWidth="700.0" />
+                <ColumnConstraints hgrow="ALWAYS" maxWidth="0" minWidth="330.0" prefWidth="330.0" />
             </columnConstraints>
             <rowConstraints>
                 <RowConstraints minHeight="20.0" prefHeight="30.0" vgrow="ALWAYS" />
             </rowConstraints>
             <children>
-                <TabPane fx:id="mainTabPane" focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE">
-                    <GridPane.margin>
-                        <Insets />
-                    </GridPane.margin>
+                <TabPane fx:id="mainTabPaneLeft" focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE">
                     <tabs>
                         <Tab fx:id="storiesTab" closable="false" text="Stories">
                             <content>
@@ -142,6 +140,100 @@
                                 </AnchorPane>
                             </content>
                         </Tab>
+                    </tabs>
+                </TabPane>
+                <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="300.0" minWidth="300.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
+                    <children>
+                        <VBox fx:id="displayVBox" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="5.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
+                            <children>
+                                <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+                                    <children>
+                                        <AnchorPane fx:id="modelAnchorPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="300.0" minWidth="300.0" prefHeight="670.0" prefWidth="670.0" AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <children>
+                                                <Label fx:id="timeLabel" layoutX="500.0" layoutY="581.0" text="Time 001" textAlignment="RIGHT" textFill="WHITE" translateZ="10.0" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="5.0">
+                                                    <font>
+                                                        <Font size="14.0" />
+                                                    </font>
+                                                </Label>
+                                                <Label fx:id="totalNucleiLabel" layoutX="1.0" layoutY="558.0" text="0 nuclei" textFill="WHITE" translateZ="10.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0">
+                                                    <font>
+                                                        <Font size="14.0" />
+                                                    </font>
+                                                </Label>
+                                            </children>
+                                        </AnchorPane>
+                                        <HBox fx:id="sceneControlsBox" fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                            <children>
+                                                <Button id="backwardButton" fx:id="backwardButton" focusTraversable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" />
+                                                <Button id="playButton" fx:id="playButton" focusTraversable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" />
+                                                <Button id="forwardButton" fx:id="forwardButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" />
+                                                <Slider fx:id="timeSlider" blockIncrement="5.0" focusTraversable="false" majorTickUnit="50.0" maxWidth="1.7976931348623157E308" min="1.0" minorTickCount="5" prefHeight="30.0" value="1.0" HBox.hgrow="ALWAYS" />
+                                                <Button fx:id="zoomOutButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" />
+                                                <Button fx:id="zoomInButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" />
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </AnchorPane>
+                                <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="110.0" VBox.vgrow="NEVER">
+                                    <children>
+                                        <ScrollPane fx:id="infoPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" prefViewportHeight="63.0" prefViewportWidth="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <content>
+                                                <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="3.0" BorderPane.alignment="CENTER">
+                                                    <BorderPane.margin>
+                                                        <Insets top="10.0" />
+                                                    </BorderPane.margin>
+                                                    <padding>
+                                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                    </padding>
+                                                    <children>
+                                                        <HBox>
+                                                            <opaqueInsets>
+                                                                <Insets />
+                                                            </opaqueInsets>
+                                                            <children>
+                                                                <Text fx:id="displayedName" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="Active Cell: none">
+                                                                    <font>
+                                                                        <Font name="System Bold" size="14.0" />
+                                                                    </font>
+                                                                </Text>
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
+                                                                <Text fx:id="moreInfoClickableText" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="[more info]" visible="false">
+                                                                    <font>
+                                                                        <Font name="System Bold" size="14.0" />
+                                                                    </font>
+                                                                </Text>
+                                                            </children>
+                                                        </HBox>
+                                                        <Text fx:id="displayedDescription" strokeType="OUTSIDE" strokeWidth="0.0" VBox.vgrow="ALWAYS">
+                                                            <font>
+                                                                <Font size="14.0" />
+                                                            </font>
+                                                        </Text>
+                                                        <Text fx:id="displayedStory" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="Active Story: none">
+                                                            <font>
+                                                                <Font name="System Bold" size="14.0" />
+                                                            </font>
+                                                        </Text>
+                                                        <Text fx:id="displayedStoryDescription" strokeType="OUTSIDE" strokeWidth="0.0">
+                                                            <font>
+                                                                <Font size="14.0" />
+                                                            </font>
+                                                        </Text>
+                                                    </children>
+                                                </VBox>
+                                            </content>
+                                        </ScrollPane>
+                                    </children>
+                                </AnchorPane>
+                            </children>
+                        </VBox>
+                    </children>
+                </AnchorPane>
+                <TabPane fx:id="mainTabPaneRight" focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" tabClosingPolicy="UNAVAILABLE">
+                    <GridPane.margin>
+                        <Insets />
+                    </GridPane.margin>
+                    <tabs>
                         <Tab fx:id="colorAndDisplayTab" closable="false" text="Coloring and Display">
                             <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
@@ -529,93 +621,6 @@
                         </Tab>
                     </tabs>
                 </TabPane>
-                <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="300.0" minWidth="300.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
-                    <children>
-                        <VBox fx:id="displayVBox" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="5.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
-                            <children>
-                                <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
-                                    <children>
-                                        <AnchorPane fx:id="modelAnchorPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="300.0" minWidth="300.0" prefHeight="670.0" prefWidth="670.0" AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                            <children>
-                                                <Label fx:id="timeLabel" layoutX="500.0" layoutY="581.0" text="Time 001" textAlignment="RIGHT" textFill="WHITE" translateZ="10.0" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="5.0">
-                                                    <font>
-                                                        <Font size="14.0" />
-                                                    </font>
-                                                </Label>
-                                                <Label fx:id="totalNucleiLabel" layoutX="1.0" layoutY="558.0" text="0 nuclei" textFill="WHITE" translateZ="10.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0">
-                                                    <font>
-                                                        <Font size="14.0" />
-                                                    </font>
-                                                </Label>
-                                            </children>
-                                        </AnchorPane>
-                                        <HBox fx:id="sceneControlsBox" fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
-                                            <children>
-                                                <Button id="backwardButton" fx:id="backwardButton" focusTraversable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" />
-                                                <Button id="playButton" fx:id="playButton" focusTraversable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" />
-                                                <Button id="forwardButton" fx:id="forwardButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" />
-                                                <Slider fx:id="timeSlider" blockIncrement="5.0" focusTraversable="false" majorTickUnit="50.0" maxWidth="1.7976931348623157E308" min="1.0" minorTickCount="5" prefHeight="30.0" value="1.0" HBox.hgrow="ALWAYS" />
-                                                <Button fx:id="zoomOutButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" />
-                                                <Button fx:id="zoomInButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" />
-                                            </children>
-                                        </HBox>
-                                    </children>
-                                </AnchorPane>
-                                <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="110.0" VBox.vgrow="NEVER">
-                                    <children>
-                                        <ScrollPane fx:id="infoPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" prefViewportHeight="63.0" prefViewportWidth="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                            <content>
-                                                <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="3.0" BorderPane.alignment="CENTER">
-                                                    <BorderPane.margin>
-                                                        <Insets top="10.0" />
-                                                    </BorderPane.margin>
-                                                    <padding>
-                                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                                    </padding>
-                                                    <children>
-                                                        <HBox>
-                                                            <opaqueInsets>
-                                                                <Insets />
-                                                            </opaqueInsets>
-                                                            <children>
-                                                                <Text fx:id="displayedName" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="Active Cell: none">
-                                                                    <font>
-                                                                        <Font name="System Bold" size="14.0" />
-                                                                    </font>
-                                                                </Text>
-                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
-                                                                <Text fx:id="moreInfoClickableText" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="[more info]" visible="false">
-                                                                    <font>
-                                                                        <Font name="System Bold" size="14.0" />
-                                                                    </font>
-                                                                </Text>
-                                                            </children>
-                                                        </HBox>
-                                                        <Text fx:id="displayedDescription" strokeType="OUTSIDE" strokeWidth="0.0" VBox.vgrow="ALWAYS">
-                                                            <font>
-                                                                <Font size="14.0" />
-                                                            </font>
-                                                        </Text>
-                                                        <Text fx:id="displayedStory" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="Active Story: none">
-                                                            <font>
-                                                                <Font name="System Bold" size="14.0" />
-                                                            </font>
-                                                        </Text>
-                                                        <Text fx:id="displayedStoryDescription" strokeType="OUTSIDE" strokeWidth="0.0">
-                                                            <font>
-                                                                <Font size="14.0" />
-                                                            </font>
-                                                        </Text>
-                                                    </children>
-                                                </VBox>
-                                            </content>
-                                        </ScrollPane>
-                                    </children>
-                                </AnchorPane>
-                            </children>
-                        </VBox>
-                    </children>
-                </AnchorPane>
             </children>
         </GridPane>
     </center>

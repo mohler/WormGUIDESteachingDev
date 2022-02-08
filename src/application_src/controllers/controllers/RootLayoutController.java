@@ -149,7 +149,10 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
     // Tab stuff
     @FXML
-    private TabPane mainTabPane;
+    private TabPane mainTabPaneLeft;
+    @FXML
+    private TabPane mainTabPaneRight;
+   
     @FXML
     private Tab storiesTab;
     @FXML
@@ -869,7 +872,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.isEmpty()) {
-                mainTabPane.getSelectionModel().select(colorAndDisplayTab);
+                mainTabPaneRight.getSelectionModel().select(colorAndDisplayTab);
                 colorAndDisplayTabPane.getSelectionModel().select(cellsTab);
             }
         });
@@ -1247,13 +1250,14 @@ public class RootLayoutController extends BorderPane implements Initializable {
         colorAndDisplayDragTab.setCloseable(false);
         colorAndDisplayDragTab.setContent(colorAndDisplayTab.getContent());
 
-        mainTabPane.getTabs().clear();
+        mainTabPaneLeft.getTabs().clear();
+        mainTabPaneRight.getTabs().clear();
         storiesTab = storiesDragTab;
         colorAndDisplayTab = colorAndDisplayDragTab;
 
-        mainTabPane.getTabs().add(storiesTab);
-        mainTabPane.getTabs().add(colorAndDisplayTab);
-        mainTabPane.toFront();
+        mainTabPaneLeft.getTabs().add(storiesTab);
+        mainTabPaneRight.getTabs().add(colorAndDisplayTab);
+//        mainTabPaneLeft.toFront();
     }
 
     public IntegerProperty getTimeProperty() {
@@ -1334,8 +1338,10 @@ public class RootLayoutController extends BorderPane implements Initializable {
         replaceTabsWithDraggableTabs();
         initDisplayLayer();
         setSlidersProperties();
+        
+        mainTabPaneLeft.getSelectionModel().select(storiesTab);
 
-        mainTabPane.getSelectionModel().select(colorAndDisplayTab);
+        mainTabPaneRight.getSelectionModel().select(colorAndDisplayTab);
 
         initializeWithLineageData();
     }

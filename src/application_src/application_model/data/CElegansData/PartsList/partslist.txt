@@ -786,3 +786,5 @@ vpi2DR	MSpapappp	Pharyngo-intestinal valve
 vpi2V	MSaappaa	Pharyngo-intestinal valve
 vpi3D	MSaaappp	Pharyngo-intestinal valve
 vpi3V	MSaappap	Pharyngo-intestinal valve
+germline	Z2	Germline progenitor cell
+germline	Z3	Germline progenitor cell

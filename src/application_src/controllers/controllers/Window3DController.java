@@ -762,8 +762,8 @@ public class Window3DController {
 
         }
 
-        uniformSizeCheckBox.setSelected(true);
-        uniformSize = true;
+        uniformSizeCheckBox.setSelected(false);
+        uniformSize = false;
         requireNonNull(uniformSizeCheckBox).selectedProperty().addListener((observable, oldValue, newValue) -> {
             uniformSize = newValue;
             buildScene();
