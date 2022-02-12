@@ -36,6 +36,7 @@ public class MoleculeSampleApp extends Application {
     double mousePosX, mousePosY;
     double mouseOldX, mouseOldY;
     double mouseDeltaX, mouseDeltaY;
+	private Sphere ball2;
 
     private void handleMouse(Scene scene) {
         System.out.printf("handleMouse%n");
@@ -106,8 +107,12 @@ public class MoleculeSampleApp extends Application {
         // Build shiney red ball
         ball = new Sphere(50);
         ball.setDrawMode(DrawMode.LINE); // draw mesh so we can watch how it rotates
+        ball2 = new Sphere(50);
+        ball2.setDrawMode(DrawMode.LINE); // draw mesh so we can watch how it rotates
+        ball2.setTranslateX(100.0);
         ballXForm.getChildren().add(ball);
-        root.getChildren().addAll(ballXForm);
+        ballXForm.getChildren().add(ball2);
+       root.getChildren().addAll(ballXForm);
 
         Scene scene = new Scene(root, 1024, 768, true);
         scene.setFill(Color.GREY);
