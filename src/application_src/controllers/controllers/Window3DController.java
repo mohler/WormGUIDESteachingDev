@@ -572,7 +572,8 @@ public class Window3DController {
         renderService = new RenderService();
 
         this.zoomProperty = requireNonNull(zoomProperty);
-        this.zoomProperty.set(getInitialZoom());
+//        this.zoomProperty.set(getInitialZoom());
+        this.zoomProperty.set(1);
         this.zoomProperty.addListener((observable, oldValue, newValue) -> {
             xform1.setScaleX(zoomProperty.get());
             xform1.setScaleY(zoomProperty.get());
@@ -900,17 +901,19 @@ public class Window3DController {
                     transientLabelText.setFill(web(TRANSIENT_LABEL_COLOR_HEX));
                     transientLabelText.setOnMouseEntered(Event::consume);
                     transientLabelText.setOnMouseClicked(Event::consume);
-                    final Point2D p = project(
-                            camera,
-                            new Point3D(
-                                    (b.getMinX() + b.getMaxX())*getModelScaleFactor() / 2.0,
-                                    (b.getMinY() + b.getMaxY())*getModelScaleFactor() / 2.0,
-                                    (b.getMaxZ() + b.getMinZ())*getModelScaleFactor() / 2.0));
-                    double x = p.getX();
-                    double y = p.getY();
+//                    final Point2D p = project(
+//                            camera,
+//                            new Point3D(
+//                                    (b.getMinX() + b.getMaxX())*getModelScaleFactor() / 2.0,
+//                                    (b.getMinY() + b.getMaxY())*getModelScaleFactor() / 2.0,
+//                                    (b.getMaxZ() + b.getMinZ())*getModelScaleFactor() / 2.0));
+//                    double x = p.getX();
+//                    double y = p.getY();
+                  double x = entity.getBoundsInParent().getMaxX();
+                  double y = entity.getBoundsInParent().getMinY();
 
                     y -= getLabelSpriteYOffset();
-                    transientLabelText.getTransforms().add(new Translate(x, y));
+                    transientLabelText.getTransforms().add(new Translate(x+100, y+100));
                     // disable text to take away label flickering when mouse is on top top of it
                     transientLabelText.setDisable(true);
                     spritesPane.getChildren().add(transientLabelText);
@@ -939,15 +942,17 @@ public class Window3DController {
         final EventType<ScrollEvent> type = se.getEventType();
         if (type == SCROLL) {
             double z = zoomProperty.get();
-            if (se.getDeltaY() < 0) {
+            if (se.getDeltaY() > 0) {
                 // zoom out
-                if (z < 24.75) {
-                    zoomProperty.set(z + 0.25);
+                if (z < 24.975) {
+                    zoomProperty.set(z + 0.025);
+                } else {
+                	z = 25;
                 }
-            } else if (se.getDeltaY() > 0) {
+            } else if (se.getDeltaY() < 0) {
                 // zoom in
-                if (z > 0.25) {
-                    z -= 0.25;
+                if (z > 0.025) {
+                    z -= 0.025;
                 } else if (z < 0) {
                     z = 0;
                 }
@@ -979,9 +984,21 @@ public class Window3DController {
             if (me.isPrimaryButtonDown()) {
                 xform1.addRotation(-mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED, Rotate.Y_AXIS);
                 xform1.addRotation(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED, Rotate.X_AXIS);
+            } else {
+                xform1.setTranslateX(xform1.getTranslateX()+(mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
+                xform1.setTranslateY(xform1.getTranslateY()+(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
             }
         });
-    }
+
+        subscene.setOnMouseEntered(me -> {
+            mouseStartPosX = me.getSceneX();
+            mouseStartPosY = me.getSceneY();
+            mousePosX = me.getSceneX();
+            mousePosY = me.getSceneY();
+            mouseOldX = me.getSceneX();
+            mouseOldY = me.getSceneY();
+        });
+}
 
     @SuppressWarnings("unchecked")
     public void handleMouseEvent(final MouseEvent me) {
