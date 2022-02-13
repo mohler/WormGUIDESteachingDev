@@ -43,6 +43,7 @@ import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
+import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.SubScene;
 import javafx.scene.control.*;
@@ -89,6 +90,8 @@ import application_src.application_model.annotation.color.ColorComparator;
 import application_src.application_model.annotation.color.ColorHash;
 import application_src.application_model.threeD.subscenesaving.JavaPicture;
 import application_src.application_model.threeD.subscenesaving.JpegImagesToMovie;
+import moleculesampleapp.MoleculeSampleApp;
+import moleculesampleapp.XformBox;
 
 import static application_src.application_model.search.ModelSearch.ModelSpecificSearchOps.ModelSpecificSearchUtil.getFirstOccurenceOf;
 import static application_src.application_model.search.ModelSearch.ModelSpecificSearchOps.ModelSpecificSearchUtil.getLastOccurenceOf;
@@ -163,7 +166,7 @@ import static application_src.application_model.threeD.subsceneparameters.Parame
 import static application_src.application_model.threeD.subsceneparameters.Parameters.getWaitTimeMilli;
 import static application_src.application_model.threeD.subsceneparameters.Parameters.getModelScaleFactor;
 import static application_src.application_model.threeD.subsceneparameters.Parameters.getShapesIndexPad;
-
+ 
 /**
  * The controller for the 3D subscene inside the rootEntitiesGroup layout. This class contains the subscene itself, and
  * places it into the AnchorPane called modelAnchorPane inside the rootEntitiesGroup layout. It is also responsible
@@ -307,8 +310,9 @@ public class Window3DController {
 //    private List<MeshView> currentSceneElementMeshes;
     private List<SceneElement> currentSceneElements;
     private PerspectiveCamera camera;
-    private Xform xform;
-    private double mousePosX, mousePosY, mousePosZ;
+    private XformBox xform1;
+    private XformBox xform2;
+   private double mousePosX, mousePosY, mousePosZ;
     private double mouseOldX, mouseOldY, mouseOldZ;
 
     // Label stuff
@@ -356,6 +360,8 @@ public class Window3DController {
     private double yScale;
     /** Z-scale of the subscene coordinate axis read from ProductionInfo.csv */
     private double zScale;
+	private double mouseStartPosX;
+	private double mouseStartPosY;
 
     public Window3DController(
             final Stage parentStage,
@@ -415,6 +421,7 @@ public class Window3DController {
             final ObservableList<String> searchResultsList) {
 
         this.parentStage = requireNonNull(parentStage);
+        this.xform1 = new XformBox();
 
         this.offsetX = offsetX;
         this.offsetY = offsetY;
@@ -567,10 +574,14 @@ public class Window3DController {
         this.zoomProperty = requireNonNull(zoomProperty);
         this.zoomProperty.set(getInitialZoom());
         this.zoomProperty.addListener((observable, oldValue, newValue) -> {
-            xform.setScale(zoomProperty.get());
+            xform1.setScaleX(zoomProperty.get());
+            xform1.setScaleY(zoomProperty.get());
+            xform1.setScaleZ(zoomProperty.get());
             repositionNotes();
         });
-        xform.setScale(zoomProperty.get());
+        xform1.setScaleX(zoomProperty.get());
+        xform1.setScaleY(zoomProperty.get());
+        xform1.setScaleZ(zoomProperty.get());
 
         localSearchResults = new ArrayList<>();
 
@@ -637,12 +648,13 @@ public class Window3DController {
         currentLabels = new ArrayList<>();
         entityLabelMap = new HashMap<>();
 
-        final EventHandler<MouseEvent> mouseHandler = this::handleMouseEvent;
-        subscene.setOnMouseClicked(mouseHandler);
-        subscene.setOnMouseDragged(mouseHandler);
-        subscene.setOnMouseEntered(mouseHandler);
-        subscene.setOnMousePressed(mouseHandler);
-        subscene.setOnMouseReleased(mouseHandler);
+//        final EventHandler<MouseEvent> mouseHandler = this::handleMouseEvent;
+//        subscene.setOnMouseClicked(mouseHandler);
+//        subscene.setOnMouseDragged(mouseHandler);
+//        subscene.setOnMouseEntered(mouseHandler);
+//        subscene.setOnMousePressed(mouseHandler);
+//        subscene.setOnMouseReleased(mouseHandler);
+        handleMouse(subscene);
 
         final EventHandler<ScrollEvent> mouseScrollHandler = this::handleScrollEvent;
         subscene.setOnScroll(mouseScrollHandler);
@@ -662,7 +674,7 @@ public class Window3DController {
             orientationIndicator = new Cylinder(radius, height);
             orientationIndicator.setMaterial(material);
 
-            xform.getChildren().add(createOrientationIndicator());
+            xform1.getChildren().add(createOrientationIndicator());
         }
 
         this.bringUpInfoFlag = requireNonNull(bringUpInfoFlag);
@@ -944,6 +956,33 @@ public class Window3DController {
         }
     }
 
+    private void handleMouse(SubScene subscene) {
+        System.out.printf("handleMouse%n");
+
+        subscene.setOnMousePressed(me -> {
+            mouseStartPosX = me.getSceneX();
+            mouseStartPosY = me.getSceneY();
+            mousePosX = me.getSceneX();
+            mousePosY = me.getSceneY();
+            mouseOldX = me.getSceneX();
+            mouseOldY = me.getSceneY();
+        });
+
+        subscene.setOnMouseDragged(me -> {
+            mouseOldX = mousePosX;
+            mouseOldY = mousePosY;
+            mousePosX = me.getSceneX();
+            mousePosY = me.getSceneY();
+            mouseDeltaX = (mousePosX - mouseOldX);
+            mouseDeltaY = (mousePosY - mouseOldY);
+
+            if (me.isPrimaryButtonDown()) {
+                xform1.addRotation(-mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED, Rotate.Y_AXIS);
+                xform1.addRotation(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED, Rotate.X_AXIS);
+            }
+        });
+    }
+
     @SuppressWarnings("unchecked")
     public void handleMouseEvent(final MouseEvent me) {
         final EventType<MouseEvent> type = (EventType<MouseEvent>) me.getEventType();
@@ -982,19 +1021,19 @@ public class Window3DController {
         if (event.isSecondaryButtonDown() || event.isMetaDown() || event.isControlDown()) {
             double translateX = 0.;
             double translateY = 0.;
-            if (xform.s.getX() < 1.) {
-                translateX = xform.getTranslateX() - (mouseDeltaX * xform.s.getX());
-                translateY = xform.getTranslateY() - (mouseDeltaY * xform.s.getY());
-            } else if (xform.s.getX() < 2.) {
-                translateX = xform.getTranslateX() - (mouseDeltaX / xform.s.getX());
-                translateY = xform.getTranslateY() - (mouseDeltaY / xform.s.getY());
+            if (xform1.getScaleX() < 1.) {
+                translateX = xform1.getTranslateX() - (mouseDeltaX * xform1.getScaleX());
+                translateY = xform1.getTranslateY() - (mouseDeltaY * xform1.getScaleY());
+            } else if (xform1.getScaleX() < 2.) {
+                translateX = xform1.getTranslateX() - (mouseDeltaX / xform1.getScaleX());
+                translateY = xform1.getTranslateY() - (mouseDeltaY / xform1.getScaleY());
             } else {
-                translateX = xform.getTranslateX() - mouseDeltaX;
-                translateY = xform.getTranslateY() - mouseDeltaY;
+                translateX = xform1.getTranslateX() - mouseDeltaX;
+                translateY = xform1.getTranslateY() - mouseDeltaY;
             }
 
-            xform.setTranslateX(translateX);
-            xform.setTranslateY(translateY);
+            xform1.setTranslateX(translateX);
+            xform1.setTranslateY(translateY);
             translateXProperty.set(translateX);
             translateYProperty.set(translateY);
             repositionNotes();
@@ -1850,7 +1889,7 @@ public class Window3DController {
     private void refreshScene() {
         // clear note billboards, cell spheres and meshes
         rootEntitiesGroup.getChildren().clear();
-        rootEntitiesGroup.getChildren().add(xform);
+        rootEntitiesGroup.getChildren().add(xform1);
 
         // clear note sprites and overlays
         storyOverlayVBox.getChildren().clear();
@@ -1881,7 +1920,7 @@ public class Window3DController {
         // add cell and cell body geometries
         addEntities(entities);
         entities.sort(opacityComparator);
-        rootEntitiesGroup.getChildren().addAll(entities);
+        xform1.getChildren().addAll(entities);
 
         // add notes
         insertOverlayTitles();
@@ -1906,11 +1945,11 @@ public class Window3DController {
         if (!noteGraphics.isEmpty()) {
             // insert note graphics to the beginning of the group so they can be rendered last (otherwise, the notes
             // will not be completely visible behind semi-opaque entities)
-            rootEntitiesGroup.getChildren().addAll(0, noteGraphics);
+            xform1.getChildren().addAll(0, noteGraphics);
         }
-        rootEntitiesGroup.setScaleX(rootEntitiesGroup.getScaleX() * getModelScaleFactor());
-        rootEntitiesGroup.setScaleY(rootEntitiesGroup.getScaleY() * getModelScaleFactor());
-        rootEntitiesGroup.setScaleZ(rootEntitiesGroup.getScaleZ() * getModelScaleFactor());
+        xform1.setScaleX(rootEntitiesGroup.getScaleX() * getModelScaleFactor());
+        xform1.setScaleY(rootEntitiesGroup.getScaleY() * getModelScaleFactor());
+        xform1.setScaleZ(rootEntitiesGroup.getScaleZ() * getModelScaleFactor());
 
         repositionNotes();
     }
@@ -1921,7 +1960,7 @@ public class Window3DController {
         List<Shape3D> entities = new ArrayList();
         this.addColoredGeometries(entities);
         entities.sort(this.opacityComparator);
-        this.rootEntitiesGroup.getChildren().addAll(entities);
+        xform1.getChildren().addAll(entities);
     }
 
     /**
@@ -2752,10 +2791,10 @@ public class Window3DController {
 
     private void buildCamera() {
         camera = new PerspectiveCamera(true);
-        xform = new Xform();
-        xform.reset();
-        rootEntitiesGroup.getChildren().add(xform);
-        xform.getChildren().add(camera);
+        xform2 = new XformBox();
+        xform2.reset();
+        rootEntitiesGroup.getChildren().add(xform2);
+        xform2.getChildren().add(camera);
         camera.setNearClip(getCameraNearClip());
         camera.setFarClip(getCameraFarClip());
         camera.setTranslateZ(getCameraInitialDistance());
@@ -2973,8 +3012,8 @@ public class Window3DController {
     private ChangeListener<Number> getTranslateXListener() {
         return (observable, oldValue, newValue) -> {
             final double value = newValue.doubleValue();
-            if (xform.getTranslateX() != value) {
-                xform.setTranslateX(value);
+            if (xform1.getTranslateX() != value) {
+                xform1.setTranslateX(value);
             }
         };
     }
@@ -2982,8 +3021,8 @@ public class Window3DController {
     private ChangeListener<Number> getTranslateYListener() {
         return (observable, oldValue, newValue) -> {
             final double value = newValue.doubleValue();
-            if (xform.getTranslateY() != value) {
-                xform.setTranslateY(value);
+            if (xform1.getTranslateY() != value) {
+                xform1.setTranslateY(value);
             }
         };
     }

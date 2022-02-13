@@ -5,9 +5,9 @@ import javafx.scene.Group;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Rotate;
 
-class XformBox extends Group {
+public class XformBox extends Group {
 
-    XformBox() {
+    public XformBox() {
         super();
         getTransforms().add(new Affine());
     }

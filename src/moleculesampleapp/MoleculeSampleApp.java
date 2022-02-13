@@ -30,8 +30,8 @@ public class MoleculeSampleApp extends Application {
     private static double CAMERA_NEAR_CLIP = 0.1;
     private static double CAMERA_FAR_CLIP = 10000.0;
     private static double AXIS_LENGTH = 250.0;
-    private static double MOUSE_SPEED = 0.1;
-    private static double ROTATION_SPEED = 2.0;
+    public static double MOUSE_SPEED = 0.1;
+    public static double ROTATION_SPEED = 2.0;
 
     double mouseStartPosX, mouseStartPosY;
     double mousePosX, mousePosY;
