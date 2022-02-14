@@ -312,6 +312,7 @@ public class Window3DController {
     private PerspectiveCamera camera;
     private XformBox xform1;
     private XformBox xform2;
+    private XformBox xform3;
    private double mousePosX, mousePosY, mousePosZ;
     private double mouseOldX, mouseOldY, mouseOldZ;
 
@@ -362,6 +363,7 @@ public class Window3DController {
     private double zScale;
 	private double mouseStartPosX;
 	private double mouseStartPosY;
+
 
     public Window3DController(
             final Stage parentStage,
@@ -422,6 +424,7 @@ public class Window3DController {
 
         this.parentStage = requireNonNull(parentStage);
         this.xform1 = new XformBox();
+        this.xform2 = new XformBox();
 
         this.offsetX = offsetX;
         this.offsetY = offsetY;
@@ -573,7 +576,7 @@ public class Window3DController {
 
         this.zoomProperty = requireNonNull(zoomProperty);
 //        this.zoomProperty.set(getInitialZoom());
-        this.zoomProperty.set(1);
+        this.zoomProperty.set(0.3);
         this.zoomProperty.addListener((observable, oldValue, newValue) -> {
             xform1.setScaleX(zoomProperty.get());
             xform1.setScaleY(zoomProperty.get());
@@ -675,7 +678,7 @@ public class Window3DController {
             orientationIndicator = new Cylinder(radius, height);
             orientationIndicator.setMaterial(material);
 
-            xform1.getChildren().add(createOrientationIndicator());
+            xform2.getChildren().add(createOrientationIndicator());
         }
 
         this.bringUpInfoFlag = requireNonNull(bringUpInfoFlag);
@@ -834,7 +837,7 @@ public class Window3DController {
         middleTransformGroup.getTransforms().add(new Scale(3, 3, 3));
 
         // set the location of the indicator in the bottom right corner of the screen
-        orientationIndicator.getTransforms().add(new Translate(270, 200, 800));
+//        orientationIndicator.getTransforms().add(new Translate(270, 200, 200));
 
         // add rotation variables
         orientationIndicator.getTransforms().addAll(rotateXIndicator, rotateYIndicator, rotateZIndicator);
@@ -909,11 +912,11 @@ public class Window3DController {
 //                                    (b.getMaxZ() + b.getMinZ())*getModelScaleFactor() / 2.0));
 //                    double x = p.getX();
 //                    double y = p.getY();
-                  double x = entity.getBoundsInParent().getMaxX();
-                  double y = entity.getBoundsInParent().getMinY();
+                  double x = mousePosX;
+                  double y = mousePosY;
 
                     y -= getLabelSpriteYOffset();
-                    transientLabelText.getTransforms().add(new Translate(x+100, y+100));
+                    transientLabelText.getTransforms().add(new Translate(x+10, y+10));
                     // disable text to take away label flickering when mouse is on top top of it
                     transientLabelText.setDisable(true);
                     spritesPane.getChildren().add(transientLabelText);
@@ -984,10 +987,24 @@ public class Window3DController {
             if (me.isPrimaryButtonDown()) {
                 xform1.addRotation(-mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED, Rotate.Y_AXIS);
                 xform1.addRotation(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED, Rotate.X_AXIS);
-            } else {
+
+                double wasX = xform2.getTranslateX();
+                double wasY = xform2.getTranslateY();
+                double wasZ = xform2.getTranslateZ();
+                xform2.setTranslateX(-wasX);
+                xform2.setTranslateY(-wasY);
+                xform2.setTranslateZ(-wasZ);
+                xform2.addRotation(-mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED, Rotate.Y_AXIS);
+                xform2.addRotation(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED, Rotate.X_AXIS);
+                xform2.setTranslateX(wasX);
+                xform2.setTranslateY(wasY);
+                xform2.setTranslateZ(wasZ);
+           } else {
                 xform1.setTranslateX(xform1.getTranslateX()+(mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
                 xform1.setTranslateY(xform1.getTranslateY()+(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
-            }
+                xform2.setTranslateX(xform2.getTranslateX()+(mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
+                xform2.setTranslateY(xform2.getTranslateY()+(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
+           }
         });
 
         subscene.setOnMouseEntered(me -> {
@@ -998,7 +1015,7 @@ public class Window3DController {
             mouseOldX = me.getSceneX();
             mouseOldY = me.getSceneY();
         });
-}
+    }
 
     @SuppressWarnings("unchecked")
     public void handleMouseEvent(final MouseEvent me) {
@@ -2807,15 +2824,15 @@ public class Window3DController {
     }
 
     private void buildCamera() {
-        camera = new PerspectiveCamera(true);
-        xform2 = new XformBox();
-        xform2.reset();
-        rootEntitiesGroup.getChildren().add(xform2);
-        xform2.getChildren().add(camera);
-        camera.setNearClip(getCameraNearClip());
-        camera.setFarClip(getCameraFarClip());
-        camera.setTranslateZ(getCameraInitialDistance());
-        subscene.setCamera(camera);
+//        camera = new PerspectiveCamera(true);
+//        xform3 = new XformBox();
+//        xform3.reset();
+////        rootEntitiesGroup.getChildren().add(xform3);
+//        xform3.getChildren().add(camera);
+//        camera.setNearClip(getCameraNearClip());
+//        camera.setFarClip(getCameraFarClip());
+//        camera.setTranslateZ(getCameraInitialDistance());
+////        subscene.setCamera(camera);
     }
 
     /**
