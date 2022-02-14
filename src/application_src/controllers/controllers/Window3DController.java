@@ -575,8 +575,8 @@ public class Window3DController {
         renderService = new RenderService();
 
         this.zoomProperty = requireNonNull(zoomProperty);
-//        this.zoomProperty.set(getInitialZoom());
-        this.zoomProperty.set(0.3);
+        this.zoomProperty.set(getInitialZoom());
+//        this.zoomProperty.set(0.3);
         this.zoomProperty.addListener((observable, oldValue, newValue) -> {
             xform1.setScaleX(zoomProperty.get());
             xform1.setScaleY(zoomProperty.get());
@@ -834,7 +834,7 @@ public class Window3DController {
         middleTransformGroup.getChildren().add(t);
 
         // xy relocates z shrinks apparent by moving away from camera? improves resolution?
-        middleTransformGroup.getTransforms().add(new Scale(3, 3, 3));
+//        middleTransformGroup.getTransforms().add(new Scale(3, 3, 3));
 
         // set the location of the indicator in the bottom right corner of the screen
 //        orientationIndicator.getTransforms().add(new Translate(270, 200, 200));
@@ -945,14 +945,14 @@ public class Window3DController {
         final EventType<ScrollEvent> type = se.getEventType();
         if (type == SCROLL) {
             double z = zoomProperty.get();
-            if (se.getDeltaY() > 0) {
+            if (se.getDeltaY() < 0) {
                 // zoom out
                 if (z < 24.975) {
                     zoomProperty.set(z + 0.025);
                 } else {
                 	z = 25;
                 }
-            } else if (se.getDeltaY() < 0) {
+            } else if (se.getDeltaY() >= 0) {
                 // zoom in
                 if (z > 0.025) {
                     z -= 0.025;
@@ -2824,15 +2824,16 @@ public class Window3DController {
     }
 
     private void buildCamera() {
-//        camera = new PerspectiveCamera(true);
+        camera = new PerspectiveCamera(true);
+
 //        xform3 = new XformBox();
 //        xform3.reset();
-////        rootEntitiesGroup.getChildren().add(xform3);
+//        rootEntitiesGroup.getChildren().add(xform3);
 //        xform3.getChildren().add(camera);
-//        camera.setNearClip(getCameraNearClip());
-//        camera.setFarClip(getCameraFarClip());
-//        camera.setTranslateZ(getCameraInitialDistance());
-////        subscene.setCamera(camera);
+        camera.setNearClip(getCameraNearClip());
+        camera.setFarClip(getCameraFarClip());
+        camera.setTranslateZ(getCameraInitialDistance());
+        subscene.setCamera(camera);
     }
 
     /**
@@ -3091,7 +3092,7 @@ public class Window3DController {
         };
     }
 
-    private EventHandler<ActionEvent> getZoomInButtonListener() {
+    private EventHandler<ActionEvent> getZoomOutButtonListener() {
         return event -> {
             hideContextPopups();
             double z = zoomProperty.get();
@@ -3108,7 +3109,7 @@ public class Window3DController {
         };
     }
 
-    private EventHandler<ActionEvent> getZoomOutButtonListener() {
+    private EventHandler<ActionEvent> getZoomInButtonListener() {
         return event -> {
             hideContextPopups();
             zoomProperty.set(zoomProperty.get() + 0.25);
