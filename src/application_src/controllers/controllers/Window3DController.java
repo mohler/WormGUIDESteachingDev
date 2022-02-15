@@ -365,9 +365,11 @@ public class Window3DController {
     private double zScale;
 	private double mouseStartPosX;
 	private double mouseStartPosY;
+	private RootLayoutController rootLC;
 
 
     public Window3DController(
+            final RootLayoutController rootLC, 
             final Stage parentStage,
             final Group rootEntitiesGroup,
             final SubScene subscene,
@@ -387,6 +389,7 @@ public class Window3DController {
             final double yScale,
             final double zScale,
             final AnchorPane modelAnchorPane,
+            final Button playButton,
             final Button backwardButton,
             final Button forwardButton,
             final Button zoomOutButton,
@@ -425,7 +428,8 @@ public class Window3DController {
             final ContextMenuController contextMenuController,
             final ObservableList<String> searchResultsList) {
 
-        this.parentStage = requireNonNull(parentStage);
+    	this.rootLC = rootLC;
+    	this.parentStage = requireNonNull(parentStage);
         this.xform1 = new XformBox();
         this.xform2 = new XformBox();
 
@@ -570,8 +574,10 @@ public class Window3DController {
             hideContextPopups();
             if (newValue) {
                 playService.restart();
+                playButton.setGraphic(rootLC.pauseIcon);
             } else {
                 playService.cancel();
+                playButton.setGraphic(rootLC.playIcon);
             }
         });
 
@@ -910,19 +916,17 @@ public class Window3DController {
                     transientLabelText.setFill(web(TRANSIENT_LABEL_COLOR_HEX));
                     transientLabelText.setOnMouseEntered(Event::consume);
                     transientLabelText.setOnMouseClicked(Event::consume);
-//                    final Point2D p = project(
-//                            camera,
-//                            new Point3D(
-//                                    (b.getMinX() + b.getMaxX())*getModelScaleFactor() / 2.0,
-//                                    (b.getMinY() + b.getMaxY())*getModelScaleFactor() / 2.0,
-//                                    (b.getMaxZ() + b.getMinZ())*getModelScaleFactor() / 2.0));
-//                    double x = p.getX();
-//                    double y = p.getY();
-                  double x = mousePosX;
-                  double y = mousePosY;
+                    final Point2D p = project(
+                            camera,
+                            new Point3D(
+                                    (b.getMinX() + b.getMaxX())*getModelScaleFactor() / 2.0,
+                                    (b.getMinY() + b.getMaxY())*getModelScaleFactor() / 2.0,
+                                    (b.getMaxZ() + b.getMinZ())*getModelScaleFactor() / 2.0));
+                    double x = p.getX();
+                    double y = p.getY();
 
                     y -= getLabelSpriteYOffset();
-                    transientLabelText.getTransforms().add(new Translate(x+10, y+10));
+                    transientLabelText.getTransforms().add(new Translate(entity.getTranslateX(), entity.getTranslateY()));
                     // disable text to take away label flickering when mouse is on top top of it
                     transientLabelText.setDisable(true);
                     spritesPane.getChildren().add(transientLabelText);
@@ -979,9 +983,164 @@ public class Window3DController {
         }
     }
 
+    public class MyHandler implements EventHandler<MouseEvent> {
+
+        private  EventHandler<MouseEvent> onDraggedEventHandler;
+
+        private  EventHandler<MouseEvent> onClickedEventHandler;
+
+        private boolean dragging = false;
+
+        public void Handler(EventHandler<MouseEvent> onDraggedEventHandler, EventHandler<MouseEvent> onClickedEventHandler) {
+            this.onDraggedEventHandler = onDraggedEventHandler;
+            this.onClickedEventHandler = onClickedEventHandler;
+        }
+
+        @Override
+        public void handle(MouseEvent event) {
+            if (event.getEventType() == MouseEvent.MOUSE_PRESSED) {
+                dragging = false;
+            }
+            else if (event.getEventType() == MouseEvent.DRAG_DETECTED) {
+                dragging = true;
+            }
+            else if (event.getEventType() == MouseEvent.MOUSE_DRAGGED) {
+                //maybe filter on dragging (== true)
+                onDraggedEventHandler.handle(event);
+            }
+            else if (event.getEventType() == MouseEvent.MOUSE_CLICKED) {
+                if (!dragging) {
+                    onClickedEventHandler.handle(event);
+                }
+            }
+
+        }
+    }
+    
     private void handleMouse(SubScene subscene) {
         System.out.printf("handleMouse%n");
+        
+        subscene.setOnMouseClicked(me -> {
+        	if(me.getClickCount() > 1) {
+        		this.playingMovieProperty.set(!this.playingMovieProperty.get());
+        	} else {
+                spritesPane.setCursor(DEFAULT);
+                hideContextPopups();
 
+                final Node node = me.getPickResult().getIntersectedNode();
+
+                if (node instanceof Sphere) {
+                    // Nucleus
+                    Sphere picked = (Sphere) node;
+                    int index = getPickedSphereIndex(picked);
+                    String name = normalizeName(cellNames.get(index));
+
+                    cellClickedProperty.set(true);
+                    selectedNameProperty.set(name);
+                    selectedIndex.set(index);
+
+                    // right click
+                    if (me.getButton() == SECONDARY
+                            || (me.getButton() == PRIMARY
+                            && (me.isMetaDown() || me.isControlDown()))) {
+                		this.playingMovieProperty.set(false);
+                        boolean hasFunctionalName = false;
+                        if (getFunctionalNameByLineageName(name) != null) {
+                            hasFunctionalName = true;
+                        }
+                        showContextMenu(
+                                name,
+                                me.getScreenX(),
+                                me.getScreenY(),
+                                false,
+                                false,
+                                hasFunctionalName);
+
+                    } else if (me.getButton() == PRIMARY) {
+                        // regular click
+                        if (allLabels.contains(name)) {
+                            removeLabelFor(name);
+                        } else {
+                            if (!allLabels.contains(name)) {
+                                allLabels.add(name);
+                                currentLabels.add(name);
+                                final Shape3D entity = getEntityWithName(name);
+                                insertLabelFor(name, entity);
+                                highlightActiveCellLabel(entity);
+                            }
+                        }
+                    }
+
+                } else if (node instanceof SceneElementMeshView) {
+                    // Structure
+                    boolean found = false; // this will indicate whether this meshview is a scene element
+                    SceneElementMeshView curr;
+//                    MeshView curr;
+                    SceneElement clickedSceneElement;
+                    String funcName;
+                    for (int i = 0; i < currentSceneElementMeshes.size(); i++) {
+                        curr = currentSceneElementMeshes.get(i);
+                        if (curr.equals(node)) {
+                            clickedSceneElement = currentSceneElements.get(i);
+                            if (!clickedSceneElement.isSelectable()) {
+                                selectedIndex.set(-1);
+                                selectedNameProperty.set("");
+                                return;
+                            }
+
+                            found = true;
+
+                            String name = normalizeName(clickedSceneElement.getSceneName());
+                            selectedNameProperty.set(name);
+
+                            if (me.getButton() == SECONDARY
+                                    || (me.getButton() == PRIMARY && (me.isMetaDown() || me.isControlDown()))) {
+                                // right click
+                                if (sceneElementsList.isStructureSceneName(name)) {
+                                    boolean hasFunctionalName = false;
+                                    if (getFunctionalNameByLineageName(name) != null) {
+                                        hasFunctionalName = true;
+                                    }
+                                    showContextMenu(
+                                            name,
+                                            me.getScreenX(),
+                                            me.getScreenY(),
+                                            true,
+                                            sceneElementsList.isMulticellStructureName(name),
+                                            hasFunctionalName);
+                                }
+
+                            } else if (me.getButton() == PRIMARY) {
+                                // regular click
+                                if (allLabels.contains(name)) {
+                                    removeLabelFor(name);
+                                } else {
+                                    allLabels.add(name);
+                                    currentLabels.add(name);
+                                    final Shape3D entity = getEntityWithName(name);
+                                    insertLabelFor(name, entity);
+                                    highlightActiveCellLabel(entity);
+                                }
+                            }
+                            break;
+                        }
+                    }
+
+                    // if the node isn't a SceneElement
+                    if (!found) {
+                        // note structure
+                        currentNotesToMeshesMap.keySet()
+                                .stream()
+                                .filter(note -> currentNotesToMeshesMap.get(note).equals(node))
+                                .forEachOrdered(note -> selectedNameProperty.set(note.getTagName()));
+                    }
+                } else {
+                    selectedIndex.set(-1);
+                    selectedNameProperty.set("");
+                }
+            }
+        });
+        
         subscene.setOnMousePressed(me -> {
             mouseStartPosX = me.getSceneX();
             mouseStartPosY = me.getSceneY();
@@ -1003,17 +1162,8 @@ public class Window3DController {
                 xform1.addRotation(-mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED, Rotate.Y_AXIS);
                 xform1.addRotation(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED, Rotate.X_AXIS);
 
-                double wasX = xform2.getTranslateX();
-                double wasY = xform2.getTranslateY();
-                double wasZ = xform2.getTranslateZ();
-                xform2.setTranslateX(-wasX);
-                xform2.setTranslateY(-wasY);
-                xform2.setTranslateZ(-wasZ);
                 xform2.addRotation(-mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED, Rotate.Y_AXIS);
                 xform2.addRotation(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED, Rotate.X_AXIS);
-                xform2.setTranslateX(wasX);
-                xform2.setTranslateY(wasY);
-                xform2.setTranslateZ(wasZ);
            } else {
                 xform1.setTranslateX(xform1.getTranslateX()+(mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
                 xform1.setTranslateY(xform1.getTranslateY()+(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
@@ -1029,24 +1179,7 @@ public class Window3DController {
             mousePosY = me.getSceneY();
             mouseOldX = me.getSceneX();
             mouseOldY = me.getSceneY();
-        });
-    }
-
-    @SuppressWarnings("unchecked")
-    public void handleMouseEvent(final MouseEvent me) {
-        final EventType<MouseEvent> type = (EventType<MouseEvent>) me.getEventType();
-        if (type == MOUSE_ENTERED_TARGET
-                || type == MOUSE_ENTERED
-                || type == MOUSE_RELEASED
-                || type == MOUSE_MOVED) {
-            handleMouseReleasedOrEntered();
-        } else if (type == MOUSE_CLICKED && me.isStillSincePress()) {
-            handleMouseClicked(me);
-        } else if (type == MOUSE_DRAGGED) {
-            handleMouseDragged(me);
-        } else if (type == MOUSE_PRESSED) {
-            handleMousePressed(me);
-        }
+       });
     }
 
     private void handleMouseDragged(final MouseEvent event) {

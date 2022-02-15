@@ -298,7 +298,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
     // Info window stuff
     private CasesLists casesLists;
     private InfoWindow infoWindow;
-    private ImageView playIcon, pauseIcon;
+    public ImageView playIcon, pauseIcon;
 
     // SulstonLineage tree stuff
     private TreeItem<String> lineageTreeRoot;
@@ -769,6 +769,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
     private void initWindow3DController() {
         final double[] xyzScale = lineageData.getXYZScale();
         window3DController = new Window3DController(
+                this,
                 mainStage,
                 rootEntitiesGroup,
                 subscene,
@@ -788,6 +789,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
                 xyzScale[1],
                 xyzScale[2],
                 modelAnchorPane,
+                playButton,
                 backwardButton,
                 forwardButton,
                 zoomOutButton,
