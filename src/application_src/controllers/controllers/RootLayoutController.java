@@ -323,6 +323,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
     private DoubleProperty rotateZAngleProperty;
     private DoubleProperty translateXProperty;
     private DoubleProperty translateYProperty;
+    private DoubleProperty translateZProperty;
     private DoubleProperty zoomProperty;
     private DoubleProperty othersOpacityProperty;
     private DoubleProperty numPrev;
@@ -425,6 +426,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
                     rotateZAngleProperty,
                     translateXProperty,
                     translateYProperty,
+                    translateZProperty,
                     zoomProperty,
                     othersOpacityProperty);
             urlShareWindow.getCloseButton().setOnAction(event -> urlDisplayStage.hide());
@@ -463,6 +465,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
                                 rotateZAngleProperty,
                                 translateXProperty,
                                 translateYProperty,
+                                translateZProperty,
                                 zoomProperty,
                                 othersOpacityProperty,
                                 rebuildSubsceneFlag);
@@ -481,6 +484,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
                             rotateZAngleProperty,
                             translateXProperty,
                             translateYProperty,
+                            translateZProperty,
                             zoomProperty,
                             othersOpacityProperty,
                             rebuildSubsceneFlag);
@@ -809,6 +813,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
                 rotateZAngleProperty,
                 translateXProperty,
                 translateYProperty,
+                translateZProperty,
                 selectedEntityNameProperty,
                 selectedNameLabeledProperty,
                 cellClickedFlag,
@@ -1166,6 +1171,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
                 rotateZAngleProperty,
                 translateXProperty,
                 translateYProperty,
+                translateZProperty,
                 zoomProperty,
                 othersOpacityProperty,
                 usingInternalRulesFlag,
@@ -1388,6 +1394,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
         rotateZAngleProperty = new SimpleDoubleProperty();
         translateXProperty = new SimpleDoubleProperty();
         translateYProperty = new SimpleDoubleProperty();
+        translateZProperty = new SimpleDoubleProperty();
         zoomProperty = new SimpleDoubleProperty();
 
         selectedEntityNameProperty = new SimpleStringProperty("");

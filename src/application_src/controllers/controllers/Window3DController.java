@@ -152,6 +152,7 @@ import static application_src.application_model.threeD.subsceneparameters.Parame
 import static application_src.application_model.threeD.subsceneparameters.Parameters.getDefaultOthersOpacity;
 import static application_src.application_model.threeD.subsceneparameters.Parameters.getInitialTranslateX;
 import static application_src.application_model.threeD.subsceneparameters.Parameters.getInitialTranslateY;
+import static application_src.application_model.threeD.subsceneparameters.Parameters.getInitialTranslateZ;
 import static application_src.application_model.threeD.subsceneparameters.Parameters.getInitialZoom;
 import static application_src.application_model.threeD.subsceneparameters.Parameters.getLabelSpriteYOffset;
 import static application_src.application_model.threeD.subsceneparameters.Parameters.getNoteBillboardImageScale;
@@ -238,6 +239,7 @@ public class Window3DController {
     private final DoubleProperty rotateZAngleProperty;
     private final DoubleProperty translateXProperty;
     private final DoubleProperty translateYProperty;
+    private final DoubleProperty translateZProperty;
     private final IntegerProperty timeProperty;
     private final IntegerProperty totalNucleiProperty;
     private final double[] initialRotation;
@@ -410,6 +412,7 @@ public class Window3DController {
             final DoubleProperty rotateZAngleProperty,
             final DoubleProperty translateXProperty,
             final DoubleProperty translateYProperty,
+            final DoubleProperty translateZProperty,
             final StringProperty selectedNameProperty,
             final StringProperty selectedNameLabeledProperty,
             final BooleanProperty cellClickedFlag,
@@ -625,6 +628,9 @@ public class Window3DController {
         this.translateYProperty = requireNonNull(translateYProperty);
         this.translateYProperty.addListener(getTranslateYListener());
         this.translateYProperty.set(getInitialTranslateY());
+        this.translateZProperty = requireNonNull(translateZProperty);
+        this.translateZProperty.addListener(getTranslateZListener());
+        this.translateZProperty.set(getInitialTranslateZ());
 
         this.colorHash = requireNonNull(colorHash);
         colorComparator = new ColorComparator();
@@ -944,23 +950,32 @@ public class Window3DController {
     public void handleScrollEvent(final ScrollEvent se) {
         final EventType<ScrollEvent> type = se.getEventType();
         if (type == SCROLL) {
-            double z = zoomProperty.get();
-            if (se.getDeltaY() < 0) {
+//            double z = zoomProperty.get();
+//            if (se.getDeltaY() < 0) {
+//                // zoom out
+//                if (z < 24.975) {
+//                    zoomProperty.set(z + 0.025);
+//                } else {
+//                	z = 25;
+//                }
+//            } else if (se.getDeltaY() >= 0) {
+//                // zoom in
+//                if (z > 0.025) {
+//                    z -= 0.025;
+//                } else if (z < 0) {
+//                    z = 0;
+//                }
+//                zoomProperty.set(z);
+//            }
+            double z = translateZProperty.get();
+            if (se.getDeltaY() > 0) {
                 // zoom out
-                if (z < 24.975) {
-                    zoomProperty.set(z + 0.025);
-                } else {
-                	z = 25;
-                }
-            } else if (se.getDeltaY() >= 0) {
+            	z = (z * 1.125);
+             } else if (se.getDeltaY() <= 0) {
                 // zoom in
-                if (z > 0.025) {
-                    z -= 0.025;
-                } else if (z < 0) {
-                    z = 0;
-                }
-                zoomProperty.set(z);
+             	z = (z / 1.125);
             }
+             translateZProperty.set(z);
         }
     }
 
@@ -1924,7 +1939,7 @@ public class Window3DController {
         // clear note billboards, cell spheres and meshes
         rootEntitiesGroup.getChildren().clear();
         rootEntitiesGroup.getChildren().add(xform1);
-
+    	xform1.getChildren().clear();
         // clear note sprites and overlays
         storyOverlayVBox.getChildren().clear();
 
@@ -2090,6 +2105,10 @@ public class Window3DController {
                     position[X_COR_INDEX] * xScale,
                     position[Y_COR_INDEX] * yScale,
                     position[Z_COR_INDEX] * zScale));
+            sphere.getTransforms().add(new Rotate(90, sphere.getBoundsInLocal().getMaxX() -sphere.getBoundsInLocal().getMinX() 
+            											, sphere.getBoundsInLocal().getMaxY() -sphere.getBoundsInLocal().getMinY() 
+            											, sphere.getBoundsInLocal().getMaxZ() -sphere.getBoundsInLocal().getMinZ() 
+            											, Z_AXIS));
             spheres.add(sphere);
 
             if (!sphere.isDisable()) {
@@ -3062,6 +3081,15 @@ public class Window3DController {
         };
     }
 
+    private ChangeListener<Number> getTranslateZListener() {
+        return (observable, oldValue, newValue) -> {
+            final double value = newValue.doubleValue();
+            if (xform1.getTranslateZ() != value) {
+                xform1.setTranslateZ(value);
+            }
+        };
+    }
+
     private ChangeListener<Number> getRotateXAngleListener() {
         return (observable, oldValue, newValue) -> {
             double newAngle = newValue.doubleValue();
@@ -3095,9 +3123,9 @@ public class Window3DController {
     private EventHandler<ActionEvent> getZoomOutButtonListener() {
         return event -> {
             hideContextPopups();
-            double z = zoomProperty.get();
+            double z = translateZProperty.get();
             if (z > 0.25) {
-                z -= 0.25;
+                z = z * 1.125;
             } else if (z < 0) {
                 // normalize zoom by making 0 its minimum
                 // javafx has a bug where for a zoom below 0, the camera flips and does not pass through the scene
@@ -3105,14 +3133,14 @@ public class Window3DController {
                 // culled shapes appear, surrounded w/ artifacts.
                 z = 0;
             }
-            zoomProperty.set(z);
+            translateZProperty.set(z);
         };
     }
 
     private EventHandler<ActionEvent> getZoomInButtonListener() {
         return event -> {
             hideContextPopups();
-            zoomProperty.set(zoomProperty.get() + 0.25);
+            translateZProperty.set(translateZProperty.get() / 1.125);
         };
     }
 
@@ -3239,6 +3267,11 @@ public class Window3DController {
                         //render current time point
                         getSceneData();
                         addEntitiesAndNotes();
+//                        xform1.setScaleX(zoomProperty.get());
+//                        xform1.setScaleY(zoomProperty.get());
+                        xform1.setTranslateZ(translateZProperty.get());
+                        repositionNotes();
+
                     });
                     return null;
                 }

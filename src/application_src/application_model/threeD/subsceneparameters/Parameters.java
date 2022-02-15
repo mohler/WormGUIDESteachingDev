@@ -23,6 +23,7 @@ public class Parameters {
     private static final String INITIAL_ZOOM_KEY = "INITIAL_ZOOM";
     private static final String INITIAL_TRANSLATE_X_KEY = "INITIAL_TRANSLATE_X";
     private static final String INITIAL_TRANSLATE_Y_KEY = "INITIAL_TRANSLATE_Y";
+    private static final String INITIAL_TRANSLATE_Z_KEY = "INITIAL_TRANSLATE_Z";
     private static final String CAMERA_INITIAL_DISTANCE_KEY = "CAMERA_INITIAL_DISTANCE";
     private static final String CAMERA_NEAR_CLIP_KEY = "CAMERA_NEAR_CLIP";
     private static final String CAMERA_FAR_CLIP_KEY = "CAMERA_FAR_CLIP";
@@ -50,6 +51,8 @@ public class Parameters {
     private static double initialTranslateX;
 
     private static double initialTranslateY;
+
+    private static double initialTranslateZ;
 
     private static double cameraInitialDistance;
 
@@ -105,6 +108,7 @@ public class Parameters {
             initialZoom = parseDouble(param_map.get(INITIAL_ZOOM_KEY));
             initialTranslateX = parseDouble(param_map.get(INITIAL_TRANSLATE_X_KEY));
             initialTranslateY = parseDouble(param_map.get(INITIAL_TRANSLATE_Y_KEY));
+            initialTranslateZ = parseDouble(param_map.get(INITIAL_TRANSLATE_Z_KEY));
             cameraInitialDistance = parseDouble(param_map.get(CAMERA_INITIAL_DISTANCE_KEY));
             cameraNearClip = parseDouble(param_map.get(CAMERA_NEAR_CLIP_KEY));
             cameraFarClip = parseDouble(param_map.get(CAMERA_FAR_CLIP_KEY));
@@ -143,6 +147,10 @@ public class Parameters {
 
     public static double getInitialTranslateY() {
         return initialTranslateY;
+    }
+
+    public static double getInitialTranslateZ() {
+        return initialTranslateZ;
     }
 
     public static double getCameraInitialDistance() {

@@ -19,7 +19,11 @@ public class XformBox extends Group {
      * @param axis
      */
     public void addRotation(double angle, Point3D axis) {
-        Rotate r = new Rotate(angle, axis);
+        Rotate r = new Rotate(angle
+        					, 100
+        					, 0
+        					, 0
+        					, axis);
         /**
          * This is the important bit and thanks to bronkowitz in this post
          * https://stackoverflow.com/questions/31382634/javafx-3d-rotations for

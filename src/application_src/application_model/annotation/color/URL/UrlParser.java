@@ -343,6 +343,7 @@ public class UrlParser {
             final DoubleProperty rotateZAngleProperty,
             final DoubleProperty translateXProperty,
             final DoubleProperty translateYProperty,
+            final DoubleProperty translateZProperty,
             final DoubleProperty zoomProperty,
             final DoubleProperty othersOpacityProperty,
             final BooleanProperty rebuildSubsceneFlag) {

@@ -45,6 +45,7 @@ public class URLShareWindow extends AnchorPane {
     private final DoubleProperty rotateZAngleProperty;
     private final DoubleProperty translateXProperty;
     private final DoubleProperty translateYProperty;
+    private final DoubleProperty translateZProperty;
     private final DoubleProperty zoomProperty;
     private final DoubleProperty othersOpacityProperty;
 
@@ -58,6 +59,7 @@ public class URLShareWindow extends AnchorPane {
             final DoubleProperty rotateZAngleProperty,
             final DoubleProperty translateXProperty,
             final DoubleProperty translateYProperty,
+            final DoubleProperty translateZProperty,
             final DoubleProperty zoomProperty,
             final DoubleProperty othersOpacityProperty) {
 
@@ -71,6 +73,7 @@ public class URLShareWindow extends AnchorPane {
         this.rotateZAngleProperty = requireNonNull(rotateZAngleProperty);
         this.translateXProperty = requireNonNull(translateXProperty);
         this.translateYProperty = requireNonNull(translateYProperty);
+        this.translateZProperty = requireNonNull(translateYProperty);
         this.zoomProperty = requireNonNull(zoomProperty);
         this.othersOpacityProperty = requireNonNull(othersOpacityProperty);
 
