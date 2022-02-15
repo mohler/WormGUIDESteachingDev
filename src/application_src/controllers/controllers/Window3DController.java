@@ -916,17 +916,19 @@ public class Window3DController {
                     transientLabelText.setFill(web(TRANSIENT_LABEL_COLOR_HEX));
                     transientLabelText.setOnMouseEntered(Event::consume);
                     transientLabelText.setOnMouseClicked(Event::consume);
-                    final Point2D p = project(
-                            camera,
-                            new Point3D(
-                                    (b.getMinX() + b.getMaxX())*getModelScaleFactor() / 2.0,
-                                    (b.getMinY() + b.getMaxY())*getModelScaleFactor() / 2.0,
-                                    (b.getMaxZ() + b.getMinZ())*getModelScaleFactor() / 2.0));
-                    double x = p.getX();
-                    double y = p.getY();
+//                    final Point2D p = project(
+//                            camera,
+//                            new Point3D(
+//                                    (b.getMinX() + b.getMaxX())*getModelScaleFactor() / 2.0,
+//                                    (b.getMinY() + b.getMaxY())*getModelScaleFactor() / 2.0,
+//                                    (b.getMaxZ() + b.getMinZ())*getModelScaleFactor() / 2.0));
+//                    double x = p.getX();
+//                    double y = p.getY();
+                  double x = mousePosX;
+                  double y = mousePosY;
 
                     y -= getLabelSpriteYOffset();
-                    transientLabelText.getTransforms().add(new Translate(entity.getTranslateX(), entity.getTranslateY()));
+                    transientLabelText.getTransforms().add(new Translate(x+10, y+10));
                     // disable text to take away label flickering when mouse is on top top of it
                     transientLabelText.setDisable(true);
                     spritesPane.getChildren().add(transientLabelText);
@@ -983,40 +985,6 @@ public class Window3DController {
         }
     }
 
-    public class MyHandler implements EventHandler<MouseEvent> {
-
-        private  EventHandler<MouseEvent> onDraggedEventHandler;
-
-        private  EventHandler<MouseEvent> onClickedEventHandler;
-
-        private boolean dragging = false;
-
-        public void Handler(EventHandler<MouseEvent> onDraggedEventHandler, EventHandler<MouseEvent> onClickedEventHandler) {
-            this.onDraggedEventHandler = onDraggedEventHandler;
-            this.onClickedEventHandler = onClickedEventHandler;
-        }
-
-        @Override
-        public void handle(MouseEvent event) {
-            if (event.getEventType() == MouseEvent.MOUSE_PRESSED) {
-                dragging = false;
-            }
-            else if (event.getEventType() == MouseEvent.DRAG_DETECTED) {
-                dragging = true;
-            }
-            else if (event.getEventType() == MouseEvent.MOUSE_DRAGGED) {
-                //maybe filter on dragging (== true)
-                onDraggedEventHandler.handle(event);
-            }
-            else if (event.getEventType() == MouseEvent.MOUSE_CLICKED) {
-                if (!dragging) {
-                    onClickedEventHandler.handle(event);
-                }
-            }
-
-        }
-    }
-    
     private void handleMouse(SubScene subscene) {
         System.out.printf("handleMouse%n");
         
