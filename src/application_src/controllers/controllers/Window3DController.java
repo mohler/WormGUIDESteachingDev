@@ -64,6 +64,8 @@ import javafx.scene.shape.Shape3D;
 import javafx.scene.shape.Sphere;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.transform.Affine;
+import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Transform;
@@ -185,7 +187,8 @@ import static application_src.application_model.threeD.subsceneparameters.Parame
  * particular entity, then queries the {@link ColorHash} for the {@link Material} to use for the entity.
  */
 public class Window3DController {
-    private static final String CS = ", ";
+
+	private static final String CS = ", ";
     private static final String ACTIVE_LABEL_COLOR_HEX = "#ffff66",
             SPRITE_COLOR_HEX = "#ffffff",
             TRANSIENT_LABEL_COLOR_HEX = "#f0f0f0";
@@ -1030,7 +1033,7 @@ public class Window3DController {
                                 currentLabels.add(name);
                                 final Shape3D entity = getEntityWithName(name);
                                 insertLabelFor(name, entity);
-                                highlightActiveCellLabel(entity);
+                                highlightActiveCellLabel(entity);                               
                             }
                         }
                     }
@@ -1125,6 +1128,20 @@ public class Window3DController {
             if (me.isPrimaryButtonDown()) {
                 xform1.addRotation(-mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED, Rotate.Y_AXIS);
                 xform1.addRotation(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED, Rotate.X_AXIS);
+//                for (Node t : xform1.getChildren()) {
+//                	if (t instanceof RotText) {
+////                		try {
+////							t.getTransforms().set(0, xform1.getTransforms().get(0).createInverse() );
+//                			Point3D shifted = t.localToScene(Point3D.ZERO, false);
+//                			double r = xform1.rotateProperty().get();
+//                			Point3D raxis = xform1.rotationAxisProperty().get();
+//							t.getTransforms().set(0, new Rotate(r,shifted.getX(),shifted.getY(),shifted.getZ(), raxis).createConcatenation(t.getTransforms().get(0)));
+////						} catch (NonInvertibleTransformException e) {
+//							// TODO Auto-generated catch block
+////							e.printStackTrace();
+////						}                	
+//                	}
+//                }
 
                 xform2.addRotation(-mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED, Rotate.Y_AXIS);
                 xform2.addRotation(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED, Rotate.X_AXIS);
@@ -1493,14 +1510,9 @@ public class Window3DController {
         if (entity != null) {
             final Bounds b = entity.getBoundsInParent();
             if (b != null) {
-                final Point2D p = project(
-                        camera,
-                        new Point3D(
-                                (b.getMinX() + b.getMaxX())*getModelScaleFactor() / 2.0,
-                                (b.getMinY() + b.getMaxY())*getModelScaleFactor() / 2.0,
-                                (b.getMaxZ() + b.getMinZ())*getModelScaleFactor() / 2.0));
-                double x = p.getX();
-                double y = p.getY();
+                double x = b.getMaxX();
+                double y = b.getMaxY();
+                double z = b.getMinZ();
                 double height = b.getHeight();
                 double width = b.getWidth();
 
@@ -1508,7 +1520,7 @@ public class Window3DController {
                 if (noteDisplay == null) {
                     y -= getLabelSpriteYOffset();
                     noteOrLabelGraphic.getTransforms().clear();
-                    noteOrLabelGraphic.getTransforms().add(new Translate(x, y));
+                    noteOrLabelGraphic.getTransforms().add(new Translate(x, y, z));
 
                 } else {
                     // if graphic is a note
@@ -1518,7 +1530,7 @@ public class Window3DController {
                     switch (noteDisplay) {
                         case SPRITE:
                             noteOrLabelGraphic.getTransforms().clear();
-                            noteOrLabelGraphic.getTransforms().add(new Translate(x, y));
+                            noteOrLabelGraphic.getTransforms().add(new Translate(x, y, z));
                             break;
                         case CALLOUT_UPPER_LEFT:
                             calloutY = y - (height + calloutOffset);
@@ -1582,7 +1594,18 @@ public class Window3DController {
                             break;
                     }
                 }
-            }
+                int ntc = noteOrLabelGraphic.getTransforms().size();
+                int xtc = xform1.getTransforms().size();
+                Transform nrpt= noteOrLabelGraphic.getTransforms().get(0);
+                Transform xrt = xform1.getTransforms().get(0);
+                noteOrLabelGraphic.rotateProperty().bind(xform1.rotateProperty().multiply(-1));
+                try {
+					Thread.sleep(1);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+}
         }
     }
 
@@ -2436,6 +2459,7 @@ public class Window3DController {
     private void removeLabelFrom(final Node entity) {
         if (entity != null) {
             spritesPane.getChildren().remove(entityLabelMap.get(entity));
+            xform1.getChildren().remove(entityLabelMap.get(entity));
             entityLabelMap.remove(entity);
         }
     }
@@ -2475,13 +2499,14 @@ public class Window3DController {
         text.setWrappingWidth(-1);
 
         entityLabelMap.put(entity, text);
+        xform1.getChildren().add(text);
 
-        spritesPane.getChildren().add(text);
+//        spritesPane.getChildren().add(text);
 
         alignTextWithEntity(text, entity, null);
 
         // set the name in MainApp so that other apps opening WormGUIDES can catch this event
-        MainApp.seletedEntityLabelMainApp.set(name);
+        MainApp.selectedEntityLabelMainApp.set(name);
     }
 
     private void highlightActiveCellLabel(Shape3D entity) {
@@ -2827,6 +2852,7 @@ public class Window3DController {
 
     private Text makeNoteOverlayText(final String title) {
         final Text text = new Text(title);
+
         text.setFill(web(SPRITE_COLOR_HEX));
         text.setFontSmoothingType(LCD);
         text.setWrappingWidth(storyOverlayVBox.getWidth());

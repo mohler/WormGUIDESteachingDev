@@ -20,8 +20,8 @@ public class XformBox extends Group {
      */
     public void addRotation(double angle, Point3D axis) {
         Rotate r = new Rotate(angle
-        					, 100
-        					, 0
+        					, 111
+        					, 0  
         					, 0
         					, axis);
         /**

@@ -45,7 +45,7 @@ public class MainApp extends Application implements ObserveWormGUIDES {
     public static int externallySetStartTime = -1;
     public static IntegerProperty timePropertyMainApp = new SimpleIntegerProperty(1);
     public static BooleanProperty isPlayButtonEnabled = new SimpleBooleanProperty(false);
-    public static StringProperty seletedEntityLabelMainApp = new SimpleStringProperty("");
+    public static StringProperty selectedEntityLabelMainApp = new SimpleStringProperty("");
 
 
 
