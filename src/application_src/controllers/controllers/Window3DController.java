@@ -916,16 +916,12 @@ public class Window3DController {
                     transientLabelText.setFill(web(TRANSIENT_LABEL_COLOR_HEX));
                     transientLabelText.setOnMouseEntered(Event::consume);
                     transientLabelText.setOnMouseClicked(Event::consume);
-//                    final Point2D p = project(
-//                            camera,
-//                            new Point3D(
-//                                    (b.getMinX() + b.getMaxX())*getModelScaleFactor() / 2.0,
-//                                    (b.getMinY() + b.getMaxY())*getModelScaleFactor() / 2.0,
-//                                    (b.getMaxZ() + b.getMinZ())*getModelScaleFactor() / 2.0));
-//                    double x = p.getX();
-//                    double y = p.getY();
-                  double x = mousePosX;
-                  double y = mousePosY;
+                    double x = entity.localToScreen(entity.getBoundsInLocal()).getMaxX() 
+                    		- entity.localToScreen(entity.getBoundsInLocal()).getWidth()/3
+                    		- rootLC.modelAnchorPane.localToScreen(0,0).getX();
+                    double y = entity.localToScreen(entity.getBoundsInLocal()).getMaxY()
+                    		- entity.localToScreen(entity.getBoundsInLocal()).getWidth()/3
+                    		- rootLC.modelAnchorPane.localToScreen(0,0).getY();
 
                     y -= getLabelSpriteYOffset();
                     transientLabelText.getTransforms().add(new Translate(x+10, y+10));

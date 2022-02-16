@@ -125,8 +125,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
     private BorderPane rootBorderPane;
     @FXML
     private VBox displayVBox;
-    @FXML
-    private AnchorPane modelAnchorPane;
+    @FXML AnchorPane modelAnchorPane;
     @FXML
     private ScrollPane infoPane;
     @FXML
