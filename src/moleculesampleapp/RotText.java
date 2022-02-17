@@ -1,28 +1,33 @@
 package moleculesampleapp;
 
 import javafx.geometry.Point3D;
-import javafx.scene.Group;
+import javafx.scene.text.Text;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Rotate;
 
-public class XformBox extends Group {
+public class RotText extends Text {
 
-    public XformBox() {
+    public RotText() {
         super();
         getTransforms().add(new Affine());
     }
 
-    /**
+    public RotText(String title) {
+		super(title);
+        getTransforms().add(new Affine());
+	}
+
+	/**
      * Accumulate rotation about specified axis
      *
      * @param angle
      * @param axis
      */
-    public void addRotation(double angle, int pivotX, int pivotY, int pivotZ, Point3D axis) {
+    public void addRotation(double angle, double pivotX, double pivotY, double pivotZ, Point3D axis) {
         Rotate r = new Rotate(angle
-        					, pivotX
-        					, pivotY  
-        					, pivotZ
+        					, 0
+        					, 0  
+        					, 0
         					, axis);
         /**
          * This is the important bit and thanks to bronkowitz in this post
@@ -31,7 +36,8 @@ public class XformBox extends Group {
          * this way
          */
         getTransforms().set(0, r.createConcatenation(getTransforms().get(0)));
-    }
+
+     }
 
     /**
      * Reset transform to identity transform

@@ -60,15 +60,15 @@ public class MoleculeSampleApp extends Application {
             mouseDeltaY = (mousePosY - mouseOldY);
 
             if (me.isPrimaryButtonDown()) {
-                ballXForm.addRotation(-mouseDeltaX * MOUSE_SPEED * ROTATION_SPEED, Rotate.Y_AXIS);
-                ballXForm.addRotation(mouseDeltaY * MOUSE_SPEED * ROTATION_SPEED, Rotate.X_AXIS);
-                ball2XForm.addRotation(mouseDeltaX * MOUSE_SPEED * ROTATION_SPEED, Rotate.Y_AXIS);
-                ball2XForm.addRotation(mouseDeltaY * MOUSE_SPEED * ROTATION_SPEED, Rotate.X_AXIS);
-                ball3XForm.addRotation(-mouseDeltaX * MOUSE_SPEED * ROTATION_SPEED, Rotate.Y_AXIS);
-                ball3XForm.addRotation(-mouseDeltaY * MOUSE_SPEED * ROTATION_SPEED, Rotate.X_AXIS);
-                ball4XForm.addRotation(mouseDeltaX * MOUSE_SPEED * ROTATION_SPEED, Rotate.Y_AXIS);
-                cameraXform.addRotation(mouseDeltaX * MOUSE_SPEED * ROTATION_SPEED/2, Rotate.X_AXIS);
-                cameraXform.addRotation(-mouseDeltaY * MOUSE_SPEED * ROTATION_SPEED/2, Rotate.Y_AXIS);
+                ballXForm.addRotation(-mouseDeltaX * MOUSE_SPEED * ROTATION_SPEED, 0, 0, 0, Rotate.Y_AXIS);
+                ballXForm.addRotation(mouseDeltaY * MOUSE_SPEED * ROTATION_SPEED, 0, 0, 0, Rotate.X_AXIS);
+                ball2XForm.addRotation(mouseDeltaX * MOUSE_SPEED * ROTATION_SPEED, 0, 0, 0, Rotate.Y_AXIS);
+                ball2XForm.addRotation(mouseDeltaY * MOUSE_SPEED * ROTATION_SPEED, 0, 0, 0, Rotate.X_AXIS);
+                ball3XForm.addRotation(-mouseDeltaX * MOUSE_SPEED * ROTATION_SPEED, 0, 0, 0, Rotate.Y_AXIS);
+                ball3XForm.addRotation(-mouseDeltaY * MOUSE_SPEED * ROTATION_SPEED, 0, 0, 0, Rotate.X_AXIS);
+                ball4XForm.addRotation(mouseDeltaX * MOUSE_SPEED * ROTATION_SPEED, 0, 0, 0, Rotate.Y_AXIS);
+                cameraXform.addRotation(mouseDeltaX * MOUSE_SPEED * ROTATION_SPEED/2, 0, 0, 0, Rotate.X_AXIS);
+                cameraXform.addRotation(-mouseDeltaY * MOUSE_SPEED * ROTATION_SPEED/2, 0, 0, 0, Rotate.Y_AXIS);
             }
         });
     }
@@ -100,8 +100,8 @@ public class MoleculeSampleApp extends Application {
         camera.setFarClip(CAMERA_FAR_CLIP);
         camera.setTranslateZ(CAMERA_INITIAL_DISTANCE);
         camera.setTranslateZ(CAMERA_INITIAL_DISTANCE);
-        cameraXform.addRotation(CAMERA_INITIAL_X_ANGLE, Rotate.X_AXIS);
-        cameraXform.addRotation(CAMERA_INITIAL_Y_ANGLE, Rotate.Y_AXIS);
+        cameraXform.addRotation(CAMERA_INITIAL_X_ANGLE, 0, 0, 0, Rotate.X_AXIS);
+        cameraXform.addRotation(CAMERA_INITIAL_Y_ANGLE, 0, 0, 0, Rotate.Y_AXIS);
 
         // Build Axes
         Box xAxis = new Box(AXIS_LENGTH, 1, 1);

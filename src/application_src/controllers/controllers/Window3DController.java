@@ -1126,25 +1126,11 @@ public class Window3DController {
             mouseDeltaY = (mousePosY - mouseOldY);
 
             if (me.isPrimaryButtonDown()) {
-                xform1.addRotation(-mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED, Rotate.Y_AXIS);
-                xform1.addRotation(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED, Rotate.X_AXIS);
-//                for (Node t : xform1.getChildren()) {
-//                	if (t instanceof RotText) {
-////                		try {
-////							t.getTransforms().set(0, xform1.getTransforms().get(0).createInverse() );
-//                			Point3D shifted = t.localToScene(Point3D.ZERO, false);
-//                			double r = xform1.rotateProperty().get();
-//                			Point3D raxis = xform1.rotationAxisProperty().get();
-//							t.getTransforms().set(0, new Rotate(r,shifted.getX(),shifted.getY(),shifted.getZ(), raxis).createConcatenation(t.getTransforms().get(0)));
-////						} catch (NonInvertibleTransformException e) {
-//							// TODO Auto-generated catch block
-////							e.printStackTrace();
-////						}                	
-//                	}
-//                }
+                xform1.addRotation(-mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED, 111,0,0, Rotate.Y_AXIS);
+                xform1.addRotation(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED, 111,0,0, Rotate.X_AXIS);
 
-                xform2.addRotation(-mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED, Rotate.Y_AXIS);
-                xform2.addRotation(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED, Rotate.X_AXIS);
+                xform2.addRotation(-mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED,  250,0,0, Rotate.Y_AXIS);
+                xform2.addRotation(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED,  250,0,0, Rotate.X_AXIS);
            } else {
                 xform1.setTranslateX(xform1.getTranslateX()+(mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
                 xform1.setTranslateY(xform1.getTranslateY()+(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
