@@ -1126,8 +1126,46 @@ public class Window3DController {
             mouseDeltaY = (mousePosY - mouseOldY);
 
             if (me.isPrimaryButtonDown()) {
-                xform1.addRotation(-mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED, 111,0,0, Rotate.Y_AXIS);
-                xform1.addRotation(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED, 111,0,0, Rotate.X_AXIS);
+            	double angleY = -mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED;
+            	double angleX = mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED;
+                xform1.addRotation(angleY, 111,0,0, Rotate.Y_AXIS);
+                xform1.addRotation(angleX, 111,0,0, Rotate.X_AXIS);
+                for (Node thingy:xform1.getChildren()) {
+                	if (!(thingy instanceof Text)) {
+                		Text thingyLabel = entityLabelMap.get(thingy);
+                		if (thingyLabel == null)
+                			continue;
+                		double xPivot = (thingy.getBoundsInParent().getMaxX() + thingy.getBoundsInParent().getMinX())/2;
+                		double yPivot = (thingy.getBoundsInParent().getMaxY() + thingy.getBoundsInParent().getMinY())/2;
+                		double zPivot = (thingy.getBoundsInParent().getMinZ() + thingy.getBoundsInParent().getMaxZ())/2;
+
+//                		THIS STUFF ALMOST WORKS!!
+                		Rotate rX = new Rotate(-angleX
+                				, xPivot
+                				, yPivot  
+                				, zPivot
+                				, Rotate.X_AXIS);
+                		Rotate rY = new Rotate(-angleY
+                				, xPivot
+                				, yPivot  
+                				, zPivot
+                				, Rotate.Y_AXIS);
+                		
+                 		thingyLabel.getTransforms().set(0, rY.createConcatenation(thingyLabel.getTransforms().get(0))); 
+                 		thingyLabel.getTransforms().set(0, rX.createConcatenation(thingyLabel.getTransforms().get(0))); 
+                		
+// 						THIS NEVER WORKS, BECAUSE getRotat... methods always return blanks...
+//                		double tRot = thingy.getRotate();
+//                		Point3D tRotAxis = thingy.getRotationAxis();
+//                		Rotate rT = new Rotate(-tRot
+//                				, xPivot
+//                				, yPivot  
+//                				, zPivot
+//                				, tRotAxis);
+//                		
+//                 		thingyLabel.getTransforms().set(0, rT.createConcatenation(thingyLabel.getTransforms().get(0))); 
+                	}
+                }
 
                 xform2.addRotation(-mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED,  250,0,0, Rotate.Y_AXIS);
                 xform2.addRotation(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED,  250,0,0, Rotate.X_AXIS);
