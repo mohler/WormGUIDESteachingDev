@@ -1128,11 +1128,13 @@ public class Window3DController {
             if (me.isPrimaryButtonDown()) {
             	double angleY = -mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED;
             	double angleX = mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED;
+            	
                 xform1.addRotation(angleY, 111,0,0, Rotate.Y_AXIS);
                 xform1.addRotation(angleX, 111,0,0, Rotate.X_AXIS);
                 for (Node thingy:xform1.getChildren()) {
                 	if (!(thingy instanceof Text)) {
                 		Text thingyLabel = entityLabelMap.get(thingy);
+
                 		if (thingyLabel == null)
                 			continue;
                 		double xPivot = (thingy.getBoundsInParent().getMaxX() + thingy.getBoundsInParent().getMinX())/2;
@@ -1140,30 +1142,42 @@ public class Window3DController {
                 		double zPivot = (thingy.getBoundsInParent().getMinZ() + thingy.getBoundsInParent().getMaxZ())/2;
 
 //                		THIS STUFF ALMOST WORKS!!
-                		Rotate rX = new Rotate(-angleX
-                				, xPivot
-                				, yPivot  
-                				, zPivot
-                				, Rotate.X_AXIS);
-                		Rotate rY = new Rotate(-angleY
-                				, xPivot
-                				, yPivot  
-                				, zPivot
-                				, Rotate.Y_AXIS);
+                		Transform rT = new Rotate();
+                		List<Transform> xfm1List = xform1.getTransforms();
+                		List<Transform> tLList = thingyLabel.getTransforms();
+                		for (int t=0;t<tLList.size();t++) {
+                			Transform tfm = xfm1List.get(t);
+                			if (tfm instanceof Rotate && t<3) {
+//  THIS may now be unused....
+                				Affine rTA = (Affine) ((Rotate)tfm).createConcatenation(new Affine());
+                				try {
+                					Point3D axis;
+                					axis = rTA.inverseDeltaTransform(((Rotate)rT).getAxis());
+                					double angle = -(((Rotate)rT).getAngle());
+                					tLList.set(0, new Rotate(angle, xPivot, yPivot, zPivot, axis)
+                							.createConcatenation(tLList.get(t)));
+                				} catch (NonInvertibleTransformException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+                 			} else if (tfm instanceof Affine && t<3) {
+ // THIS FINALLY WORKS!!!!!
+                				rT = ((Affine)tfm);
+								try {
+									Point3D axis = ((Affine)rT).inverseDeltaTransform(Y_AXIS);
+									tLList.set(0, new Rotate(-angleY, xPivot, yPivot, zPivot, axis)
+											.createConcatenation(tLList.get(0)));
+									axis = ((Affine)rT).inverseDeltaTransform(X_AXIS);
+									tLList.set(0, new Rotate(-angleX, xPivot, yPivot, zPivot, axis)
+											.createConcatenation(tLList.get(0)));
+									
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+                			}
+
+                		}
                 		
-                 		thingyLabel.getTransforms().set(0, rY.createConcatenation(thingyLabel.getTransforms().get(0))); 
-                 		thingyLabel.getTransforms().set(0, rX.createConcatenation(thingyLabel.getTransforms().get(0))); 
-                		
-// 						THIS NEVER WORKS, BECAUSE getRotat... methods always return blanks...
-//                		double tRot = thingy.getRotate();
-//                		Point3D tRotAxis = thingy.getRotationAxis();
-//                		Rotate rT = new Rotate(-tRot
-//                				, xPivot
-//                				, yPivot  
-//                				, zPivot
-//                				, tRotAxis);
-//                		
-//                 		thingyLabel.getTransforms().set(0, rT.createConcatenation(thingyLabel.getTransforms().get(0))); 
                 	}
                 }
 
@@ -1545,7 +1559,7 @@ public class Window3DController {
                     y -= getLabelSpriteYOffset();
                     noteOrLabelGraphic.getTransforms().clear();
                     noteOrLabelGraphic.getTransforms().add(new Translate(x, y, z));
-
+	
                 } else {
                     // if graphic is a note
                     final double calloutOffset = 10.0;
@@ -1618,12 +1632,8 @@ public class Window3DController {
                             break;
                     }
                 }
-                int ntc = noteOrLabelGraphic.getTransforms().size();
-                int xtc = xform1.getTransforms().size();
-                Transform nrpt= noteOrLabelGraphic.getTransforms().get(0);
-                Transform xrt = xform1.getTransforms().get(0);
-                noteOrLabelGraphic.rotateProperty().bind(xform1.rotateProperty().multiply(-1));
-                try {
+    
+            try {
 					Thread.sleep(1);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
