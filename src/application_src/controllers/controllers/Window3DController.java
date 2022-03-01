@@ -1164,11 +1164,11 @@ public class Window3DController {
  // THIS FINALLY WORKS!!!!!
                 				rT = ((Affine)tfm);
 								try {
-									Point3D axis = ((Affine)rT).inverseDeltaTransform(Y_AXIS);
-									tLList.set(0, new Rotate(-angleY, xPivot, yPivot, zPivot, axis)
-											.createConcatenation(tLList.get(0)));
-									axis = ((Affine)rT).inverseDeltaTransform(X_AXIS);
+									Point3D axis = ((Affine)rT).inverseDeltaTransform(X_AXIS);
 									tLList.set(0, new Rotate(-angleX, xPivot, yPivot, zPivot, axis)
+											.createConcatenation(tLList.get(0)));
+									axis = ((Affine)rT).inverseDeltaTransform(Y_AXIS);
+									tLList.set(0, new Rotate(-angleY, xPivot, yPivot, zPivot, axis)
 											.createConcatenation(tLList.get(0)));
 									
 								} catch (Exception e) {
@@ -1558,8 +1558,7 @@ public class Window3DController {
                 if (noteDisplay == null) {
                     y -= getLabelSpriteYOffset();
                     noteOrLabelGraphic.getTransforms().clear();
-                    noteOrLabelGraphic.getTransforms().add(new Translate(x, y, z));
-	
+                    noteOrLabelGraphic.getTransforms().add(new Translate(x, y, z));	
                 } else {
                     // if graphic is a note
                     final double calloutOffset = 10.0;
