@@ -65,6 +65,7 @@ import javafx.scene.shape.Sphere;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Affine;
+import javafx.scene.transform.MatrixType;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
@@ -203,9 +204,9 @@ public class Window3DController {
     private static final int CALLOUT_LINE_X_OFFSET = 0;
 
     // rotation stuff
-    private final Rotate rotateX;
-    private final Rotate rotateY;
-    private final Rotate rotateZ;
+    private Rotate rotateX;
+    private Rotate rotateY;
+    private Rotate rotateZ;
     private final Rotate rotateXIndicator;
     private final Rotate rotateYIndicator;
     private final Rotate rotateZIndicator;
@@ -1128,7 +1129,7 @@ public class Window3DController {
             if (me.isPrimaryButtonDown()) {
             	double angleY = -mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED;
             	double angleX = mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED;
-            	
+            	             	
                 xform1.addRotation(angleY, 111,0,0, Rotate.Y_AXIS);
                 xform1.addRotation(angleX, 111,0,0, Rotate.X_AXIS);
                 for (Node thingy:xform1.getChildren()) {
@@ -1141,11 +1142,10 @@ public class Window3DController {
                 		double yPivot = (thingy.getBoundsInParent().getMaxY() + thingy.getBoundsInParent().getMinY())/2;
                 		double zPivot = (thingy.getBoundsInParent().getMinZ() + thingy.getBoundsInParent().getMaxZ())/2;
 
-//                		THIS STUFF ALMOST WORKS!!
                 		Transform rT = new Rotate();
                 		List<Transform> xfm1List = xform1.getTransforms();
                 		List<Transform> tLList = thingyLabel.getTransforms();
-                		for (int t=0;t<tLList.size();t++) {
+                		for (int t=0;t<xfm1List.size();t++) {
                 			Transform tfm = xfm1List.get(t);
                 			if (tfm instanceof Rotate && t<3) {
 //  THIS may now be unused....
@@ -1201,180 +1201,180 @@ public class Window3DController {
        });
     }
 
-    private void handleMouseDragged(final MouseEvent event) {
-        hideContextPopups();
-        spritesPane.setCursor(CLOSED_HAND);
-
-        mouseOldX = mousePosX;
-        mouseOldY = mousePosY;
-        mouseOldZ = mousePosZ;
-        mousePosX = event.getSceneX();
-        mousePosY = event.getSceneY();
-        mouseDeltaX = (mousePosX - mouseOldX);
-        mouseDeltaY = (mousePosY - mouseOldY);
-
-        mouseDeltaX /= 2;
-        mouseDeltaY /= 2;
-
-        angleOfRotation = rotationAngleFromMouseMovement();
-        mousePosZ = computeZCoord(mousePosX, mousePosY, angleOfRotation);
-
-        if (event.isSecondaryButtonDown() || event.isMetaDown() || event.isControlDown()) {
-            double translateX = 0.;
-            double translateY = 0.;
-            if (xform1.getScaleX() < 1.) {
-                translateX = xform1.getTranslateX() - (mouseDeltaX * xform1.getScaleX());
-                translateY = xform1.getTranslateY() - (mouseDeltaY * xform1.getScaleY());
-            } else if (xform1.getScaleX() < 2.) {
-                translateX = xform1.getTranslateX() - (mouseDeltaX / xform1.getScaleX());
-                translateY = xform1.getTranslateY() - (mouseDeltaY / xform1.getScaleY());
-            } else {
-                translateX = xform1.getTranslateX() - mouseDeltaX;
-                translateY = xform1.getTranslateY() - mouseDeltaY;
-            }
-
-            xform1.setTranslateX(translateX);
-            xform1.setTranslateY(translateY);
-            translateXProperty.set(translateX);
-            translateYProperty.set(translateY);
-            repositionNotes();
-
-        } else {
-            if (event.isPrimaryButtonDown()) {
-                double modifier = 10.0;
-                double modifierFactor = 0.1;
-
-                rotateXAngleProperty.set((
-                        (rotateXAngleProperty.get() + mouseDeltaY * modifierFactor * modifier * 2.0)
-                                % 360 + 540) % 360 - 180);
-                rotateXIndicator.setAngle(rotateX.getAngle() - initialRotation[0]);
-                rotateYAngleProperty.set((
-                        (rotateYAngleProperty.get() + mouseDeltaX * modifierFactor * modifier * 2.0)
-                                % 360 + 540) % 360 - 180);
-                rotateYIndicator.setAngle(rotateY.getAngle() - initialRotation[1]);
-            }
-        }
-    }
-
-    private void handleMouseReleasedOrEntered() {
-        spritesPane.setCursor(DEFAULT);
-    }
-
-    private void handleMouseClicked(final MouseEvent event) {
-        spritesPane.setCursor(DEFAULT);
-        hideContextPopups();
-
-        final Node node = event.getPickResult().getIntersectedNode();
-
-        if (node instanceof Sphere) {
-            // Nucleus
-            Sphere picked = (Sphere) node;
-            int index = getPickedSphereIndex(picked);
-            String name = normalizeName(cellNames.get(index));
-
-            cellClickedProperty.set(true);
-            selectedNameProperty.set(name);
-            selectedIndex.set(index);
-
-            // right click
-            if (event.getButton() == SECONDARY
-                    || (event.getButton() == PRIMARY
-                    && (event.isMetaDown() || event.isControlDown()))) {
-                boolean hasFunctionalName = false;
-                if (getFunctionalNameByLineageName(name) != null) {
-                    hasFunctionalName = true;
-                }
-                showContextMenu(
-                        name,
-                        event.getScreenX(),
-                        event.getScreenY(),
-                        false,
-                        false,
-                        hasFunctionalName);
-
-            } else if (event.getButton() == PRIMARY) {
-                // regular click
-                if (allLabels.contains(name)) {
-                    removeLabelFor(name);
-                } else {
-                    if (!allLabels.contains(name)) {
-                        allLabels.add(name);
-                        currentLabels.add(name);
-                        final Shape3D entity = getEntityWithName(name);
-                        insertLabelFor(name, entity);
-                        highlightActiveCellLabel(entity);
-                    }
-                }
-            }
-
-        } else if (node instanceof SceneElementMeshView) {
-            // Structure
-            boolean found = false; // this will indicate whether this meshview is a scene element
-            SceneElementMeshView curr;
-//            MeshView curr;
-            SceneElement clickedSceneElement;
-            String funcName;
-            for (int i = 0; i < currentSceneElementMeshes.size(); i++) {
-                curr = currentSceneElementMeshes.get(i);
-                if (curr.equals(node)) {
-                    clickedSceneElement = currentSceneElements.get(i);
-                    if (!clickedSceneElement.isSelectable()) {
-                        selectedIndex.set(-1);
-                        selectedNameProperty.set("");
-                        return;
-                    }
-
-                    found = true;
-
-                    String name = normalizeName(clickedSceneElement.getSceneName());
-                    selectedNameProperty.set(name);
-
-                    if (event.getButton() == SECONDARY
-                            || (event.getButton() == PRIMARY && (event.isMetaDown() || event.isControlDown()))) {
-                        // right click
-                        if (sceneElementsList.isStructureSceneName(name)) {
-                            boolean hasFunctionalName = false;
-                            if (getFunctionalNameByLineageName(name) != null) {
-                                hasFunctionalName = true;
-                            }
-                            showContextMenu(
-                                    name,
-                                    event.getScreenX(),
-                                    event.getScreenY(),
-                                    true,
-                                    sceneElementsList.isMulticellStructureName(name),
-                                    hasFunctionalName);
-                        }
-
-                    } else if (event.getButton() == PRIMARY) {
-                        // regular click
-                        if (allLabels.contains(name)) {
-                            removeLabelFor(name);
-                        } else {
-                            allLabels.add(name);
-                            currentLabels.add(name);
-                            final Shape3D entity = getEntityWithName(name);
-                            insertLabelFor(name, entity);
-                            highlightActiveCellLabel(entity);
-                        }
-                    }
-                    break;
-                }
-            }
-
-            // if the node isn't a SceneElement
-            if (!found) {
-                // note structure
-                currentNotesToMeshesMap.keySet()
-                        .stream()
-                        .filter(note -> currentNotesToMeshesMap.get(note).equals(node))
-                        .forEachOrdered(note -> selectedNameProperty.set(note.getTagName()));
-            }
-        } else {
-            selectedIndex.set(-1);
-            selectedNameProperty.set("");
-        }
-    }
+//    private void handleMouseDragged(final MouseEvent event) {
+//        hideContextPopups();
+//        spritesPane.setCursor(CLOSED_HAND);
+//
+//        mouseOldX = mousePosX;
+//        mouseOldY = mousePosY;
+//        mouseOldZ = mousePosZ;
+//        mousePosX = event.getSceneX();
+//        mousePosY = event.getSceneY();
+//        mouseDeltaX = (mousePosX - mouseOldX);
+//        mouseDeltaY = (mousePosY - mouseOldY);
+//
+//        mouseDeltaX /= 2;
+//        mouseDeltaY /= 2;
+//
+//        angleOfRotation = rotationAngleFromMouseMovement();
+//        mousePosZ = computeZCoord(mousePosX, mousePosY, angleOfRotation);
+//
+//        if (event.isSecondaryButtonDown() || event.isMetaDown() || event.isControlDown()) {
+//            double translateX = 0.;
+//            double translateY = 0.;
+//            if (xform1.getScaleX() < 1.) {
+//                translateX = xform1.getTranslateX() - (mouseDeltaX * xform1.getScaleX());
+//                translateY = xform1.getTranslateY() - (mouseDeltaY * xform1.getScaleY());
+//            } else if (xform1.getScaleX() < 2.) {
+//                translateX = xform1.getTranslateX() - (mouseDeltaX / xform1.getScaleX());
+//                translateY = xform1.getTranslateY() - (mouseDeltaY / xform1.getScaleY());
+//            } else {
+//                translateX = xform1.getTranslateX() - mouseDeltaX;
+//                translateY = xform1.getTranslateY() - mouseDeltaY;
+//            }
+//
+//            xform1.setTranslateX(translateX);
+//            xform1.setTranslateY(translateY);
+//            translateXProperty.set(translateX);
+//            translateYProperty.set(translateY);
+//            repositionNotes();
+//
+//        } else {
+//            if (event.isPrimaryButtonDown()) {
+//                double modifier = 10.0;
+//                double modifierFactor = 0.1;
+//
+//                rotateXAngleProperty.set((
+//                        (rotateXAngleProperty.get() + mouseDeltaY * modifierFactor * modifier * 2.0)
+//                                % 360 + 540) % 360 - 180);
+//                rotateXIndicator.setAngle(rotateX.getAngle() - initialRotation[0]);
+//                rotateYAngleProperty.set((
+//                        (rotateYAngleProperty.get() + mouseDeltaX * modifierFactor * modifier * 2.0)
+//                                % 360 + 540) % 360 - 180);
+//                rotateYIndicator.setAngle(rotateY.getAngle() - initialRotation[1]);
+//            }
+//        }
+//    }
+//
+//    private void handleMouseReleasedOrEntered() {
+//        spritesPane.setCursor(DEFAULT);
+//    }
+//
+//    private void handleMouseClicked(final MouseEvent event) {
+//        spritesPane.setCursor(DEFAULT);
+//        hideContextPopups();
+//
+//        final Node node = event.getPickResult().getIntersectedNode();
+//
+//        if (node instanceof Sphere) {
+//            // Nucleus
+//            Sphere picked = (Sphere) node;
+//            int index = getPickedSphereIndex(picked);
+//            String name = normalizeName(cellNames.get(index));
+//
+//            cellClickedProperty.set(true);
+//            selectedNameProperty.set(name);
+//            selectedIndex.set(index);
+//
+//            // right click
+//            if (event.getButton() == SECONDARY
+//                    || (event.getButton() == PRIMARY
+//                    && (event.isMetaDown() || event.isControlDown()))) {
+//                boolean hasFunctionalName = false;
+//                if (getFunctionalNameByLineageName(name) != null) {
+//                    hasFunctionalName = true;
+//                }
+//                showContextMenu(
+//                        name,
+//                        event.getScreenX(),
+//                        event.getScreenY(),
+//                        false,
+//                        false,
+//                        hasFunctionalName);
+//
+//            } else if (event.getButton() == PRIMARY) {
+//                // regular click
+//                if (allLabels.contains(name)) {
+//                    removeLabelFor(name);
+//                } else {
+//                    if (!allLabels.contains(name)) {
+//                        allLabels.add(name);
+//                        currentLabels.add(name);
+//                        final Shape3D entity = getEntityWithName(name);
+//                        insertLabelFor(name, entity);
+//                        highlightActiveCellLabel(entity);
+//                    }
+//                }
+//            }
+//
+//        } else if (node instanceof SceneElementMeshView) {
+//            // Structure
+//            boolean found = false; // this will indicate whether this meshview is a scene element
+//            SceneElementMeshView curr;
+////            MeshView curr;
+//            SceneElement clickedSceneElement;
+//            String funcName;
+//            for (int i = 0; i < currentSceneElementMeshes.size(); i++) {
+//                curr = currentSceneElementMeshes.get(i);
+//                if (curr.equals(node)) {
+//                    clickedSceneElement = currentSceneElements.get(i);
+//                    if (!clickedSceneElement.isSelectable()) {
+//                        selectedIndex.set(-1);
+//                        selectedNameProperty.set("");
+//                        return;
+//                    }
+//
+//                    found = true;
+//
+//                    String name = normalizeName(clickedSceneElement.getSceneName());
+//                    selectedNameProperty.set(name);
+//
+//                    if (event.getButton() == SECONDARY
+//                            || (event.getButton() == PRIMARY && (event.isMetaDown() || event.isControlDown()))) {
+//                        // right click
+//                        if (sceneElementsList.isStructureSceneName(name)) {
+//                            boolean hasFunctionalName = false;
+//                            if (getFunctionalNameByLineageName(name) != null) {
+//                                hasFunctionalName = true;
+//                            }
+//                            showContextMenu(
+//                                    name,
+//                                    event.getScreenX(),
+//                                    event.getScreenY(),
+//                                    true,
+//                                    sceneElementsList.isMulticellStructureName(name),
+//                                    hasFunctionalName);
+//                        }
+//
+//                    } else if (event.getButton() == PRIMARY) {
+//                        // regular click
+//                        if (allLabels.contains(name)) {
+//                            removeLabelFor(name);
+//                        } else {
+//                            allLabels.add(name);
+//                            currentLabels.add(name);
+//                            final Shape3D entity = getEntityWithName(name);
+//                            insertLabelFor(name, entity);
+//                            highlightActiveCellLabel(entity);
+//                        }
+//                    }
+//                    break;
+//                }
+//            }
+//
+//            // if the node isn't a SceneElement
+//            if (!found) {
+//                // note structure
+//                currentNotesToMeshesMap.keySet()
+//                        .stream()
+//                        .filter(note -> currentNotesToMeshesMap.get(note).equals(node))
+//                        .forEachOrdered(note -> selectedNameProperty.set(note.getTagName()));
+//            }
+//        } else {
+//            selectedIndex.set(-1);
+//            selectedNameProperty.set("");
+//        }
+//    }
 
     private double[] vectorBWPoints(double px, double py, double pz, double qx, double qy, double qz) {
         double[] vector = new double[3];
@@ -1551,14 +1551,48 @@ public class Window3DController {
                 double x = b.getMaxX();
                 double y = b.getMaxY();
                 double z = b.getMinZ();
+        		double xPivot = (entity.getBoundsInParent().getMaxX() + entity.getBoundsInParent().getMinX())/2;
+        		double yPivot = (entity.getBoundsInParent().getMaxY() + entity.getBoundsInParent().getMinY())/2;
+        		double zPivot = (entity.getBoundsInParent().getMinZ() + entity.getBoundsInParent().getMaxZ())/2;
+
                 double height = b.getHeight();
                 double width = b.getWidth();
+                double depth = b.getDepth();
 
                 // if graphic is a label
                 if (noteDisplay == null) {
                     y -= getLabelSpriteYOffset();
-                    noteOrLabelGraphic.getTransforms().clear();
-                    noteOrLabelGraphic.getTransforms().add(new Translate(x, y, z));	
+                    ObservableList<Transform> olTfms = noteOrLabelGraphic.getTransforms();
+                    olTfms.clear();
+					olTfms.add(new Translate(xPivot, yPivot, zPivot));	
+                    try {
+						Thread.sleep(1);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+//         NAILED IT!!!
+
+                    ObservableList<Transform> xfm1List = xform1.getTransforms();
+            		for (int t=0;t<xfm1List.size();t++) {
+            			Transform xfm = xfm1List.get(t);
+            			if (xfm instanceof Rotate && t<3) {
+             			} else if (xfm instanceof Affine && t<3) {
+
+							try {
+								Transform aff = xfm;
+								olTfms.add(new Affine(aff.getMxx(), aff.getMxy(), aff.getMxz(),0,
+														aff.getMyx(),aff.getMyy(),aff.getMyz(),0,
+														aff.getMzx(),aff.getMzy(),aff.getMzz(),0).createInverse());
+								olTfms.add(new Translate(width*.4, height*.4, -depth*.4));	
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+            			}
+
+            		}
+
                 } else {
                     // if graphic is a note
                     final double calloutOffset = 10.0;
