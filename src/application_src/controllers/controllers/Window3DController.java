@@ -693,8 +693,6 @@ public class Window3DController {
         if (defaultEmbryoFlag) {
             orientationIndicator = new Cylinder(radius, height);
             orientationIndicator.setMaterial(material);
-
-            xform2.getChildren().add(createOrientationIndicator());
         }
 
         this.bringUpInfoFlag = requireNonNull(bringUpInfoFlag);
@@ -829,42 +827,65 @@ public class Window3DController {
         indicatorRotation = new Rotate();
         // top level group
         // had rotation to make it match main rotation
-        final Group orientationIndicator = new Group();
+        final Group orientationIndicatorGroup = new Group();
         // has rotation to make it match biological orientation
         final Group middleTransformGroup = new Group();
 
         // set up the orientation indicator in bottom right corner
-        Text t = makeOrientationIndicatorText("A     P");
+        Text t = makeOrientationIndicatorText("A");
+        t.setTranslateY(-5);
         t.setTranslateX(-10);
+        t.getTransforms().add(new Rotate(90, new Point3D(1, 0, 0)));
         middleTransformGroup.getChildren().add(t);
 
-        t = makeOrientationIndicatorText("R     L");
-        t.setTranslateX(-10);
-        t.setRotate(90);
+        t = makeOrientationIndicatorText("P");
+        t.setTranslateY(-5);
+        t.setTranslateX(10);
+        t.getTransforms().add(new Rotate(90, new Point3D(1, 0, 0)));
         middleTransformGroup.getChildren().add(t);
 
-        t = makeOrientationIndicatorText("V    D");
+        t = makeOrientationIndicatorText("R");
         t.setTranslateX(5);
-        t.setTranslateZ(15);
+       t.setTranslateY(-12);
+        t.getTransforms().add(new Rotate(90, new Point3D(1, 0, 0)));
+        t.getTransforms().add(new Rotate(-90, new Point3D(0, 1, 0)));
+       middleTransformGroup.getChildren().add(t);
+
+        t = makeOrientationIndicatorText("L");
+        t.setTranslateX(5);
+        t.setTranslateY(10);
+        t.getTransforms().add(new Rotate(90, new Point3D(1, 0, 0)));
+        t.getTransforms().add(new Rotate(-90, new Point3D(0, 1, 0)));
+        middleTransformGroup.getChildren().add(t);
+
+        t = makeOrientationIndicatorText("V");
+        t.setTranslateX(5);
+        t.setTranslateZ(10);
+        t.getTransforms().add(new Rotate(90, new Point3D(0, 1, 0)));
+        middleTransformGroup.getChildren().add(t);
+
+        t = makeOrientationIndicatorText("D");
+        t.setTranslateX(5);
+        t.setTranslateZ(-10);
         t.getTransforms().add(new Rotate(90, new Point3D(0, 1, 0)));
         middleTransformGroup.getChildren().add(t);
 
         // xy relocates z shrinks apparent by moving away from camera? improves resolution?
-//        middleTransformGroup.getTransforms().add(new Scale(3, 3, 3));
+        middleTransformGroup.getTransforms().add(new Scale(1,1,1));
 
         // set the location of the indicator in the bottom right corner of the screen
-//        orientationIndicator.getTransforms().add(new Translate(270, 200, 200));
+        middleTransformGroup.getTransforms().add(new Translate(150,100,10));
 
         // add rotation variables
-        orientationIndicator.getTransforms().addAll(rotateXIndicator, rotateYIndicator, rotateZIndicator);
+        middleTransformGroup.getTransforms().addAll(rotateXIndicator, rotateYIndicator, rotateZIndicator);
 
         // add the directional symbols to the group
-        orientationIndicator.getChildren().add(middleTransformGroup);
+        orientationIndicatorGroup.getChildren().add(middleTransformGroup);
 
         // add rotation
         middleTransformGroup.getTransforms().add(indicatorRotation);
 
-        return orientationIndicator;
+        return orientationIndicatorGroup;
     }
 
     private double computeInterpolatedValue(int timevalue, double[] keyFrames, double[] keyValues) {
@@ -1132,6 +1153,8 @@ public class Window3DController {
             	             	
                 xform1.addRotation(angleY, 111,0,0, Rotate.Y_AXIS);
                 xform1.addRotation(angleX, 111,0,0, Rotate.X_AXIS);
+                xform2.addRotation(angleY, 160,110,20, Rotate.Y_AXIS);
+                xform2.addRotation(angleX, 160,110,20, Rotate.X_AXIS);
                 for (Node thingy:xform1.getChildren()) {
                 	if (!(thingy instanceof Text)) {
                 		Text thingyLabel = entityLabelMap.get(thingy);
@@ -1181,13 +1204,11 @@ public class Window3DController {
                 	}
                 }
 
-                xform2.addRotation(-mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED,  250,0,0, Rotate.Y_AXIS);
-                xform2.addRotation(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED,  250,0,0, Rotate.X_AXIS);
-           } else {
+          } else {
                 xform1.setTranslateX(xform1.getTranslateX()+(mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
                 xform1.setTranslateY(xform1.getTranslateY()+(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
-                xform2.setTranslateX(xform2.getTranslateX()+(mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
-                xform2.setTranslateY(xform2.getTranslateY()+(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
+//                xform2.setTranslateX(xform2.getTranslateX()+(mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
+//                xform2.setTranslateY(xform2.getTranslateY()+(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
            }
         });
 
@@ -1200,181 +1221,6 @@ public class Window3DController {
             mouseOldY = me.getSceneY();
        });
     }
-
-//    private void handleMouseDragged(final MouseEvent event) {
-//        hideContextPopups();
-//        spritesPane.setCursor(CLOSED_HAND);
-//
-//        mouseOldX = mousePosX;
-//        mouseOldY = mousePosY;
-//        mouseOldZ = mousePosZ;
-//        mousePosX = event.getSceneX();
-//        mousePosY = event.getSceneY();
-//        mouseDeltaX = (mousePosX - mouseOldX);
-//        mouseDeltaY = (mousePosY - mouseOldY);
-//
-//        mouseDeltaX /= 2;
-//        mouseDeltaY /= 2;
-//
-//        angleOfRotation = rotationAngleFromMouseMovement();
-//        mousePosZ = computeZCoord(mousePosX, mousePosY, angleOfRotation);
-//
-//        if (event.isSecondaryButtonDown() || event.isMetaDown() || event.isControlDown()) {
-//            double translateX = 0.;
-//            double translateY = 0.;
-//            if (xform1.getScaleX() < 1.) {
-//                translateX = xform1.getTranslateX() - (mouseDeltaX * xform1.getScaleX());
-//                translateY = xform1.getTranslateY() - (mouseDeltaY * xform1.getScaleY());
-//            } else if (xform1.getScaleX() < 2.) {
-//                translateX = xform1.getTranslateX() - (mouseDeltaX / xform1.getScaleX());
-//                translateY = xform1.getTranslateY() - (mouseDeltaY / xform1.getScaleY());
-//            } else {
-//                translateX = xform1.getTranslateX() - mouseDeltaX;
-//                translateY = xform1.getTranslateY() - mouseDeltaY;
-//            }
-//
-//            xform1.setTranslateX(translateX);
-//            xform1.setTranslateY(translateY);
-//            translateXProperty.set(translateX);
-//            translateYProperty.set(translateY);
-//            repositionNotes();
-//
-//        } else {
-//            if (event.isPrimaryButtonDown()) {
-//                double modifier = 10.0;
-//                double modifierFactor = 0.1;
-//
-//                rotateXAngleProperty.set((
-//                        (rotateXAngleProperty.get() + mouseDeltaY * modifierFactor * modifier * 2.0)
-//                                % 360 + 540) % 360 - 180);
-//                rotateXIndicator.setAngle(rotateX.getAngle() - initialRotation[0]);
-//                rotateYAngleProperty.set((
-//                        (rotateYAngleProperty.get() + mouseDeltaX * modifierFactor * modifier * 2.0)
-//                                % 360 + 540) % 360 - 180);
-//                rotateYIndicator.setAngle(rotateY.getAngle() - initialRotation[1]);
-//            }
-//        }
-//    }
-//
-//    private void handleMouseReleasedOrEntered() {
-//        spritesPane.setCursor(DEFAULT);
-//    }
-//
-//    private void handleMouseClicked(final MouseEvent event) {
-//        spritesPane.setCursor(DEFAULT);
-//        hideContextPopups();
-//
-//        final Node node = event.getPickResult().getIntersectedNode();
-//
-//        if (node instanceof Sphere) {
-//            // Nucleus
-//            Sphere picked = (Sphere) node;
-//            int index = getPickedSphereIndex(picked);
-//            String name = normalizeName(cellNames.get(index));
-//
-//            cellClickedProperty.set(true);
-//            selectedNameProperty.set(name);
-//            selectedIndex.set(index);
-//
-//            // right click
-//            if (event.getButton() == SECONDARY
-//                    || (event.getButton() == PRIMARY
-//                    && (event.isMetaDown() || event.isControlDown()))) {
-//                boolean hasFunctionalName = false;
-//                if (getFunctionalNameByLineageName(name) != null) {
-//                    hasFunctionalName = true;
-//                }
-//                showContextMenu(
-//                        name,
-//                        event.getScreenX(),
-//                        event.getScreenY(),
-//                        false,
-//                        false,
-//                        hasFunctionalName);
-//
-//            } else if (event.getButton() == PRIMARY) {
-//                // regular click
-//                if (allLabels.contains(name)) {
-//                    removeLabelFor(name);
-//                } else {
-//                    if (!allLabels.contains(name)) {
-//                        allLabels.add(name);
-//                        currentLabels.add(name);
-//                        final Shape3D entity = getEntityWithName(name);
-//                        insertLabelFor(name, entity);
-//                        highlightActiveCellLabel(entity);
-//                    }
-//                }
-//            }
-//
-//        } else if (node instanceof SceneElementMeshView) {
-//            // Structure
-//            boolean found = false; // this will indicate whether this meshview is a scene element
-//            SceneElementMeshView curr;
-////            MeshView curr;
-//            SceneElement clickedSceneElement;
-//            String funcName;
-//            for (int i = 0; i < currentSceneElementMeshes.size(); i++) {
-//                curr = currentSceneElementMeshes.get(i);
-//                if (curr.equals(node)) {
-//                    clickedSceneElement = currentSceneElements.get(i);
-//                    if (!clickedSceneElement.isSelectable()) {
-//                        selectedIndex.set(-1);
-//                        selectedNameProperty.set("");
-//                        return;
-//                    }
-//
-//                    found = true;
-//
-//                    String name = normalizeName(clickedSceneElement.getSceneName());
-//                    selectedNameProperty.set(name);
-//
-//                    if (event.getButton() == SECONDARY
-//                            || (event.getButton() == PRIMARY && (event.isMetaDown() || event.isControlDown()))) {
-//                        // right click
-//                        if (sceneElementsList.isStructureSceneName(name)) {
-//                            boolean hasFunctionalName = false;
-//                            if (getFunctionalNameByLineageName(name) != null) {
-//                                hasFunctionalName = true;
-//                            }
-//                            showContextMenu(
-//                                    name,
-//                                    event.getScreenX(),
-//                                    event.getScreenY(),
-//                                    true,
-//                                    sceneElementsList.isMulticellStructureName(name),
-//                                    hasFunctionalName);
-//                        }
-//
-//                    } else if (event.getButton() == PRIMARY) {
-//                        // regular click
-//                        if (allLabels.contains(name)) {
-//                            removeLabelFor(name);
-//                        } else {
-//                            allLabels.add(name);
-//                            currentLabels.add(name);
-//                            final Shape3D entity = getEntityWithName(name);
-//                            insertLabelFor(name, entity);
-//                            highlightActiveCellLabel(entity);
-//                        }
-//                    }
-//                    break;
-//                }
-//            }
-//
-//            // if the node isn't a SceneElement
-//            if (!found) {
-//                // note structure
-//                currentNotesToMeshesMap.keySet()
-//                        .stream()
-//                        .filter(note -> currentNotesToMeshesMap.get(note).equals(node))
-//                        .forEachOrdered(note -> selectedNameProperty.set(note.getTagName()));
-//            }
-//        } else {
-//            selectedIndex.set(-1);
-//            selectedNameProperty.set("");
-//        }
-//    }
 
     private double[] vectorBWPoints(double px, double py, double pz, double qx, double qy, double qz) {
         double[] vector = new double[3];
@@ -2126,7 +1972,9 @@ public class Window3DController {
         // clear note billboards, cell spheres and meshes
         rootEntitiesGroup.getChildren().clear();
         rootEntitiesGroup.getChildren().add(xform1);
+        rootEntitiesGroup.getChildren().add(xform2);
     	xform1.getChildren().clear();
+    	xform2.getChildren().clear();
         // clear note sprites and overlays
         storyOverlayVBox.getChildren().clear();
 
@@ -2143,7 +1991,8 @@ public class Window3DController {
         }
 
         if (defaultEmbryoFlag) {
-            double newrotate = computeInterpolatedValue(timeProperty.get(), keyFramesRotate, keyValuesRotate);
+            xform2.getChildren().add(createOrientationIndicator());
+            double newrotate = computeInterpolatedValue(0 /*timeProperty.get()*/, keyFramesRotate, keyValuesRotate);
             indicatorRotation.setAngle(-newrotate);
             indicatorRotation.setAxis(new Point3D(1, 0, 0));
         }
@@ -3460,6 +3309,7 @@ public class Window3DController {
 //                        xform1.setScaleX(zoomProperty.get());
 //                        xform1.setScaleY(zoomProperty.get());
                         xform1.setTranslateZ(translateZProperty.get());
+                        xform2.setTranslateZ(600);
                         repositionNotes();
 
                     });
