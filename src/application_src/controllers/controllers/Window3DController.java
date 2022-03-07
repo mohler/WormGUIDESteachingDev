@@ -207,9 +207,9 @@ public class Window3DController {
     private Rotate rotateX;
     private Rotate rotateY;
     private Rotate rotateZ;
-    private final Rotate rotateXIndicator;
-    private final Rotate rotateYIndicator;
-    private final Rotate rotateZIndicator;
+    private final Rotate oriIndRotX;
+    private final Rotate oriIndRotY;
+    private final Rotate oriIndRotZ;
     // transformation stuff
     private final Group rootEntitiesGroup;
     // switching timepoints stuff
@@ -370,6 +370,7 @@ public class Window3DController {
 	private double mouseStartPosX;
 	private double mouseStartPosY;
 	private RootLayoutController rootLC;
+	private Group middleTransformGroup;
 
 
     public Window3DController(
@@ -611,9 +612,9 @@ public class Window3DController {
 
         otherCells = new ArrayList<>();
 
-        rotateXIndicator = new Rotate(0, X_AXIS);
-        rotateYIndicator = new Rotate(0, Y_AXIS);
-        rotateZIndicator = new Rotate(0, Z_AXIS);
+        oriIndRotX = new Rotate(90, X_AXIS);
+        oriIndRotY = new Rotate(0, Y_AXIS);
+        oriIndRotZ = new Rotate(0, Z_AXIS);
 
         rotateX = new Rotate(initialRotation[0], X_AXIS);
         rotateY = new Rotate(initialRotation[1], Y_AXIS);
@@ -628,10 +629,10 @@ public class Window3DController {
         this.rotateZAngleProperty.set(rotateZ.getAngle());
 
         // add listener for control from rotationcontroller
-        this.rotateXAngleProperty.addListener(getRotateXAngleListener());
-        this.rotateYAngleProperty.addListener(getRotateYAngleListener());
-        this.rotateZAngleProperty.addListener(getRotateZAngleListener());
-
+//        this.rotateXAngleProperty.addListener(getRotateXAngleListener());
+//        this.rotateYAngleProperty.addListener(getRotateYAngleListener());
+//        this.rotateZAngleProperty.addListener(getRotateZAngleListener());
+//
         this.translateXProperty = requireNonNull(translateXProperty);
         this.translateXProperty.addListener(getTranslateXListener());
         this.translateXProperty.set(getInitialTranslateX());
@@ -824,66 +825,67 @@ public class Window3DController {
      * @return the group containing the orientation indicator texts
      */
     private Group createOrientationIndicator() {
-        indicatorRotation = new Rotate();
         // top level group
         // had rotation to make it match main rotation
         final Group orientationIndicatorGroup = new Group();
-        // has rotation to make it match biological orientation
-        final Group middleTransformGroup = new Group();
+        if (middleTransformGroup == null) {
+        	indicatorRotation = new Rotate();
+        	middleTransformGroup = new Group();
 
-        // set up the orientation indicator in bottom right corner
-        Text t = makeOrientationIndicatorText("A");
-        t.setTranslateY(-5);
-        t.setTranslateX(-10);
-        t.getTransforms().add(new Rotate(90, new Point3D(1, 0, 0)));
-        middleTransformGroup.getChildren().add(t);
+        	// set up the orientation indicator in bottom right corner
+        	Text t = makeOrientationIndicatorText("A");
+        	t.setTranslateX(-20);
+        	t.setTranslateZ(-5);
+        	//        t.getTransforms().add(new Rotate(90, new Point3D(1, 0, 0)));
+        	middleTransformGroup.getChildren().add(t);
 
-        t = makeOrientationIndicatorText("P");
-        t.setTranslateY(-5);
-        t.setTranslateX(10);
-        t.getTransforms().add(new Rotate(90, new Point3D(1, 0, 0)));
-        middleTransformGroup.getChildren().add(t);
+        	t = makeOrientationIndicatorText("P");
+        	t.setTranslateX(20);
+        	t.setTranslateZ(-5);
+        	//        t.getTransforms().add(new Rotate(90, new Point3D(1, 0, 0)));
+        	middleTransformGroup.getChildren().add(t);
 
-        t = makeOrientationIndicatorText("R");
-        t.setTranslateX(5);
-       t.setTranslateY(-12);
-        t.getTransforms().add(new Rotate(90, new Point3D(1, 0, 0)));
-        t.getTransforms().add(new Rotate(-90, new Point3D(0, 1, 0)));
-       middleTransformGroup.getChildren().add(t);
+        	t = makeOrientationIndicatorText("L");
+        	t.setTranslateX(0);
+        	t.setTranslateZ(-25);
+        	//        t.getTransforms().add(new Rotate(90, new Point3D(1, 0, 0)));
+        	//        t.getTransforms().add(new Rotate(-90, new Point3D(0, 1, 0)));
+        	middleTransformGroup.getChildren().add(t);
 
-        t = makeOrientationIndicatorText("L");
-        t.setTranslateX(5);
-        t.setTranslateY(10);
-        t.getTransforms().add(new Rotate(90, new Point3D(1, 0, 0)));
-        t.getTransforms().add(new Rotate(-90, new Point3D(0, 1, 0)));
-        middleTransformGroup.getChildren().add(t);
+        	t = makeOrientationIndicatorText("R");
+        	t.setTranslateX(0);
+        	t.setTranslateZ(15);
+        	//        t.getTransforms().add(new Rotate(90, new Point3D(1, 0, 0)));
+        	//        t.getTransforms().add(new Rotate(-90, new Point3D(0, 1, 0)));
+        	middleTransformGroup.getChildren().add(t);
 
-        t = makeOrientationIndicatorText("V");
-        t.setTranslateX(5);
-        t.setTranslateZ(10);
-        t.getTransforms().add(new Rotate(90, new Point3D(0, 1, 0)));
-        middleTransformGroup.getChildren().add(t);
+        	t = makeOrientationIndicatorText("V");
+        	t.setTranslateY(20);
+        	t.setTranslateZ(-5);
+        	//        t.getTransforms().add(new Rotate(90, new Point3D(0, 1, 0)));
+        	middleTransformGroup.getChildren().add(t);
 
-        t = makeOrientationIndicatorText("D");
-        t.setTranslateX(5);
-        t.setTranslateZ(-10);
-        t.getTransforms().add(new Rotate(90, new Point3D(0, 1, 0)));
-        middleTransformGroup.getChildren().add(t);
+        	t = makeOrientationIndicatorText("D");
+        	t.setTranslateY(-20);
+        	t.setTranslateZ(-5);
+        	//        t.getTransforms().add(new Rotate(-90, new Point3D(0, 1, 0)));
+        	middleTransformGroup.getChildren().add(t);
 
-        // xy relocates z shrinks apparent by moving away from camera? improves resolution?
-        middleTransformGroup.getTransforms().add(new Scale(1,1,1));
+        	// xy relocates z shrinks apparent by moving away from camera? improves resolution?
+        	middleTransformGroup.getTransforms().add(new Scale(1,1,1));
 
-        // set the location of the indicator in the bottom right corner of the screen
-        middleTransformGroup.getTransforms().add(new Translate(150,100,10));
+        	// set the location of the indicator in the bottom right corner of the screen
+        	middleTransformGroup.getTransforms().add(new Translate(160,120,5));
 
-        // add rotation variables
-        middleTransformGroup.getTransforms().addAll(rotateXIndicator, rotateYIndicator, rotateZIndicator);
+        	// add rotation variables
+        	middleTransformGroup.getTransforms().addAll(oriIndRotX, oriIndRotY, oriIndRotZ);
 
-        // add the directional symbols to the group
-        orientationIndicatorGroup.getChildren().add(middleTransformGroup);
-
-        // add rotation
-        middleTransformGroup.getTransforms().add(indicatorRotation);
+        	// add the directional symbols to the group
+        	orientationIndicatorGroup.getChildren().add(middleTransformGroup);
+        	
+//      	// add rotation
+        	middleTransformGroup.getTransforms().add(indicatorRotation);
+        }
 
         return orientationIndicatorGroup;
     }
@@ -1153,8 +1155,6 @@ public class Window3DController {
             	             	
                 xform1.addRotation(angleY, 111,0,0, Rotate.Y_AXIS);
                 xform1.addRotation(angleX, 111,0,0, Rotate.X_AXIS);
-                xform2.addRotation(angleY, 160,110,20, Rotate.Y_AXIS);
-                xform2.addRotation(angleX, 160,110,20, Rotate.X_AXIS);
                 for (Node thingy:xform1.getChildren()) {
                 	if (!(thingy instanceof Text)) {
                 		Text thingyLabel = entityLabelMap.get(thingy);
@@ -1194,6 +1194,67 @@ public class Window3DController {
 									tLList.set(0, new Rotate(-angleY, xPivot, yPivot, zPivot, axis)
 											.createConcatenation(tLList.get(0)));
 									
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+                			}
+
+                		}
+                		
+                	}
+                }
+                
+//  THIS FOR ORIENTATION INDICATOR                
+//              Group middleTransformGroup = ((Group)((Group)xform2.getChildren().get(0)).getChildren().get(0));
+                Bounds mtgBounds = middleTransformGroup.getBoundsInParent();
+                Point3D oriIndCenter = new Point3D((mtgBounds.getMaxX()+mtgBounds.getMinX())/2,
+							                		(mtgBounds.getMaxY()+mtgBounds.getMinY())/2,
+							                		(mtgBounds.getMaxZ()+mtgBounds.getMinZ())/2);
+                xform2.addRotation(angleY, (int)oriIndCenter.getX(), (int)oriIndCenter.getY(), (int)oriIndCenter.getZ(), Rotate.Y_AXIS);
+                xform2.addRotation(angleX, (int)oriIndCenter.getX(), (int)oriIndCenter.getY(), (int)oriIndCenter.getZ(), Rotate.X_AXIS);
+                for (Node direction:middleTransformGroup.getChildren()) {
+                	if ((direction instanceof Text)) {
+
+                		double xPivot = (direction.getBoundsInLocal().getMaxX() + direction.getBoundsInLocal().getMinX())/2;
+                		double yPivot = (direction.getBoundsInLocal().getMaxY() + direction.getBoundsInLocal().getMinY())/2;
+                		double zPivot = (direction.getBoundsInLocal().getMinZ() + direction.getBoundsInLocal().getMaxZ())/2;
+
+                		Transform rT = new Rotate();
+                		List<Transform> xfm1List = xform2.getTransforms();
+                		List<Transform> dirTfmList = direction.getTransforms();
+                		for (int t=0;t<xfm1List.size();t++) {
+                			Transform tfm = xfm1List.get(t);
+                			if (tfm instanceof Rotate && t<3) {
+//  THIS may now be unused....
+                				Affine rTA = (Affine) ((Rotate)tfm).createConcatenation(new Affine());
+                				try {
+                					Point3D axis;
+                					axis = rTA.inverseDeltaTransform(((Rotate)rT).getAxis());
+                					double angle = -(((Rotate)rT).getAngle());
+                					dirTfmList.set(0, new Rotate(angle, xPivot, yPivot, zPivot, axis)
+                							.createConcatenation(dirTfmList.get(t)));
+                				} catch (NonInvertibleTransformException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+                 			} else if (tfm instanceof Affine && t<3) {
+ // THIS !!!!!
+                				rT = ((Affine)tfm);
+								try {
+									Point3D axis = ((Affine)rT).inverseDeltaTransform(X_AXIS);
+									if (dirTfmList.size() <1) {
+										dirTfmList.add(new Rotate(-angleX, xPivot, yPivot, zPivot, axis));
+									}else {
+										dirTfmList.set(0, new Rotate(-angleX, xPivot, yPivot, zPivot, axis)
+											.createConcatenation(dirTfmList.get(0)));
+									}
+									axis = ((Affine)rT).inverseDeltaTransform(Y_AXIS);
+									if (dirTfmList.size() <1) {
+										dirTfmList.add(new Rotate(-angleY, xPivot, yPivot, zPivot, axis));
+									}else {
+										dirTfmList.set(0, new Rotate(-angleY, xPivot, yPivot, zPivot, axis)
+												.createConcatenation(dirTfmList.get(0)));
+									}
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
@@ -1974,7 +2035,7 @@ public class Window3DController {
         rootEntitiesGroup.getChildren().add(xform1);
         rootEntitiesGroup.getChildren().add(xform2);
     	xform1.getChildren().clear();
-    	xform2.getChildren().clear();
+//    	xform2.getChildren().clear();
         // clear note sprites and overlays
         storyOverlayVBox.getChildren().clear();
 
@@ -1991,10 +2052,13 @@ public class Window3DController {
         }
 
         if (defaultEmbryoFlag) {
-            xform2.getChildren().add(createOrientationIndicator());
-            double newrotate = computeInterpolatedValue(0 /*timeProperty.get()*/, keyFramesRotate, keyValuesRotate);
-            indicatorRotation.setAngle(-newrotate);
-            indicatorRotation.setAxis(new Point3D(1, 0, 0));
+        	if (true ) {//xform2.getChildren().size()<1 || !((Group)xform2.getChildren().get(0)).getChildren().contains(middleTransformGroup)) {
+        		xform2.getChildren().add(createOrientationIndicator());
+        	}
+        	double newrotate = computeInterpolatedValue(timeProperty.get(), keyFramesRotate, keyValuesRotate);
+        	indicatorRotation.setAngle(-newrotate);
+        	indicatorRotation.setAxis(new Point3D(1, 0, 0));
+        	
         }
     }
 
@@ -2793,7 +2857,7 @@ public class Window3DController {
     private Text makeOrientationIndicatorText(final String string) {
         final Text text = new Text(string);
         text.setFont(getOrientationIndicatorFont());
-        text.setSmooth(false);
+        text.setSmooth(true);
         text.setFontSmoothingType(LCD);
         text.setFill(web(SPRITE_COLOR_HEX));
         return text;
@@ -3129,36 +3193,36 @@ public class Window3DController {
         };
     }
 
-    private ChangeListener<Number> getRotateXAngleListener() {
-        return (observable, oldValue, newValue) -> {
-            double newAngle = newValue.doubleValue();
-            this.rotateXAngleProperty.set(newAngle);
-            rotateX.setAngle(rotateXAngleProperty.get());
-            rotateXIndicator.setAngle(newAngle - initialRotation[0]);
-            repositionNotes();
-        };
-    }
-
-    private ChangeListener<Number> getRotateYAngleListener() {
-        return (observable, oldValue, newValue) -> {
-            double newAngle = newValue.doubleValue();
-            this.rotateYAngleProperty.set(newAngle);
-            rotateY.setAngle(rotateYAngleProperty.get());
-            rotateYIndicator.setAngle(newAngle - initialRotation[1]);
-            repositionNotes();
-        };
-    }
-
-    private ChangeListener<Number> getRotateZAngleListener() {
-        return (observable, oldValue, newValue) -> {
-            double newAngle = newValue.doubleValue();
-            this.rotateZAngleProperty.set(newAngle);
-            rotateZ.setAngle(rotateZAngleProperty.get());;
-            rotateZIndicator.setAngle(newAngle - initialRotation[2]);
-            repositionNotes();
-        };
-    }
-
+//    private ChangeListener<Number> getRotateXAngleListener() {
+//        return (observable, oldValue, newValue) -> {
+//            double newAngle = newValue.doubleValue();
+//            this.rotateXAngleProperty.set(newAngle);
+//            rotateX.setAngle(rotateXAngleProperty.get());
+//            oriIndRotX.setAngle(newAngle - initialRotation[0]);
+//            repositionNotes();
+//        };
+//    }
+//
+//    private ChangeListener<Number> getRotateYAngleListener() {
+//        return (observable, oldValue, newValue) -> {
+//            double newAngle = newValue.doubleValue();
+//            this.rotateYAngleProperty.set(newAngle);
+//            rotateY.setAngle(rotateYAngleProperty.get());
+//            oriIndRotY.setAngle(newAngle - initialRotation[1]);
+//            repositionNotes();
+//        };
+//    }
+//
+//    private ChangeListener<Number> getRotateZAngleListener() {
+//        return (observable, oldValue, newValue) -> {
+//            double newAngle = newValue.doubleValue();
+//            this.rotateZAngleProperty.set(newAngle);
+//            rotateZ.setAngle(rotateZAngleProperty.get());;
+//            oriIndRotZ.setAngle(newAngle - initialRotation[2]);
+//            repositionNotes();
+//        };
+//    }
+//
     private EventHandler<ActionEvent> getZoomOutButtonListener() {
         return event -> {
             hideContextPopups();
