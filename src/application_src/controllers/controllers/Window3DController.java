@@ -371,6 +371,7 @@ public class Window3DController {
 	private double mouseStartPosY;
 	private RootLayoutController rootLC;
 	private Group middleTransformGroup;
+	private double oldrotate = 90;
 
 
     public Window3DController(
@@ -832,6 +833,9 @@ public class Window3DController {
         	indicatorRotation = new Rotate();
         	middleTransformGroup = new Group();
 
+        	Cylinder dvCylinder = new Cylinder(2,30);
+        	middleTransformGroup.getChildren().add(dvCylinder);
+        	
         	// set up the orientation indicator in bottom right corner
         	Text t = makeOrientationIndicatorText("A");
         	t.setTranslateX(-20);
@@ -2052,13 +2056,22 @@ public class Window3DController {
         }
 
         if (defaultEmbryoFlag) {
-        	if (true ) {//xform2.getChildren().size()<1 || !((Group)xform2.getChildren().get(0)).getChildren().contains(middleTransformGroup)) {
-        		xform2.getChildren().add(createOrientationIndicator());
-        	}
+        	xform2.getChildren().add(createOrientationIndicator());
         	double newrotate = computeInterpolatedValue(timeProperty.get(), keyFramesRotate, keyValuesRotate);
+        	double counterRotate = 0;
+        	counterRotate = oldrotate - newrotate;
+        	oldrotate = newrotate;
         	indicatorRotation.setAngle(-newrotate);
         	indicatorRotation.setAxis(new Point3D(1, 0, 0));
-        	
+        	for(Node direction:middleTransformGroup.getChildren()) {
+        		if (direction instanceof Text) {
+        			if (direction.getTransforms().size()<1) {
+        				direction.getTransforms().add(new Rotate(-counterRotate, X_AXIS));
+        			} else {
+        				direction.getTransforms().set(0, new Rotate(-counterRotate, X_AXIS).createConcatenation(direction.getTransforms().get(0)));
+        			}
+        		}
+        	}
         }
     }
 
