@@ -900,7 +900,7 @@ public class Window3DController {
         	// add rotation variables
         	middleTransformGroup.getTransforms().addAll(oriIndRotX, oriIndRotY, oriIndRotZ);
 
-        	// add the directional symbols to the group
+        	// add the directionLabel symbols to the group
         	orientationIndicatorGroup.getChildren().add(middleTransformGroup);
         	
 //      	// add rotation
@@ -1232,16 +1232,16 @@ public class Window3DController {
 							                		(mtgBounds.getMaxZ()+mtgBounds.getMinZ())/2);
                 xform2.addRotation(angleY, (int)oriIndCenter.getX(), (int)oriIndCenter.getY(), (int)oriIndCenter.getZ(), Rotate.Y_AXIS);
                 xform2.addRotation(angleX, (int)oriIndCenter.getX(), (int)oriIndCenter.getY(), (int)oriIndCenter.getZ(), Rotate.X_AXIS);
-                for (Node direction:middleTransformGroup.getChildren()) {
-                	if ((direction instanceof Text)) {
+                for (Node directionLabel:middleTransformGroup.getChildren()) {
+                	if ((directionLabel instanceof Text)) {
 
-                		double xPivot = (direction.getBoundsInLocal().getMaxX() + direction.getBoundsInLocal().getMinX())/2;
-                		double yPivot = (direction.getBoundsInLocal().getMaxY() + direction.getBoundsInLocal().getMinY())/2;
-                		double zPivot = (direction.getBoundsInLocal().getMinZ() + direction.getBoundsInLocal().getMaxZ())/2;
+                		double xPivot = (directionLabel.getBoundsInLocal().getMaxX() + directionLabel.getBoundsInLocal().getMinX())/2;
+                		double yPivot = (directionLabel.getBoundsInLocal().getMaxY() + directionLabel.getBoundsInLocal().getMinY())/2;
+                		double zPivot = (directionLabel.getBoundsInLocal().getMinZ() + directionLabel.getBoundsInLocal().getMaxZ())/2;
 
                 		Transform rT = new Rotate();
                 		List<Transform> xfm2List = xform2.getTransforms();
-                		List<Transform> dirTfmList = direction.getTransforms();
+                		List<Transform> dirTfmList = directionLabel.getTransforms();
                 		for (int t=0;t<xfm2List.size();t++) {
                 			Transform tfm = xfm2List.get(t);
                 			if (tfm instanceof Rotate && t<3) {
@@ -2074,9 +2074,12 @@ public class Window3DController {
 
 //THIS STILL IS BUGGY FOR COUNTERROTATION OF TIMEVARYING AXIS.
         if (defaultEmbryoFlag) {
-        	if (xform2.getChildren().contains(orientationIndicatorGroup))
-        		xform2.getChildren().remove(orientationIndicatorGroup);
-        	xform2.getChildren().add(createOrientationIndicator());
+//        	if (xform2.getChildren().contains(orientationIndicatorGroup))
+//        		xform2.getChildren().remove(orientationIndicatorGroup);
+//        	xform2.getChildren().add(createOrientationIndicator());
+        	if (!xform2.getChildren().contains(orientationIndicatorGroup))
+            	xform2.getChildren().add(createOrientationIndicator());
+        	
         	double newrotate = computeInterpolatedValue(timeProperty.get(), keyFramesRotate, keyValuesRotate);
         	double counterRotate = 0;
         	counterRotate = oldrotate - newrotate;
@@ -2084,28 +2087,28 @@ public class Window3DController {
         	indicatorRotation.setAngle(-newrotate);
         	indicatorRotation.setAxis(X_AXIS);        	
         	
-        	for(Node direction:middleTransformGroup.getChildren()) {
-        		Bounds b = direction.getBoundsInParent();
+        	for(Node directionLabel:middleTransformGroup.getChildren()) {
+        		Bounds b = directionLabel.getBoundsInLocal();
         		if (b != null) {
         			double x = b.getMaxX();
         			double y = b.getMaxY();
         			double z = b.getMinZ();
-        			double xPivot = (direction.getBoundsInParent().getMaxX() + direction.getBoundsInParent().getMinX())/2;
-        			double yPivot = (direction.getBoundsInParent().getMaxY() + direction.getBoundsInParent().getMinY())/2;
-        			double zPivot = (direction.getBoundsInParent().getMinZ() + direction.getBoundsInParent().getMaxZ())/2;
+        			double xPivot = (b.getMaxX() + b.getMinX())/2;
+        			double yPivot = (b.getMaxY() + b.getMinY())/2;
+        			double zPivot = (b.getMinZ() + b.getMaxZ())/2;
 
         			double height = b.getHeight();
         			double width = b.getWidth();
         			double depth = b.getDepth();
 
-                    ObservableList<Transform> olTfms = direction.getTransforms();
+                    ObservableList<Transform> olTfms = directionLabel.getTransforms();
                     olTfms.clear();
 					olTfms.add(new Translate(xPivot, yPivot, zPivot));	
 
-        			if (direction instanceof Text) {
-        				ObservableList<Transform> xfm1List = xform1.getTransforms();
-        				for (int t=0;t<xfm1List.size();t++) {
-        					Transform xfm = xfm1List.get(t);
+        			if (directionLabel instanceof Text) {
+        				ObservableList<Transform> xfm2List = xform2.getTransforms();
+        				for (int t=0;t<xfm2List.size();t++) {
+        					Transform xfm = xfm2List.get(t);
         					if (xfm instanceof Rotate && t<3) {
         					} else if (xfm instanceof Affine && t<3) {
 
@@ -2114,7 +2117,6 @@ public class Window3DController {
         							olTfms.add(new Affine(aff.getMxx(), aff.getMxy(), aff.getMxz(),0,
         									aff.getMyx(),aff.getMyy(),aff.getMyz(),0,
         									aff.getMzx(),aff.getMzy(),aff.getMzz(),0).createInverse());
-//        							olTfms.add(new Translate(width*.4, height*.4, -depth*.4));	
         						} catch (Exception e) {
         							e.printStackTrace();
         						}
