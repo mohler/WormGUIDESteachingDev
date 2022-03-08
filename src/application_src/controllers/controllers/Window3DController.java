@@ -372,6 +372,8 @@ public class Window3DController {
 	private RootLayoutController rootLC;
 	private Group middleTransformGroup;
 	private double oldrotate = 90;
+	private Point3D counterAxis;
+	private Group orientationIndicatorGroup;
 
 
     public Window3DController(
@@ -826,52 +828,66 @@ public class Window3DController {
      * @return the group containing the orientation indicator texts
      */
     private Group createOrientationIndicator() {
-        // top level group
-        // had rotation to make it match main rotation
-        final Group orientationIndicatorGroup = new Group();
+        if (orientationIndicatorGroup == null)
+        	orientationIndicatorGroup = new Group();
         if (middleTransformGroup == null) {
         	indicatorRotation = new Rotate();
         	middleTransformGroup = new Group();
 
-        	Cylinder dvCylinder = new Cylinder(2,30);
+        	Cylinder dvCylinder = new Cylinder(1.414,20);
+        	dvCylinder.setMaterial(new PhongMaterial(Color.CYAN));
         	middleTransformGroup.getChildren().add(dvCylinder);
+        	
+        	Cylinder apCylinder = new Cylinder(1.414,30);
+        	apCylinder.setMaterial(new PhongMaterial(Color.MAGENTA));
+        	apCylinder.setRotate(90);
+        	apCylinder.setRotationAxis(Z_AXIS);
+        	middleTransformGroup.getChildren().add(apCylinder);
+        	
+        	Cylinder lrCylinder = new Cylinder(1.414,20);
+        	lrCylinder.setMaterial(new PhongMaterial(Color.YELLOW));
+        	lrCylinder.setRotate(90);
+        	lrCylinder.setRotationAxis(X_AXIS);
+        	middleTransformGroup.getChildren().add(lrCylinder);
         	
         	// set up the orientation indicator in bottom right corner
         	Text t = makeOrientationIndicatorText("A");
-        	t.setTranslateX(-20);
-        	t.setTranslateZ(-5);
+        	t.setTranslateX(-23);
+        	t.setTranslateY(3);
         	//        t.getTransforms().add(new Rotate(90, new Point3D(1, 0, 0)));
         	middleTransformGroup.getChildren().add(t);
 
         	t = makeOrientationIndicatorText("P");
-        	t.setTranslateX(20);
-        	t.setTranslateZ(-5);
+        	t.setTranslateX(17);
+        	t.setTranslateY(3);
         	//        t.getTransforms().add(new Rotate(90, new Point3D(1, 0, 0)));
         	middleTransformGroup.getChildren().add(t);
 
         	t = makeOrientationIndicatorText("L");
-        	t.setTranslateX(0);
-        	t.setTranslateZ(-25);
+        	t.setTranslateX(-3);
+        	t.setTranslateZ(-15);
+        	t.setTranslateY(3);
         	//        t.getTransforms().add(new Rotate(90, new Point3D(1, 0, 0)));
         	//        t.getTransforms().add(new Rotate(-90, new Point3D(0, 1, 0)));
         	middleTransformGroup.getChildren().add(t);
 
         	t = makeOrientationIndicatorText("R");
-        	t.setTranslateX(0);
+        	t.setTranslateX(-3);
         	t.setTranslateZ(15);
+        	t.setTranslateY(3);
         	//        t.getTransforms().add(new Rotate(90, new Point3D(1, 0, 0)));
         	//        t.getTransforms().add(new Rotate(-90, new Point3D(0, 1, 0)));
         	middleTransformGroup.getChildren().add(t);
 
         	t = makeOrientationIndicatorText("V");
-        	t.setTranslateY(20);
-        	t.setTranslateZ(-5);
+        	t.setTranslateY(21);
+        	t.setTranslateX(-3);
         	//        t.getTransforms().add(new Rotate(90, new Point3D(0, 1, 0)));
         	middleTransformGroup.getChildren().add(t);
 
         	t = makeOrientationIndicatorText("D");
-        	t.setTranslateY(-20);
-        	t.setTranslateZ(-5);
+        	t.setTranslateY(-15);
+        	t.setTranslateX(-3);
         	//        t.getTransforms().add(new Rotate(-90, new Point3D(0, 1, 0)));
         	middleTransformGroup.getChildren().add(t);
 
@@ -1224,10 +1240,10 @@ public class Window3DController {
                 		double zPivot = (direction.getBoundsInLocal().getMinZ() + direction.getBoundsInLocal().getMaxZ())/2;
 
                 		Transform rT = new Rotate();
-                		List<Transform> xfm1List = xform2.getTransforms();
+                		List<Transform> xfm2List = xform2.getTransforms();
                 		List<Transform> dirTfmList = direction.getTransforms();
-                		for (int t=0;t<xfm1List.size();t++) {
-                			Transform tfm = xfm1List.get(t);
+                		for (int t=0;t<xfm2List.size();t++) {
+                			Transform tfm = xfm2List.get(t);
                 			if (tfm instanceof Rotate && t<3) {
 //  THIS may now be unused....
                 				Affine rTA = (Affine) ((Rotate)tfm).createConcatenation(new Affine());
@@ -1242,17 +1258,17 @@ public class Window3DController {
 									e.printStackTrace();
 								}
                  			} else if (tfm instanceof Affine && t<3) {
- // THIS !!!!!
+ // THIS works but needs synching to the time-rotated state of orientationIndicator !!!!!
                 				rT = ((Affine)tfm);
 								try {
-									Point3D axis = ((Affine)rT).inverseDeltaTransform(X_AXIS);
+									Point3D axis = ((Affine)rT).inverseDeltaTransform(Rotate.X_AXIS);
 									if (dirTfmList.size() <1) {
 										dirTfmList.add(new Rotate(-angleX, xPivot, yPivot, zPivot, axis));
 									}else {
 										dirTfmList.set(0, new Rotate(-angleX, xPivot, yPivot, zPivot, axis)
 											.createConcatenation(dirTfmList.get(0)));
 									}
-									axis = ((Affine)rT).inverseDeltaTransform(Y_AXIS);
+									axis = ((Affine)rT).inverseDeltaTransform(Rotate.Y_AXIS);
 									if (dirTfmList.size() <1) {
 										dirTfmList.add(new Rotate(-angleY, xPivot, yPivot, zPivot, axis));
 									}else {
@@ -1262,6 +1278,7 @@ public class Window3DController {
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
+								t = xfm2List.size();
                 			}
 
                 		}
@@ -2055,20 +2072,34 @@ public class Window3DController {
             }
         }
 
+//THIS STILL IS BUGGY FOR COUNTERROTATION OF TIMEVARYING AXIS.
         if (defaultEmbryoFlag) {
+        	if (xform2.getChildren().contains(orientationIndicatorGroup))
+        		xform2.getChildren().remove(orientationIndicatorGroup);
         	xform2.getChildren().add(createOrientationIndicator());
         	double newrotate = computeInterpolatedValue(timeProperty.get(), keyFramesRotate, keyValuesRotate);
         	double counterRotate = 0;
         	counterRotate = oldrotate - newrotate;
         	oldrotate = newrotate;
         	indicatorRotation.setAngle(-newrotate);
-        	indicatorRotation.setAxis(new Point3D(1, 0, 0));
+        	indicatorRotation.setAxis(X_AXIS);        	
+        	Transform rT = xform2.getTransforms().get(0);
+        	if (counterAxis == null)
+        		counterAxis = X_AXIS;
+         	if (rT != null)
+				try {
+					counterAxis = ((Affine)rT).deltaTransform(counterAxis);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+       	
         	for(Node direction:middleTransformGroup.getChildren()) {
         		if (direction instanceof Text) {
         			if (direction.getTransforms().size()<1) {
-        				direction.getTransforms().add(new Rotate(-counterRotate, X_AXIS));
+        				direction.getTransforms().add(new Rotate(-counterRotate, counterAxis));
         			} else {
-        				direction.getTransforms().set(0, new Rotate(-counterRotate, X_AXIS).createConcatenation(direction.getTransforms().get(0)));
+        				direction.getTransforms().set(0, new Rotate(-counterRotate, counterAxis).createConcatenation(direction.getTransforms().get(0)));
         			}
         		}
         	}
