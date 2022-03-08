@@ -1278,7 +1278,7 @@ public class Window3DController {
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
-								t = xfm2List.size();
+//								t = xfm2List.size();
                 			}
 
                 		}
@@ -2083,23 +2083,43 @@ public class Window3DController {
         	oldrotate = newrotate;
         	indicatorRotation.setAngle(-newrotate);
         	indicatorRotation.setAxis(X_AXIS);        	
-        	Transform rT = xform2.getTransforms().get(0);
-        	if (counterAxis == null)
-        		counterAxis = X_AXIS;
-         	if (rT != null)
-				try {
-					counterAxis = ((Affine)rT).deltaTransform(counterAxis);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-       	
+        	
         	for(Node direction:middleTransformGroup.getChildren()) {
-        		if (direction instanceof Text) {
-        			if (direction.getTransforms().size()<1) {
-        				direction.getTransforms().add(new Rotate(-counterRotate, counterAxis));
-        			} else {
-        				direction.getTransforms().set(0, new Rotate(-counterRotate, counterAxis).createConcatenation(direction.getTransforms().get(0)));
+        		Bounds b = direction.getBoundsInParent();
+        		if (b != null) {
+        			double x = b.getMaxX();
+        			double y = b.getMaxY();
+        			double z = b.getMinZ();
+        			double xPivot = (direction.getBoundsInParent().getMaxX() + direction.getBoundsInParent().getMinX())/2;
+        			double yPivot = (direction.getBoundsInParent().getMaxY() + direction.getBoundsInParent().getMinY())/2;
+        			double zPivot = (direction.getBoundsInParent().getMinZ() + direction.getBoundsInParent().getMaxZ())/2;
+
+        			double height = b.getHeight();
+        			double width = b.getWidth();
+        			double depth = b.getDepth();
+
+                    ObservableList<Transform> olTfms = direction.getTransforms();
+                    olTfms.clear();
+					olTfms.add(new Translate(xPivot, yPivot, zPivot));	
+
+        			if (direction instanceof Text) {
+        				ObservableList<Transform> xfm1List = xform1.getTransforms();
+        				for (int t=0;t<xfm1List.size();t++) {
+        					Transform xfm = xfm1List.get(t);
+        					if (xfm instanceof Rotate && t<3) {
+        					} else if (xfm instanceof Affine && t<3) {
+
+        						try {
+        							Transform aff = xfm;
+        							olTfms.add(new Affine(aff.getMxx(), aff.getMxy(), aff.getMxz(),0,
+        									aff.getMyx(),aff.getMyy(),aff.getMyz(),0,
+        									aff.getMzx(),aff.getMzy(),aff.getMzz(),0).createInverse());
+//        							olTfms.add(new Translate(width*.4, height*.4, -depth*.4));	
+        						} catch (Exception e) {
+        							e.printStackTrace();
+        						}
+        					}
+        				}
         			}
         		}
         	}
