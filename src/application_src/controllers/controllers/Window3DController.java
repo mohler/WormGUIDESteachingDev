@@ -828,9 +828,9 @@ public class Window3DController {
      * @return the group containing the orientation indicator texts
      */
     private Group createOrientationIndicator() {
-        if (orientationIndicatorGroup == null) {
+        if (orientationIndicatorGroup == null)
         	orientationIndicatorGroup = new Group();
-//        if (middleTransformGroup == null) {
+        if (middleTransformGroup == null) {
         	indicatorRotation = new Rotate();
         	middleTransformGroup = new Group();
 
@@ -1258,27 +1258,27 @@ public class Window3DController {
 									e.printStackTrace();
 								}
                  			} else if (tfm instanceof Affine && t<3) {
- // THIS works but needs synching to the time-rotated state of orientationIndicator !!!!!
-                				rT = ((Affine)tfm);
-								try {
-									Point3D axis = ((Affine)rT).inverseDeltaTransform(Rotate.X_AXIS);
-									if (dirTfmList.size() <1) {
-										dirTfmList.add(new Rotate(-angleX, xPivot, yPivot, zPivot, axis));
-									}else {
-										dirTfmList.set(0, new Rotate(-angleX, xPivot, yPivot, zPivot, axis)
-											.createConcatenation(dirTfmList.get(0)));
-									}
-									axis = ((Affine)rT).inverseDeltaTransform(Rotate.Y_AXIS);
-									if (dirTfmList.size() <1) {
-										dirTfmList.add(new Rotate(-angleY, xPivot, yPivot, zPivot, axis));
-									}else {
-										dirTfmList.set(0, new Rotate(-angleY, xPivot, yPivot, zPivot, axis)
-												.createConcatenation(dirTfmList.get(0)));
-									}
-								} catch (Exception e) {
-									e.printStackTrace();
-								}
-								t = xfm2List.size();
+// // THIS works but needs synching to the time-rotated state of orientationIndicator !!!!!
+//                				rT = ((Affine)tfm);
+//								try {
+//									Point3D axis = ((Affine)rT).inverseDeltaTransform(Rotate.X_AXIS);
+//									if (dirTfmList.size() <1) {
+//										dirTfmList.add(new Rotate(-angleX, xPivot, yPivot, zPivot, axis));
+//									}else {
+//										dirTfmList.set(0, new Rotate(-angleX, xPivot, yPivot, zPivot, axis)
+//											.createConcatenation(dirTfmList.get(0)));
+//									}
+//									axis = ((Affine)rT).inverseDeltaTransform(Rotate.Y_AXIS);
+//									if (dirTfmList.size() <1) {
+//										dirTfmList.add(new Rotate(-angleY, xPivot, yPivot, zPivot, axis));
+//									}else {
+//										dirTfmList.set(0, new Rotate(-angleY, xPivot, yPivot, zPivot, axis)
+//												.createConcatenation(dirTfmList.get(0)));
+//									}
+//								} catch (Exception e) {
+//									e.printStackTrace();
+//								}
+//								t = xfm2List.size();
                  			}
 
                 		}
@@ -2087,54 +2087,44 @@ public class Window3DController {
         	indicatorRotation.setAngle(-newrotate);
         	indicatorRotation.setAxis(X_AXIS);        	
         	
-        	for(Node directionLabel:middleTransformGroup.getChildren()) {
-        		Bounds b = directionLabel.getBoundsInLocal();
-        		if (b != null) {
-        			if (directionLabel instanceof Text) {
-        				double x = b.getMaxX();
-        				double y = b.getMaxY();
-        				double z = b.getMinZ();
-        				double xPivot = (b.getMaxX() + b.getMinX())/2;
-        				double yPivot = (b.getMaxY() + b.getMinY())/2;
-        				double zPivot = (b.getMinZ() + b.getMaxZ())/2;
-
-        				double height = b.getHeight();
-        				double width = b.getWidth();
-        				double depth = b.getDepth();
-
- 
-        				
-        				ObservableList<Transform> olTfms = directionLabel.getTransforms();
-        				olTfms.clear();
-//        				olTfms.add(new Translate(-xPivot, -yPivot, -zPivot));	
-        				olTfms.add(new Affine());
- 
-        				
-        				
-        				
-        				
-        				
-        				
-        				
-        				ObservableList<Transform> xfm2List = xform2.getTransforms();
-        				for (int t=0;t<xfm2List.size();t++) {
-        					Transform xfm = xfm2List.get(t);
-        					if (xfm instanceof Rotate && t<3) {
-        					} else if (xfm instanceof Affine && t<3) {
-
-        						try {
-        							Transform aff = xfm;
-        							olTfms.add(new Affine(aff.getMxx(), aff.getMxy(), aff.getMxz(),0,
-					        									aff.getMyx(),aff.getMyy(),aff.getMyz(),0,
-					        									aff.getMzx(),aff.getMzy(),aff.getMzz(),0).createInverse());
-        						} catch (Exception e) {
-        							e.printStackTrace();
-        						}
-        					}
-        				}
-        			}
-        		}
-        	}
+//        	for(Node directionLabel:middleTransformGroup.getChildren()) {
+//        		Bounds b = directionLabel.getBoundsInLocal();
+//        		if (b != null) {
+//        			if (directionLabel instanceof Text) {
+//        				double x = b.getMaxX();
+//        				double y = b.getMaxY();
+//        				double z = b.getMinZ();
+//        				double xPivot = (b.getMaxX() + b.getMinX())/2;
+//        				double yPivot = (b.getMaxY() + b.getMinY())/2;
+//        				double zPivot = (b.getMinZ() + b.getMaxZ())/2;
+//
+//        				double height = b.getHeight();
+//        				double width = b.getWidth();
+//        				double depth = b.getDepth();
+//
+//        				ObservableList<Transform> olTfms = directionLabel.getTransforms();
+//        				olTfms.clear();
+//        				olTfms.add(new Translate(xPivot, yPivot, zPivot));	
+//
+//        				ObservableList<Transform> xfm2List = xform2.getTransforms();
+//        				for (int t=0;t<xfm2List.size();t++) {
+//        					Transform xfm = xfm2List.get(t);
+//        					if (xfm instanceof Rotate && t<3) {
+//        					} else if (xfm instanceof Affine && t<3) {
+//
+//        						try {
+//        							Transform aff = xfm;
+//        							olTfms.add(new Affine(aff.getMxx(), aff.getMxy(), aff.getMxz(),0,
+//        									aff.getMyx(),aff.getMyy(),aff.getMyz(),0,
+//        									aff.getMzx(),aff.getMzy(),aff.getMzz(),0).createInverse());
+//        						} catch (Exception e) {
+//        							e.printStackTrace();
+//        						}
+//        					}
+//        				}
+//        			}
+//        		}
+//        	}
         }
     }
 
