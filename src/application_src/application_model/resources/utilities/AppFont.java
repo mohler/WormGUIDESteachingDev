@@ -29,7 +29,7 @@ public class AppFont {
 
     private static final Font ORIENTATION_INDICATOR_FONT = font(SYSTEM, SEMI_BOLD, 12);
 
-    private static final Font SPRITE_AND_OVERLAY_FONT = font(SYSTEM, BOLD, 16);
+    private static final Font SPRITE_AND_OVERLAY_FONT = font(SYSTEM, EXTRA_BOLD, 28);
 
     public static Font getSpriteAndOverlayFont() {
         return SPRITE_AND_OVERLAY_FONT;

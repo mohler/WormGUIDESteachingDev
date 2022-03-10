@@ -4,6 +4,7 @@
 
 package application_src.controllers.controllers;
 
+import java.awt.Font;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
@@ -49,9 +50,12 @@ import javafx.scene.SubScene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -62,8 +66,10 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.Shape3D;
 import javafx.scene.shape.Sphere;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.text.TextFlow;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.MatrixType;
 import javafx.scene.transform.NonInvertibleTransformException;
@@ -374,6 +380,7 @@ public class Window3DController {
 	private double oldrotate = 90;
 	private Point3D counterAxis;
 	private Group orientationIndicatorGroup;
+	private TextFlow transientLabelTextFlow;
 
 
     public Window3DController(
@@ -951,14 +958,40 @@ public class Window3DController {
                     && (othersOpacityProperty.get() < getSelectabilityVisibilityCutoff())) {
                 return;
             }
-            if (!currentLabels.contains(name)) {
+//            if (!currentLabels.contains(name)) {
                 final Bounds b = entity.getBoundsInParent();
                 if (b != null) {
                     final String funcName = getFunctionalNameByLineageName(name);
+                    String goName = name;
                     if (funcName != null) {
-                        name = funcName;
+                        goName = name +" ("+funcName+")";
                     }
-                    transientLabelText = makeNoteSpriteText(name);
+                    String fullTextString = goName;
+                    transientLabelText = new Text(fullTextString);
+                    transientLabelTextFlow = new TextFlow(transientLabelText);
+                    for (Rule rule : rulesList) {
+                        //System.out.println("checking rule: " + rule.getSearchedText());
+                        if (rule.appliesToCellNucleus(name)) {
+                        	String ruleString = "\n"+"• "+rule.getSearchedText();
+                        	Text ruleText = new Text(ruleString);
+                        	ruleText.setFill(rule.getColor());
+                            ruleText.setWrappingWidth(-1);
+                            ruleText.setOnMouseEntered(Event::consume);
+                            ruleText.setOnMouseClicked(Event::consume);
+                            ruleText.setDisable(true);
+                            ruleText.setFont(getSpriteAndOverlayFont());
+                            ruleText.setStrokeWidth(0.25);
+                            ruleText.setStroke(Color.BLACK);
+                        	transientLabelTextFlow.getChildren().add(ruleText);
+//                            //System.out.println("rule applies to: " + cellName);
+//                            colors.add(web(rule.getColor().toString()));
+//                            // check if opacity of rule is below cutoff, then it's not selectable
+                            if (rule.getColor().getOpacity() <= getSelectabilityVisibilityCutoff()) {
+                                entity.setDisable(true);
+                            }
+                        }
+                    }
+                    
                     transientLabelText.setWrappingWidth(-1);
                     transientLabelText.setFill(web(TRANSIENT_LABEL_COLOR_HEX));
                     transientLabelText.setOnMouseEntered(Event::consume);
@@ -971,12 +1004,18 @@ public class Window3DController {
                     		- rootLC.modelAnchorPane.localToScreen(0,0).getY();
 
                     y -= getLabelSpriteYOffset();
-                    transientLabelText.getTransforms().add(new Translate(x+10, y+10));
+                    transientLabelTextFlow.getTransforms().add(new Translate(x+10, y+10));
+                    transientLabelTextFlow.setBackground(new Background(new BackgroundFill(Color.valueOf("0xffffff99"), null, null)));
                     // disable text to take away label flickering when mouse is on top top of it
                     transientLabelText.setDisable(true);
-                    spritesPane.getChildren().add(transientLabelText);
+                    transientLabelText.setFont(getSpriteAndOverlayFont());
+                    transientLabelText.setStrokeWidth(0.25);
+                    transientLabelText.setStroke(Color.BLACK);
+                    transientLabelText.setFill(Color.WHITE);
+
+                    spritesPane.getChildren().add(transientLabelTextFlow);
                 }
-            }
+//            }
         }
     }
 
@@ -984,7 +1023,7 @@ public class Window3DController {
      * Removes transient label from sprites pane.
      */
     private void removeTransientLabel() {
-        spritesPane.getChildren().remove(transientLabelText);
+        spritesPane.getChildren().remove(transientLabelTextFlow);
     }
 
     /**
@@ -2073,6 +2112,7 @@ public class Window3DController {
         }
 
 //THIS STILL IS BUGGY FOR COUNTERROTATION OF TIMEVARYING AXIS.
+//        ...so tricky in fact, that I have just commented out the code for it.
         if (defaultEmbryoFlag) {
         	if (xform2.getChildren().contains(orientationIndicatorGroup))
         		xform2.getChildren().remove(orientationIndicatorGroup);
@@ -2281,9 +2321,9 @@ public class Window3DController {
                 sphere.setOnMouseEntered((MouseEvent event) -> {
                     spritesPane.setCursor(HAND);
                     // make label appear
-                    if (!currentLabels.contains(cellName.toLowerCase())) {
+//                    if (!currentLabels.contains(cellName.toLowerCase())) {
                         insertTransientLabel(cellName, getEntityWithName(cellName));
-                    }
+//                    }
                 });
                 sphere.setOnMouseExited(event -> {
                     spritesPane.setCursor(DEFAULT);
