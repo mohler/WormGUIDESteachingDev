@@ -93,6 +93,7 @@ import application_src.application_model.threeD.subscenegeometry.SceneElementMes
 import application_src.application_model.threeD.subscenegeometry.SceneElementsList;
 import application_src.application_model.threeD.subscenegeometry.StructureTreeNode;
 import application_src.application_model.resources.ProductionInfo;
+import application_src.application_model.resources.utilities.AppFont;
 import application_src.application_model.annotation.stories.Note;
 import application_src.application_model.annotation.stories.Note.Display;
 import application_src.application_model.annotation.color.ColorComparator;
@@ -154,6 +155,7 @@ import static application_src.application_model.annotation.stories.Note.Display.
 import static application_src.application_model.resources.utilities.AppFont.getBillboardFont;
 import static application_src.application_model.resources.utilities.AppFont.getOrientationIndicatorFont;
 import static application_src.application_model.resources.utilities.AppFont.getSpriteAndOverlayFont;
+import static application_src.application_model.resources.utilities.AppFont.getFont;
 import static application_src.application_model.threeD.subsceneparameters.Parameters.getBillboardScale;
 import static application_src.application_model.threeD.subsceneparameters.Parameters.getCameraFarClip;
 import static application_src.application_model.threeD.subsceneparameters.Parameters.getCameraInitialDistance;
@@ -948,8 +950,9 @@ public class Window3DController {
      *         the name that appears on the transient label
      * @param entity
      *         The entity that the label should appear on
+     * @param c 
      */
-    private void insertTransientLabel(String name, final Shape3D entity) {
+    private void insertTransientLabel(String name, final Shape3D entity, boolean longForm) {
         final double opacity = othersOpacityProperty.get();
         if (entity != null) {
             // do not create transient label for "other" entities when their visibility is under the selectability
@@ -969,29 +972,30 @@ public class Window3DController {
                     String fullTextString = goName;
                     transientLabelText = new Text(fullTextString);
                     transientLabelTextFlow = new TextFlow(transientLabelText);
-                    for (Rule rule : rulesList) {
-                        //System.out.println("checking rule: " + rule.getSearchedText());
-                        if (rule.appliesToCellNucleus(name)) {
-                        	String ruleString = "\n"+"• "+rule.getSearchedText();
-                        	Text ruleText = new Text(ruleString);
-                        	ruleText.setFill(rule.getColor());
-                            ruleText.setWrappingWidth(-1);
-                            ruleText.setOnMouseEntered(Event::consume);
-                            ruleText.setOnMouseClicked(Event::consume);
-                            ruleText.setDisable(true);
-                            ruleText.setFont(getSpriteAndOverlayFont());
-                            ruleText.setStrokeWidth(0.25);
-                            ruleText.setStroke(Color.BLACK);
-                        	transientLabelTextFlow.getChildren().add(ruleText);
-//                            //System.out.println("rule applies to: " + cellName);
-//                            colors.add(web(rule.getColor().toString()));
-//                            // check if opacity of rule is below cutoff, then it's not selectable
-                            if (rule.getColor().getOpacity() <= getSelectabilityVisibilityCutoff()) {
-                                entity.setDisable(true);
-                            }
-                        }
+                    if (longForm) {
+                    	for (Rule rule : rulesList) {
+                    		//System.out.println("checking rule: " + rule.getSearchedText());
+                    		if (rule.appliesToCellNucleus(name)) {
+                    			String ruleString = "\n"+"• "+rule.getSearchedText();
+                    			Text ruleText = new Text(ruleString);
+                    			ruleText.setFill(rule.getColor());
+                    			ruleText.setWrappingWidth(-1);
+                    			ruleText.setOnMouseEntered(Event::consume);
+                    			ruleText.setOnMouseClicked(Event::consume);
+                    			ruleText.setDisable(true);
+                    			ruleText.setFont(getSpriteAndOverlayFont());
+                    			ruleText.setStrokeWidth(0.25);
+                    			ruleText.setStroke(Color.BLACK);
+                    			transientLabelTextFlow.getChildren().add(ruleText);
+                    			//                            //System.out.println("rule applies to: " + cellName);
+                    			//                            colors.add(web(rule.getColor().toString()));
+                    			//                            // check if opacity of rule is below cutoff, then it's not selectable
+                    			if (rule.getColor().getOpacity() <= getSelectabilityVisibilityCutoff()) {
+                    				entity.setDisable(true);
+                    			}
+                    		}
+                    	}
                     }
-                    
                     transientLabelText.setWrappingWidth(-1);
                     transientLabelText.setFill(web(TRANSIENT_LABEL_COLOR_HEX));
                     transientLabelText.setOnMouseEntered(Event::consume);
@@ -1005,7 +1009,8 @@ public class Window3DController {
 
                     y -= getLabelSpriteYOffset();
                     transientLabelTextFlow.getTransforms().add(new Translate(x+10, y+10));
-                    transientLabelTextFlow.setBackground(new Background(new BackgroundFill(Color.valueOf("0xffffff99"), null, null)));
+                    if (longForm) 
+                    	transientLabelTextFlow.setBackground(new Background(new BackgroundFill(Color.valueOf("0x88888888"), null, null)));
                     // disable text to take away label flickering when mouse is on top top of it
                     transientLabelText.setDisable(true);
                     transientLabelText.setFont(getSpriteAndOverlayFont());
@@ -2322,7 +2327,7 @@ public class Window3DController {
                     spritesPane.setCursor(HAND);
                     // make label appear
 //                    if (!currentLabels.contains(cellName.toLowerCase())) {
-                        insertTransientLabel(cellName, getEntityWithName(cellName));
+                        insertTransientLabel(cellName, getEntityWithName(cellName), event.isShiftDown());
 //                    }
                 });
                 sphere.setOnMouseExited(event -> {
@@ -2433,7 +2438,7 @@ public class Window3DController {
                         // make label appear
                         final String name = normalizeName(sceneName);
                         if (!currentLabels.contains(name.toLowerCase())) {
-                            insertTransientLabel(name, getEntityWithName(name));
+                            insertTransientLabel(name, getEntityWithName(name), event.isShiftDown());
                         }
                     });
                     meshView.setOnMouseExited(event -> {
@@ -2942,7 +2947,7 @@ public class Window3DController {
         text.setFill(web(SPRITE_COLOR_HEX));
         text.setFontSmoothingType(LCD);
         text.setWrappingWidth(storyOverlayVBox.getWidth());
-        text.setFont(getSpriteAndOverlayFont());
+        text.setFont(getBillboardFont());
         return text;
     }
 
