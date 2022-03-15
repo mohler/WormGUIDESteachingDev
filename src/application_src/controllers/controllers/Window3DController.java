@@ -950,7 +950,8 @@ public class Window3DController {
      *         the name that appears on the transient label
      * @param entity
      *         The entity that the label should appear on
-     * @param c 
+     * @param longForm
+     * 		Whether to include coloring rule hits for a given cell. 
      */
     private void insertTransientLabel(String name, final Shape3D entity, boolean longForm) {
         final double opacity = othersOpacityProperty.get();
@@ -1330,12 +1331,39 @@ public class Window3DController {
                 	}
                 }
 
-          } else {
-                xform1.setTranslateX(xform1.getTranslateX()+(mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
-                xform1.setTranslateY(xform1.getTranslateY()+(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
-//                xform2.setTranslateX(xform2.getTranslateX()+(mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
-//                xform2.setTranslateY(xform2.getTranslateY()+(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
-           }
+            } else {
+
+            	//STARTING TO HAVE SOME OF THE FOG LIFT ON HOW THESE RELATE...
+            	double shiftX = ((mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
+            	double shiftY = ((mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
+             	ObservableList<Transform> xfm1List = xform1.getTransforms();
+            	for (int t=0;t<xfm1List.size();t++) {
+            		Transform xfm = xfm1List.get(t);
+            		if (xfm instanceof Rotate && t<3) {
+            		} else if (xfm instanceof Affine && t<3) {
+
+            			try {
+            				Transform aff = xfm;
+            				Point3D rotShiftCoords = aff.deltaTransform(new Point3D(shiftX, shiftY, 0));
+            				for (Node content:xform1.getChildren()) {
+            					double ctx = content.getTranslateX();
+            					double cty = content.getTranslateY();
+            					double ctz = content.getTranslateZ();
+            					Point3D newTranslateCoords = new Point3D(ctx+rotShiftCoords.getX(), cty+rotShiftCoords.getY(), ctz-rotShiftCoords.getZ());
+            					
+            					content.getTransforms().set(0, new Translate(newTranslateCoords.getX(), newTranslateCoords.getY(), newTranslateCoords.getZ())
+            											.createConcatenation(content.getTransforms().get(0)));
+//            					content.setTranslateX(newTranslateCoords.getX());
+//            					content.setTranslateY(newTranslateCoords.getY());
+//            					content.setTranslateZ(newTranslateCoords.getZ());
+
+            				}
+            			} catch (Exception e) {
+            				e.printStackTrace();
+            			}
+            		}
+            	}
+            }
         });
 
         subscene.setOnMouseEntered(me -> {
