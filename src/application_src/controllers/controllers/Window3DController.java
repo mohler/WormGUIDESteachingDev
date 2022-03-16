@@ -383,6 +383,7 @@ public class Window3DController {
 	private Point3D counterAxis;
 	private Group orientationIndicatorGroup;
 	private TextFlow transientLabelTextFlow;
+	private Point3D cumRotShiftCoords;
 
 
     public Window3DController(
@@ -502,6 +503,7 @@ public class Window3DController {
         keyValuesRotate = productionInfo.getKeyValuesRotate();
         initialRotation = productionInfo.getInitialRotation();
 
+        cumRotShiftCoords = new Point3D(0,0,0);
         spheres = new LinkedList<>();
         meshes = new LinkedList<>();
         cellNames = new LinkedList<>();
@@ -1333,7 +1335,9 @@ public class Window3DController {
 
             } else {
 
-            	//STARTING TO HAVE SOME OF THE FOG LIFT ON HOW THESE RELATE...
+//// THIS CODE SHIFTS THE CONTENTS TO A NEW PIVOT POINT...
+//   BUT ONLY FOR THE CURRENT TIMEPOINT.  THIS IS NOT COMPLETE!!!
+            	
             	double shiftX = ((mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
             	double shiftY = ((mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
              	ObservableList<Transform> xfm1List = xform1.getTransforms();
@@ -1345,6 +1349,8 @@ public class Window3DController {
             			try {
             				Transform aff = xfm;
             				Point3D rotShiftCoords = aff.deltaTransform(new Point3D(shiftX, shiftY, 0));
+            				
+            				cumRotShiftCoords = cumRotShiftCoords.add(rotShiftCoords);
             				for (Node content:xform1.getChildren()) {
             					double ctx = content.getTranslateX();
             					double cty = content.getTranslateY();
@@ -1353,9 +1359,6 @@ public class Window3DController {
             					
             					content.getTransforms().set(0, new Translate(newTranslateCoords.getX(), newTranslateCoords.getY(), newTranslateCoords.getZ())
             											.createConcatenation(content.getTransforms().get(0)));
-//            					content.setTranslateX(newTranslateCoords.getX());
-//            					content.setTranslateY(newTranslateCoords.getY());
-//            					content.setTranslateZ(newTranslateCoords.getZ());
 
             				}
             			} catch (Exception e) {
@@ -3512,6 +3515,18 @@ public class Window3DController {
 //                        xform1.setScaleX(zoomProperty.get());
 //                        xform1.setScaleY(zoomProperty.get());
                         xform1.setTranslateZ(translateZProperty.get());
+                        if (cumRotShiftCoords != null) {
+                        	for (Node content:xform1.getChildren()) {
+            					double ctx = content.getTranslateX();
+            					double cty = content.getTranslateY();
+            					double ctz = content.getTranslateZ();
+            					Point3D newTranslateCoords = new Point3D(ctx+cumRotShiftCoords.getX(), cty+cumRotShiftCoords.getY(), ctz-cumRotShiftCoords.getZ());
+
+                        		content.getTransforms().set(0, new Translate(newTranslateCoords.getX(), newTranslateCoords.getY(), newTranslateCoords.getZ())
+                        				.createConcatenation(content.getTransforms().get(0)));
+
+                        	}
+                        }
                         xform2.setTranslateZ(600);
                         repositionNotes();
 
