@@ -1333,10 +1333,11 @@ public class Window3DController {
                 	}
                 }
 
-            } else {
+            } else if (me.isShiftDown()) {
+            	
 
-//// THIS CODE SHIFTS THE CONTENTS TO A NEW PIVOT POINT...
-//   BUT ONLY FOR THE CURRENT TIMEPOINT.  THIS IS NOT COMPLETE!!!
+//// THIS CODE SHIFTS THE CONTENTS TO A NEW PIVOT POINT if rightclick/shiftdown...
+    // could still be better at perfectly matching mouse interaction...
             	
             	double shiftX = ((mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
             	double shiftY = ((mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
@@ -1348,6 +1349,7 @@ public class Window3DController {
 
             			try {
             				Transform aff = xfm;
+//this is where fix is needed.... a puzzle still
             				Point3D rotShiftCoords = aff.deltaTransform(new Point3D(shiftX, shiftY, 0));
             				
             				cumRotShiftCoords = cumRotShiftCoords.add(rotShiftCoords);
@@ -1366,6 +1368,12 @@ public class Window3DController {
             			}
             		}
             	}
+            } else {
+           //// THIS CODE SHIFTS xform1 within the scene, but does not affect PIVOT POINT if rightclick alone...
+
+            	
+            	xform1.setTranslateX(xform1.getTranslateX()+(mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
+                xform1.setTranslateY(xform1.getTranslateY()+(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
             }
         });
 
