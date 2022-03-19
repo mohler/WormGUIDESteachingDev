@@ -22,6 +22,7 @@ import java.util.Vector;
 
 //import com.interactivemesh.jfx.importer.obj.ObjModelImporter;
 import application_src.MainApp;
+import javafx.beans.binding.DoubleExpression;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
@@ -384,6 +385,8 @@ public class Window3DController {
 	private Group orientationIndicatorGroup;
 	private TextFlow transientLabelTextFlow;
 	private Point3D cumRotShiftCoords;
+	private Point3D cumShiftCoords;
+	private Point3D xform1Pivot;
 
 
     public Window3DController(
@@ -450,7 +453,7 @@ public class Window3DController {
     	this.parentStage = requireNonNull(parentStage);
         this.xform1 = new XformBox();
         this.xform2 = new XformBox();
-
+        this.xform1Pivot = new Point3D(111,0,0);
         this.offsetX = offsetX;
         this.offsetY = offsetY;
         this.offsetZ = offsetZ;
@@ -504,6 +507,7 @@ public class Window3DController {
         initialRotation = productionInfo.getInitialRotation();
 
         cumRotShiftCoords = new Point3D(0,0,0);
+        cumShiftCoords = new Point3D(0,0,0);
         spheres = new LinkedList<>();
         meshes = new LinkedList<>();
         cellNames = new LinkedList<>();
@@ -1220,8 +1224,8 @@ public class Window3DController {
             	double angleY = -mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED;
             	double angleX = mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED;
             	             	
-                xform1.addRotation(angleY, 111,0,0, Rotate.Y_AXIS);
-                xform1.addRotation(angleX, 111,0,0, Rotate.X_AXIS);
+                xform1.addRotation(angleY, (int)xform1Pivot.getX(), (int)xform1Pivot.getY(), (int)xform1Pivot.getY(), Rotate.Y_AXIS);
+                xform1.addRotation(angleX, (int)xform1Pivot.getX(), (int)xform1Pivot.getY(), (int)xform1Pivot.getY(), Rotate.X_AXIS);
                 for (Node thingy:xform1.getChildren()) {
                 	if (!(thingy instanceof Text)) {
                 		Text thingyLabel = entityLabelMap.get(thingy);
@@ -1341,7 +1345,10 @@ public class Window3DController {
             	
             	double shiftX = ((mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
             	double shiftY = ((mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
-             	ObservableList<Transform> xfm1List = xform1.getTransforms();
+            	xform1.setTranslateX(xform1.getTranslateX()+ shiftX);
+            	xform1.setTranslateY(xform1.getTranslateY()+ shiftY);
+            	
+            	ObservableList<Transform> xfm1List = xform1.getTransforms();
             	for (int t=0;t<xfm1List.size();t++) {
             		Transform xfm = xfm1List.get(t);
             		if (xfm instanceof Rotate && t<3) {
@@ -1350,19 +1357,13 @@ public class Window3DController {
             			try {
             				Transform aff = xfm;
 //this is where fix is needed.... a puzzle still
-            				Point3D rotShiftCoords = aff.deltaTransform(new Point3D(shiftX, shiftY, 0));
             				
-            				cumRotShiftCoords = cumRotShiftCoords.add(rotShiftCoords);
-            				for (Node content:xform1.getChildren()) {
-            					double ctx = content.getTranslateX();
-            					double cty = content.getTranslateY();
-            					double ctz = content.getTranslateZ();
-            					Point3D newTranslateCoords = new Point3D(ctx+rotShiftCoords.getX(), cty+rotShiftCoords.getY(), ctz-rotShiftCoords.getZ());
-            					
-            					content.getTransforms().set(0, new Translate(newTranslateCoords.getX(), newTranslateCoords.getY(), newTranslateCoords.getZ())
-            											.createConcatenation(content.getTransforms().get(0)));
-
-            				}
+            //GETTING MUCH CLOSER WITH THIS SIMPLE APPROACH
+//            				Point3D xform1PivotRot = aff.inverseDeltaTransform(xform1Pivot);
+//             				xform1Pivot = aff.deltaTransform(new Point3D(xform1PivotRot.getX()-shiftX, xform1PivotRot.getY()-shiftY,xform1PivotRot.getZ()));
+             				xform1Pivot = new Point3D(xform1Pivot.getX()-shiftX, xform1Pivot.getY()-shiftY,xform1Pivot.getZ());
+             				System.out.println(xform1Pivot.toString());
+             				
             			} catch (Exception e) {
             				e.printStackTrace();
             			}
@@ -1370,8 +1371,7 @@ public class Window3DController {
             	}
             } else {
            //// THIS CODE SHIFTS xform1 within the scene, but does not affect PIVOT POINT if rightclick alone...
-
-            	
+           	
             	xform1.setTranslateX(xform1.getTranslateX()+(mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
                 xform1.setTranslateY(xform1.getTranslateY()+(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
             }
