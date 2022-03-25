@@ -479,9 +479,9 @@ public class Window3DController {
             if (startTime <= newTime && newTime <= endTime) {
                 hideContextPopups();
             } else if (newTime < startTime) {
-                timeProperty.set(startTime);
-            } else if (newTime > endTime) {
                 timeProperty.set(endTime);
+            } else if (newTime > endTime) {
+                timeProperty.set(startTime);
             }
 
             if (captureVideo.get()) {
@@ -572,8 +572,8 @@ public class Window3DController {
 
         this.subscene = requireNonNull(subscene);
         buildCamera();
-        parentPane.getChildren().add(this.subscene);
-        this.subscene.setFill(web(getSubsceneBackgroundColorHex()));
+        parentPane.getChildren().add(this.getSubscene());
+        this.getSubscene().setFill(web(getSubsceneBackgroundColorHex()));
 
         isInSearchMode = false;
 
@@ -806,6 +806,7 @@ public class Window3DController {
             /*
              * if a non-default model has been loaded, set the opacity cutoff at the level where labels will
              * appear by default
+             * THE COMMENT ABOVE MAKES NO SENSE TO ME.  OPACITY??
              */
             this.numPrev.set(1);
 
@@ -1079,7 +1080,7 @@ public class Window3DController {
         }
     }
 
-    private void handleMouse(SubScene subscene) {
+    public void handleMouse(SubScene subscene) {
         System.out.printf("handleMouse%n");
         
         subscene.setOnMouseClicked(me -> {
@@ -1213,168 +1214,152 @@ public class Window3DController {
         });
 
         subscene.setOnMouseDragged(me -> {
-            mouseOldX = mousePosX;
-            mouseOldY = mousePosY;
-            mousePosX = me.getSceneX();
-            mousePosY = me.getSceneY();
-            mouseDeltaX = (mousePosX - mouseOldX);
-            mouseDeltaY = (mousePosY - mouseOldY);
+        	mouseOldX = mousePosX;
+        	mouseOldY = mousePosY;
+        	mousePosX = me.getSceneX();
+        	mousePosY = me.getSceneY();
+        	mouseDeltaX = (mousePosX - mouseOldX);
+        	mouseDeltaY = (mousePosY - mouseOldY);
 
-            if (me.isPrimaryButtonDown()) {
-            	double angleY = -mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED;
-            	double angleX = mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED;
-            	             	
-                xform1.addRotation(angleY, (int)xform1Pivot.getX(), (int)xform1Pivot.getY(), (int)xform1Pivot.getY(), Rotate.Y_AXIS);
-                xform1.addRotation(angleX, (int)xform1Pivot.getX(), (int)xform1Pivot.getY(), (int)xform1Pivot.getY(), Rotate.X_AXIS);
-                for (Node thingy:xform1.getChildren()) {
-                	if (!(thingy instanceof Text)) {
-                		Text thingyLabel = entityLabelMap.get(thingy);
+        	if (me.isPrimaryButtonDown()) {
 
-                		if (thingyLabel == null)
-                			continue;
-                		double xPivot = (thingy.getBoundsInParent().getMaxX() + thingy.getBoundsInParent().getMinX())/2;
-                		double yPivot = (thingy.getBoundsInParent().getMaxY() + thingy.getBoundsInParent().getMinY())/2;
-                		double zPivot = (thingy.getBoundsInParent().getMinZ() + thingy.getBoundsInParent().getMaxZ())/2;
+        		if (me.isShiftDown()) {
 
-                		Transform rT = new Rotate();
-                		List<Transform> xfm1List = xform1.getTransforms();
-                		List<Transform> tLList = thingyLabel.getTransforms();
-                		for (int t=0;t<xfm1List.size();t++) {
-                			Transform tfm = xfm1List.get(t);
-                			if (tfm instanceof Rotate && t<3) {
-//  THIS may now be unused....
-                				Affine rTA = (Affine) ((Rotate)tfm).createConcatenation(new Affine());
-                				try {
-                					Point3D axis;
-                					axis = rTA.inverseDeltaTransform(((Rotate)rT).getAxis());
-                					double angle = -(((Rotate)rT).getAngle());
-                					tLList.set(0, new Rotate(angle, xPivot, yPivot, zPivot, axis)
-                							.createConcatenation(tLList.get(t)));
-                				} catch (NonInvertibleTransformException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-                 			} else if (tfm instanceof Affine && t<3) {
- // THIS FINALLY WORKS!!!!!
-                				rT = ((Affine)tfm);
-								try {
-									Point3D axis = ((Affine)rT).inverseDeltaTransform(X_AXIS);
-									tLList.set(0, new Rotate(-angleX, xPivot, yPivot, zPivot, axis)
-											.createConcatenation(tLList.get(0)));
-									axis = ((Affine)rT).inverseDeltaTransform(Y_AXIS);
-									tLList.set(0, new Rotate(-angleY, xPivot, yPivot, zPivot, axis)
-											.createConcatenation(tLList.get(0)));
-									
-								} catch (Exception e) {
-									e.printStackTrace();
-								}
-                			}
 
-                		}
-                		
-                	}
-                }
-                
-//  THIS FOR ORIENTATION INDICATOR                
-//              Group middleTransformGroup = ((Group)((Group)xform2.getChildren().get(0)).getChildren().get(0));
-                Bounds mtgBounds = middleTransformGroup.getBoundsInParent();
-                Point3D oriIndCenter = new Point3D((mtgBounds.getMaxX()+mtgBounds.getMinX())/2,
-							                		(mtgBounds.getMaxY()+mtgBounds.getMinY())/2,
-							                		(mtgBounds.getMaxZ()+mtgBounds.getMinZ())/2);
-                xform2.addRotation(angleY, (int)oriIndCenter.getX(), (int)oriIndCenter.getY(), (int)oriIndCenter.getZ(), Rotate.Y_AXIS);
-                xform2.addRotation(angleX, (int)oriIndCenter.getX(), (int)oriIndCenter.getY(), (int)oriIndCenter.getZ(), Rotate.X_AXIS);
-                for (Node directionLabel:middleTransformGroup.getChildren()) {
-                	if ((directionLabel instanceof Text)) {
+        			//// THIS CODE SHIFTS THE CONTENTS TO A NEW PIVOT POINT if rightclick/shiftdown...
 
-                		double xPivot = (directionLabel.getBoundsInLocal().getMaxX() + directionLabel.getBoundsInLocal().getMinX())/2;
-                		double yPivot = (directionLabel.getBoundsInLocal().getMaxY() + directionLabel.getBoundsInLocal().getMinY())/2;
-                		double zPivot = (directionLabel.getBoundsInLocal().getMinZ() + directionLabel.getBoundsInLocal().getMaxZ())/2;
+        			double shiftX = ((mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
+        			double shiftY = ((mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
+        			xform1.setTranslateX(xform1.getTranslateX()+ shiftX);
+        			xform1.setTranslateY(xform1.getTranslateY()+ shiftY);
 
-                		Transform rT = new Rotate();
-                		List<Transform> xfm2List = xform2.getTransforms();
-                		List<Transform> dirTfmList = directionLabel.getTransforms();
-                		for (int t=0;t<xfm2List.size();t++) {
-                			Transform tfm = xfm2List.get(t);
-                			if (tfm instanceof Rotate && t<3) {
-//  THIS may now be unused....
-                				Affine rTA = (Affine) ((Rotate)tfm).createConcatenation(new Affine());
-                				try {
-                					Point3D axis;
-                					axis = rTA.inverseDeltaTransform(((Rotate)rT).getAxis());
-                					double angle = -(((Rotate)rT).getAngle());
-                					dirTfmList.set(0, new Rotate(angle, xPivot, yPivot, zPivot, axis)
-                							.createConcatenation(dirTfmList.get(t)));
-                				} catch (NonInvertibleTransformException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-                 			} else if (tfm instanceof Affine && t<3) {
-// // THIS works but needs synching to the time-rotated state of orientationIndicator !!!!!
-//                				rT = ((Affine)tfm);
-//								try {
-//									Point3D axis = ((Affine)rT).inverseDeltaTransform(Rotate.X_AXIS);
-//									if (dirTfmList.size() <1) {
-//										dirTfmList.add(new Rotate(-angleX, xPivot, yPivot, zPivot, axis));
-//									}else {
-//										dirTfmList.set(0, new Rotate(-angleX, xPivot, yPivot, zPivot, axis)
-//											.createConcatenation(dirTfmList.get(0)));
-//									}
-//									axis = ((Affine)rT).inverseDeltaTransform(Rotate.Y_AXIS);
-//									if (dirTfmList.size() <1) {
-//										dirTfmList.add(new Rotate(-angleY, xPivot, yPivot, zPivot, axis));
-//									}else {
-//										dirTfmList.set(0, new Rotate(-angleY, xPivot, yPivot, zPivot, axis)
-//												.createConcatenation(dirTfmList.get(0)));
-//									}
-//								} catch (Exception e) {
-//									e.printStackTrace();
-//								}
-//								t = xfm2List.size();
-                 			}
+        			xform1Pivot = new Point3D(xform1Pivot.getX()-shiftX, xform1Pivot.getY()-shiftY,xform1Pivot.getZ());
 
-                		}
-                		
-                	}
-                }
+        		} else {
 
-            } else if (me.isShiftDown()) {
-            	
+        			double angleY = -mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED;
+        			double angleX = mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED;
 
-//// THIS CODE SHIFTS THE CONTENTS TO A NEW PIVOT POINT if rightclick/shiftdown...
-    // could still be better at perfectly matching mouse interaction...
-            	
-            	double shiftX = ((mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
-            	double shiftY = ((mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
-            	xform1.setTranslateX(xform1.getTranslateX()+ shiftX);
-            	xform1.setTranslateY(xform1.getTranslateY()+ shiftY);
-            	
-            	ObservableList<Transform> xfm1List = xform1.getTransforms();
-            	for (int t=0;t<xfm1List.size();t++) {
-            		Transform xfm = xfm1List.get(t);
-            		if (xfm instanceof Rotate && t<3) {
-            		} else if (xfm instanceof Affine && t<3) {
+        			xform1.addRotation(angleY, (int)xform1Pivot.getX(), (int)xform1Pivot.getY(), (int)xform1Pivot.getY(), Rotate.Y_AXIS);
+        			xform1.addRotation(angleX, (int)xform1Pivot.getX(), (int)xform1Pivot.getY(), (int)xform1Pivot.getY(), Rotate.X_AXIS);
+        			for (Node thingy:xform1.getChildren()) {
+        				if (!(thingy instanceof Text)) {
+        					Text thingyLabel = entityLabelMap.get(thingy);
 
-            			try {
-            				Transform aff = xfm;
-//this is where fix is needed.... a puzzle still
-            				
-            //GETTING MUCH CLOSER WITH THIS SIMPLE APPROACH
-//            				Point3D xform1PivotRot = aff.inverseDeltaTransform(xform1Pivot);
-//             				xform1Pivot = aff.deltaTransform(new Point3D(xform1PivotRot.getX()-shiftX, xform1PivotRot.getY()-shiftY,xform1PivotRot.getZ()));
-             				xform1Pivot = new Point3D(xform1Pivot.getX()-shiftX, xform1Pivot.getY()-shiftY,xform1Pivot.getZ());
-             				System.out.println(xform1Pivot.toString());
-             				
-            			} catch (Exception e) {
-            				e.printStackTrace();
-            			}
-            		}
-            	}
-            } else {
-           //// THIS CODE SHIFTS xform1 within the scene, but does not affect PIVOT POINT if rightclick alone...
-           	
-            	xform1.setTranslateX(xform1.getTranslateX()+(mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
-                xform1.setTranslateY(xform1.getTranslateY()+(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
-            }
+        					if (thingyLabel == null)
+        						continue;
+        					double xPivot = (thingy.getBoundsInParent().getMaxX() + thingy.getBoundsInParent().getMinX())/2;
+        					double yPivot = (thingy.getBoundsInParent().getMaxY() + thingy.getBoundsInParent().getMinY())/2;
+        					double zPivot = (thingy.getBoundsInParent().getMinZ() + thingy.getBoundsInParent().getMaxZ())/2;
+
+        					Transform rT = new Rotate();
+        					List<Transform> xfm1List = xform1.getTransforms();
+        					List<Transform> tLList = thingyLabel.getTransforms();
+        					for (int t=0;t<xfm1List.size();t++) {
+        						Transform tfm = xfm1List.get(t);
+        						if (tfm instanceof Rotate && t<3) {
+        							//  THIS may now be unused....
+        							Affine rTA = (Affine) ((Rotate)tfm).createConcatenation(new Affine());
+        							try {
+        								Point3D axis;
+        								axis = rTA.inverseDeltaTransform(((Rotate)rT).getAxis());
+        								double angle = -(((Rotate)rT).getAngle());
+        								tLList.set(0, new Rotate(angle, xPivot, yPivot, zPivot, axis)
+        										.createConcatenation(tLList.get(t)));
+        							} catch (NonInvertibleTransformException e) {
+        								// TODO Auto-generated catch block
+        								e.printStackTrace();
+        							}
+        						} else if (tfm instanceof Affine && t<3) {
+        							// THIS FINALLY WORKS!!!!!
+        							rT = ((Affine)tfm);
+        							try {
+        								Point3D axis = ((Affine)rT).inverseDeltaTransform(X_AXIS);
+        								tLList.set(0, new Rotate(-angleX, xPivot, yPivot, zPivot, axis)
+        										.createConcatenation(tLList.get(0)));
+        								axis = ((Affine)rT).inverseDeltaTransform(Y_AXIS);
+        								tLList.set(0, new Rotate(-angleY, xPivot, yPivot, zPivot, axis)
+        										.createConcatenation(tLList.get(0)));
+
+        							} catch (Exception e) {
+        								e.printStackTrace();
+        							}
+        						}
+
+        					}
+
+        				}
+        			}
+
+        			//  THIS FOR ORIENTATION INDICATOR                
+        			//              Group middleTransformGroup = ((Group)((Group)xform2.getChildren().get(0)).getChildren().get(0));
+        			Bounds mtgBounds = middleTransformGroup.getBoundsInParent();
+        			Point3D oriIndCenter = new Point3D((mtgBounds.getMaxX()+mtgBounds.getMinX())/2,
+        					(mtgBounds.getMaxY()+mtgBounds.getMinY())/2,
+        					(mtgBounds.getMaxZ()+mtgBounds.getMinZ())/2);
+        			xform2.addRotation(angleY, (int)oriIndCenter.getX(), (int)oriIndCenter.getY(), (int)oriIndCenter.getZ(), Rotate.Y_AXIS);
+        			xform2.addRotation(angleX, (int)oriIndCenter.getX(), (int)oriIndCenter.getY(), (int)oriIndCenter.getZ(), Rotate.X_AXIS);
+        			for (Node directionLabel:middleTransformGroup.getChildren()) {
+        				if ((directionLabel instanceof Text)) {
+
+        					double xPivot = (directionLabel.getBoundsInLocal().getMaxX() + directionLabel.getBoundsInLocal().getMinX())/2;
+        					double yPivot = (directionLabel.getBoundsInLocal().getMaxY() + directionLabel.getBoundsInLocal().getMinY())/2;
+        					double zPivot = (directionLabel.getBoundsInLocal().getMinZ() + directionLabel.getBoundsInLocal().getMaxZ())/2;
+
+        					Transform rT = new Rotate();
+        					List<Transform> xfm2List = xform2.getTransforms();
+        					List<Transform> dirTfmList = directionLabel.getTransforms();
+        					for (int t=0;t<xfm2List.size();t++) {
+        						Transform tfm = xfm2List.get(t);
+        						if (tfm instanceof Rotate && t<3) {
+        							//  THIS may now be unused....
+        							Affine rTA = (Affine) ((Rotate)tfm).createConcatenation(new Affine());
+        							try {
+        								Point3D axis;
+        								axis = rTA.inverseDeltaTransform(((Rotate)rT).getAxis());
+        								double angle = -(((Rotate)rT).getAngle());
+        								dirTfmList.set(0, new Rotate(angle, xPivot, yPivot, zPivot, axis)
+        										.createConcatenation(dirTfmList.get(t)));
+        							} catch (NonInvertibleTransformException e) {
+        								// TODO Auto-generated catch block
+        								e.printStackTrace();
+        							}
+        						} else if (tfm instanceof Affine && t<3) {
+        							// // THIS works but needs synching to the time-rotated state of orientationIndicator !!!!!
+        							//                				rT = ((Affine)tfm);
+        							//								try {
+        							//									Point3D axis = ((Affine)rT).inverseDeltaTransform(Rotate.X_AXIS);
+        							//									if (dirTfmList.size() <1) {
+        							//										dirTfmList.add(new Rotate(-angleX, xPivot, yPivot, zPivot, axis));
+        							//									}else {
+        							//										dirTfmList.set(0, new Rotate(-angleX, xPivot, yPivot, zPivot, axis)
+        							//											.createConcatenation(dirTfmList.get(0)));
+        							//									}
+        							//									axis = ((Affine)rT).inverseDeltaTransform(Rotate.Y_AXIS);
+        							//									if (dirTfmList.size() <1) {
+        							//										dirTfmList.add(new Rotate(-angleY, xPivot, yPivot, zPivot, axis));
+        							//									}else {
+        							//										dirTfmList.set(0, new Rotate(-angleY, xPivot, yPivot, zPivot, axis)
+        							//												.createConcatenation(dirTfmList.get(0)));
+        							//									}
+        							//								} catch (Exception e) {
+        							//									e.printStackTrace();
+        							//								}
+        							//								t = xfm2List.size();
+        						}
+
+        					}
+
+        				}
+        			}
+
+        		}
+        	} else {
+        		//// THIS CODE SHIFTS xform1 within the scene, but does not affect PIVOT POINT if rightclick alone...
+
+        		xform1.setTranslateX(xform1.getTranslateX()+(mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
+        		xform1.setTranslateY(xform1.getTranslateY()+(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
+        	}
         });
 
         subscene.setOnMouseEntered(me -> {
@@ -1409,9 +1394,9 @@ public class Window3DController {
     private double rotationAngleFromMouseMovement() {
         // http://math.stackexchange.com/questions/59/calculating-an-angle-from-2-points-in-space
         double rotationAngleRadians = Math.acos(
-                ((mouseOldX * mousePosX) + (mouseOldY * mousePosY) + (mouseOldZ * mousePosZ))
+                ((mouseOldX * getMousePosX()) + (mouseOldY * mousePosY) + (mouseOldZ * mousePosZ))
                         / sqrt((pow(mouseOldX, 2) + pow(mouseOldY, 2) + pow(mouseOldZ, 2))
-                        * (pow(mousePosX, 2) + pow(mousePosY, 2) + pow(mousePosZ, 2))));
+                        * (pow(getMousePosX(), 2) + pow(mousePosY, 2) + pow(mousePosZ, 2))));
         return rotationAngleRadians;
     }
 
@@ -3105,7 +3090,7 @@ public class Window3DController {
         camera.setNearClip(getCameraNearClip());
         camera.setFarClip(getCameraFarClip());
         camera.setTranslateZ(getCameraInitialDistance());
-        subscene.setCamera(camera);
+        getSubscene().setCamera(camera);
     }
 
     /**
@@ -3225,8 +3210,8 @@ public class Window3DController {
 
         if (javaPictures.size() > 0) {
             new JpegImagesToMovie(
-                    (int) subscene.getWidth(),
-                    (int) subscene.getHeight(),
+                    (int) getSubscene().getWidth(),
+                    (int) getSubscene().getHeight(),
                     6,
                     movieName,
                     javaPictures);
@@ -3261,7 +3246,7 @@ public class Window3DController {
         fileChooser.setTitle("Choose Save Location");
         fileChooser.getExtensionFilters().add(new ExtensionFilter("PNG File", "*.png"));
 
-        final WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
+        final WritableImage screenCapture = getSubscene().snapshot(new SnapshotParameters(), null);
 
         //write the image to a file
         try {
@@ -3482,7 +3467,15 @@ public class Window3DController {
         };
     }
 
-    /**
+    public SubScene getSubscene() {
+		return subscene;
+	}
+
+	public double getMousePosX() {
+		return mousePosX;
+	}
+
+	/**
      * This service spools a thread that
      * <p>
      * 1) retrieves the data for cells, cell bodies, and multicellular
@@ -3547,7 +3540,7 @@ public class Window3DController {
 
 
     /**
-     * This JavaFX {@link Service} of type Void spools a thread to play the subscene movie. It waits the timeProperty
+     * This JavaFX {@link Service} of type Void spools a thread to play the subscene movie. It waits the time
      * in milliseconds defined in the variable WAIT_TIME_MILLI before rendering the next
      * timeProperty frame.
      */
@@ -3605,4 +3598,9 @@ public class Window3DController {
             }
         }
     }
+
+	public double getMousePosY() {
+		// TODO Auto-generated method stub
+		return mousePosY;
+	}
 }

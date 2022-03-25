@@ -353,7 +353,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
     @FXML
     public void menuSaveImageAction() {
-        window3DController.stillscreenCapture();
+        getWindow3DController().stillscreenCapture();
     }
 
     @FXML
@@ -675,8 +675,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
         captureVideoMenuItem.setDisable(true);
         stopCaptureVideoMenuItem.setDisable(false);
         // start the image capture
-        if (window3DController != null) {
-            if (!window3DController.captureImagesForMovie()) {
+        if (getWindow3DController() != null) {
+            if (!getWindow3DController().captureImagesForMovie()) {
                 // error saving movie, update UI
                 captureVideoMenuItem.setDisable(false);
                 stopCaptureVideoMenuItem.setDisable(true);
@@ -691,8 +691,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
         stopCaptureVideoMenuItem.setDisable(true);
         capturingVideoFlag.set(false);
         // convert captured images to movie
-        if (window3DController != null) {
-            window3DController.convertImagesToMovie();
+        if (getWindow3DController() != null) {
+            getWindow3DController().convertImagesToMovie();
         }
 
     }
@@ -701,18 +701,18 @@ public class RootLayoutController extends BorderPane implements Initializable {
         this.playButton.setDisable(false);
         this.backwardButton.setDisable(false);
         this.forwardButton.setDisable(false);
-        this.timeSlider.setDisable(false);
+        this.getTimeSlider().setDisable(false);
     }
 
     public void disableTimeControls() {
         this.playButton.setDisable(true);
         this.backwardButton.setDisable(true);
         this.forwardButton.setDisable(true);
-        this.timeSlider.setDisable(true);
+        this.getTimeSlider().setDisable(true);
     }
 
     public boolean isTimeSliderPressed() {
-        return this.timeSlider.isPressed();
+        return this.getTimeSlider().isPressed();
     }
 
     public void initCloseApplication() {
@@ -828,20 +828,25 @@ public class RootLayoutController extends BorderPane implements Initializable {
                 searchResultsList);
 
         timeProperty.addListener((observable, oldValue, newValue) -> {
-            timeSlider.setValue(timeProperty.get());
-            if (timeProperty.get() >= endTime - 1) {
-                playButton.setGraphic(playIcon);
-                playingMovieFlag.set(false);
+            getTimeSlider().setValue(timeProperty.get());
+//allow looping of movie time.
+            if (timeProperty.get() > endTime) {
+            	timeProperty.set(startTime);
+                getTimeSlider().setValue(timeProperty.get());
+            }
+            if (timeProperty.get() < startTime) {
+            	timeProperty.set(endTime);
+                getTimeSlider().setValue(timeProperty.get());
             }
         });
 
         // in case AceTree has opened WormGUIDES, update the time property in MainApp when the slider is let go because
         // AceTree doesn't update dynamically with the time slider for optimization purposes
-        timeSlider.setOnMouseReleased(e -> {
+        getTimeSlider().setOnMouseReleased(e -> {
             MainApp.timePropertyMainApp.set(timeProperty.get());
         });
 
-        timeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+        getTimeSlider().valueProperty().addListener((observable, oldValue, newValue) -> {
             final int value = newValue.intValue();
             if (value != oldValue.intValue()) {
                 timeProperty.set(value);
@@ -861,7 +866,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
     }
 
     public void setTimePropertyValue(int time) {
-        if (time > 0 && time <= lineageData.getNumberOfTimePoints()) {
+        if (time >= 0 && time <= lineageData.getNumberOfTimePoints()) {
             timeProperty.set(time);
         }
     }
@@ -1063,8 +1068,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
     }
 
     private void setSlidersProperties() {
-        timeSlider.setMin(startTime);
-        timeSlider.setMax(endTime);
+        getTimeSlider().setMin(startTime);
+        getTimeSlider().setMax(endTime);
 
         opacitySlider.setMin(0);
         opacitySlider.setMax(100);
@@ -1276,7 +1281,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
      * extend MainApp
      */
     public void buildScene() {
-        if (window3DController != null) {
+        if (getWindow3DController() != null) {
             rebuildSubsceneFlag.set(true);
         }
     }
@@ -1462,4 +1467,12 @@ public class RootLayoutController extends BorderPane implements Initializable {
             }
         }
     }
+
+	public Slider getTimeSlider() {
+		return timeSlider;
+	}
+
+	public Window3DController getWindow3DController() {
+		return window3DController;
+	}
 }

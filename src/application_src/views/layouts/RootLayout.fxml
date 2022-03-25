@@ -580,13 +580,13 @@
                                                                                 </Button>
                                                                             </children>
                                                                         </HBox>
-                                                                        <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Visibility for Other Cells:">
+                                                                        <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Dim Other Cells:">
                                                                             <font>
                                                                                 <Font size="14.0" />
                                                                             </font>
                                                                         </Label>
                                                                         <Slider fx:id="opacitySlider" minorTickCount="5" value="25.0" VBox.vgrow="ALWAYS" />
-                                                                        <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Show Previous Time Points:">
+                                                                        <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Trace Earlier Time Points:">
                                                                             <font>
                                                                                 <Font size="14.0" />
                                                                             </font>
@@ -601,7 +601,7 @@
                                                                                 </Label>
                                                                             </children>
                                                                         </HBox>
-                                                                        <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Coloring Layers:">
+                                                                        <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Coloring Rules:">
                                                                             <font>
                                                                                 <Font size="14.0" />
                                                                             </font>

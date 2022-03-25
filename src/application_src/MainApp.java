@@ -6,15 +6,22 @@ package application_src;
   
 import java.io.IOException;
 import java.time.Instant;
+import java.util.Map;
 
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.*;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseDragEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 
 import application_src.controllers.controllers.RootLayoutController;
@@ -118,6 +125,42 @@ public class MainApp extends Application implements ObserveWormGUIDES {
             primaryStage.setScene(scene);
             primaryStage.setResizable(true);
             primaryStage.centerOnScreen();
+            
+//  ADDED THIS FILTER TO PREVENT WHACKY CAPTURING OF ARROW KEYS BY EVERY RANDOM WIDGET IN THE CONTROLLER.
+            primaryStage.addEventFilter(KeyEvent.KEY_TYPED, new EventHandler<KeyEvent>() {
+                @Override
+                public void handle(KeyEvent event) {
+                    Scene scene = controller.getScene();
+                    if (scene == null) {
+                        return;
+                    }
+                    if(event.isAltDown()) {                    
+                    	if (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN) {
+
+                    		controller.getWindow3DController().getSubscene().getOnMouseDragged().handle(new MouseDragEvent(MouseDragEvent.ANY, 
+                    				controller.getWindow3DController().getMousePosX(), 
+                    				controller.getWindow3DController().getMousePosY() + (event.getCode()==KeyCode.DOWN? 10:-10), 0, 0, 
+                    				null, 0, false,false,false,false, event.isShiftDown(), false, false, false, false, null, null ));	
+                    		
+                    	} else if (event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.LEFT) {
+                    		
+                    		controller.getWindow3DController().getSubscene().getOnMouseDragged().handle(new MouseDragEvent(MouseDragEvent.ANY, 
+                    				controller.getWindow3DController().getMousePosX() + (event.getCode()==KeyCode.RIGHT? 10:-10), 
+                    				controller.getWindow3DController().getMousePosY(), 0, 0, 
+                    				null, 0, false,false,false,false, event.isShiftDown(), false, false, false, false, null, null ));	
+                    		
+                    	}
+                    } else {
+                    	if (event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.LEFT) {
+                    		if(true) {
+                    			controller.setTimePropertyValue(controller.getTimeProperty().get() + (event.getCode()==KeyCode.RIGHT?1:-1));
+                    		}
+                    	}
+                    }
+                    event.consume();
+                    return;
+                }
+            });
 
             final Parent root = scene.getRoot();
             for (Node node : root.getChildrenUnmodifiable()) {
