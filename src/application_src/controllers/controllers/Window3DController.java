@@ -2141,7 +2141,7 @@ public class Window3DController {
         }
 
 //THIS STILL IS BUGGY FOR COUNTERROTATION OF TIMEVARYING AXIS.
-//        ...so tricky in fact, that I have just commented out the code for it.
+
         if (defaultEmbryoFlag) {
         	if (xform2.getChildren().contains(orientationIndicatorGroup))
         		xform2.getChildren().remove(orientationIndicatorGroup);
@@ -2156,44 +2156,7 @@ public class Window3DController {
         	indicatorRotation.setAngle(-newrotate);
         	indicatorRotation.setAxis(X_AXIS);        	
         	
-//        	for(Node directionLabel:middleTransformGroup.getChildren()) {
-//        		Bounds b = directionLabel.getBoundsInLocal();
-//        		if (b != null) {
-//        			if (directionLabel instanceof Text) {
-//        				double x = b.getMaxX();
-//        				double y = b.getMaxY();
-//        				double z = b.getMinZ();
-//        				double xPivot = (b.getMaxX() + b.getMinX())/2;
-//        				double yPivot = (b.getMaxY() + b.getMinY())/2;
-//        				double zPivot = (b.getMinZ() + b.getMaxZ())/2;
-//
-//        				double height = b.getHeight();
-//        				double width = b.getWidth();
-//        				double depth = b.getDepth();
-//
-//        				ObservableList<Transform> olTfms = directionLabel.getTransforms();
-//        				olTfms.clear();
-//        				olTfms.add(new Translate(xPivot, yPivot, zPivot));	
-//
-//        				ObservableList<Transform> xfm2List = xform2.getTransforms();
-//        				for (int t=0;t<xfm2List.size();t++) {
-//        					Transform xfm = xfm2List.get(t);
-//        					if (xfm instanceof Rotate && t<3) {
-//        					} else if (xfm instanceof Affine && t<3) {
-//
-//        						try {
-//        							Transform aff = xfm;
-//        							olTfms.add(new Affine(aff.getMxx(), aff.getMxy(), aff.getMxz(),0,
-//        									aff.getMyx(),aff.getMyy(),aff.getMyz(),0,
-//        									aff.getMzx(),aff.getMzy(),aff.getMzz(),0).createInverse());
-//        						} catch (Exception e) {
-//        							e.printStackTrace();
-//        						}
-//        					}
-//        				}
-//        			}
-//        		}
-//        	}
+
         }
     }
 
@@ -2238,7 +2201,7 @@ public class Window3DController {
         repositionNotes();
     }
 
-    //For Adding previous time points graphics of cells that exitst in the ruleslist
+    //For Adding previous time points graphics of cells that exist in the ruleslist
     //For previous time points feature
     private void addEntitiesNoNotesWithColorRule() {
         List<Shape3D> entities = new ArrayList();
@@ -2533,11 +2496,30 @@ public class Window3DController {
                             position[X_COR_INDEX] * xScale,
                             position[Y_COR_INDEX] * yScale,
                             position[Z_COR_INDEX] * zScale));
+                    sphere.getTransforms().add(new Rotate(90, sphere.getBoundsInLocal().getMaxX() -sphere.getBoundsInLocal().getMinX() 
+                    											, sphere.getBoundsInLocal().getMaxY() -sphere.getBoundsInLocal().getMinY() 
+                    											, sphere.getBoundsInLocal().getMaxZ() -sphere.getBoundsInLocal().getMinZ() 
+                    											, Z_AXIS));
+                    spheres.add(sphere);
 
-                    //spheres.add(sphere);
+                    if (!sphere.isDisable()) {
+                        sphere.setOnMouseEntered((MouseEvent event) -> {
+                            spritesPane.setCursor(HAND);
+                            // make label appear
+//                            if (!currentLabels.contains(cellName.toLowerCase())) {
+                                insertTransientLabel(cellName, getEntityWithName(cellName), event.isShiftDown());
+//                            }
+                        });
+                        sphere.setOnMouseExited(event -> {
+                            spritesPane.setCursor(DEFAULT);
+                            // make label disappear
+                            removeTransientLabel();
+                        });
+                    }
 
                     entities.add(sphere);
-                } else { // remove this cell from scene data at current time point
+                    
+               } else { // remove this cell from scene data at current time point
                     iter.remove();
                     positions.remove(index);
                     diameters.remove(index);
