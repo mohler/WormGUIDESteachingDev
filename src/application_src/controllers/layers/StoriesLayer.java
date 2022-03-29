@@ -258,7 +258,7 @@ public class StoriesLayer {
         storiesListView.setOnScrollStarted(event -> {
             // ignore horizontal scrolls
             if (event != null && event.getDeltaX() != 0) {
-                event.consume();
+//                event.consume();
             }
         });
     }

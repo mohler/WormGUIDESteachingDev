@@ -17,6 +17,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseDragEvent;
@@ -39,24 +40,26 @@ import static application_src.application_model.loaders.IconImageLoader.loadImag
  */
 public class MainApp extends Application implements ObserveWormGUIDES {
 
-    private static Stage primaryStage;
+    private  Stage primaryStage;
 
-    private static NucleiMgrAdapterResource nucleiMgrAdapterResource;
+    private  NucleiMgrAdapterResource nucleiMgrAdapterResource;
 
-    private Scene scene;
+    private  Scene scene;
 
     private BorderPane rootLayout;
 
 
-    public static RootLayoutController controller;
-    public static int externallySetStartTime = -1;
-    public static IntegerProperty timePropertyMainApp = new SimpleIntegerProperty(1);
-    public static BooleanProperty isPlayButtonEnabled = new SimpleBooleanProperty(false);
-    public static StringProperty selectedEntityLabelMainApp = new SimpleStringProperty("");
+    public  RootLayoutController controller;
+    public  static int externallySetStartTime = -1;
+    public  static IntegerProperty timePropertyMainApp = new SimpleIntegerProperty(1);
+    public  static BooleanProperty isPlayButtonEnabled = new SimpleBooleanProperty(false);
+    public  static StringProperty selectedEntityLabelMainApp = new SimpleStringProperty("");
+
+	private  EventHandler<KeyEvent> keyHandler;
 
 
 
-    public static void startProgramatically(final String[] args, final NucleiMgrAdapterResource nmar) {
+    public  void startProgramatically(final String[] args, final NucleiMgrAdapterResource nmar) {
         nucleiMgrAdapterResource = nmar;
         launch(args);
     }
@@ -71,8 +74,8 @@ public class MainApp extends Application implements ObserveWormGUIDES {
 
         loadImages();
 
-        MainApp.primaryStage = primaryStage;
-        MainApp.primaryStage.setTitle("WormGUIDESteachingDev");
+        this.primaryStage = primaryStage;
+        primaryStage.setTitle("WormGUIDESteachingDev");
 
         final Instant start = now();
         initRootLayout();
@@ -126,45 +129,51 @@ public class MainApp extends Application implements ObserveWormGUIDES {
             primaryStage.setResizable(true);
             primaryStage.centerOnScreen();
             
-//  ADDED THIS FILTER TO PREVENT WHACKY CAPTURING OF ARROW KEYS BY EVERY RANDOM WIDGET IN THE CONTROLLER.
-            primaryStage.addEventFilter(KeyEvent.KEY_TYPED, new EventHandler<KeyEvent>() {
-                @Override
-                public void handle(KeyEvent event) {
-                    Scene scene = controller.getScene();
-                    if (scene == null) {
-                        return;
-                    }
-                    if(event.isAltDown()) {                    
-                    	if (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN) {
+            keyHandler = new EventHandler<KeyEvent>() {
 
-                    		controller.getWindow3DController().getSubscene().getOnMouseDragged().handle(new MouseDragEvent(MouseDragEvent.ANY, 
-                    				controller.getWindow3DController().getMousePosX(), 
-                    				controller.getWindow3DController().getMousePosY() + (event.getCode()==KeyCode.DOWN? 10:-10), 0, 0, 
-                    				null, 0, false,false,false,false, event.isShiftDown(), false, false, false, false, null, null ));	
-                    		
-                    	} else if (event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.LEFT) {
-                    		
-                    		controller.getWindow3DController().getSubscene().getOnMouseDragged().handle(new MouseDragEvent(MouseDragEvent.ANY, 
-                    				controller.getWindow3DController().getMousePosX() + (event.getCode()==KeyCode.RIGHT? 10:-10), 
-                    				controller.getWindow3DController().getMousePosY(), 0, 0, 
-                    				null, 0, false,false,false,false, event.isShiftDown(), false, false, false, false, null, null ));	
-                    		
-                    	}
-                    } else {
-                    	if (event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.LEFT) {
-                    		if(true) {
-                    			controller.setTimePropertyValue(controller.getTimeProperty().get() + (event.getCode()==KeyCode.RIGHT?1:-1));
-                    		}
-                    	}
-                    }
-                    event.consume();
-                    return;
-                }
-            });
+            	@Override
+            	public void handle(KeyEvent event) {
+            		event.consume();
+            		if (scene == null) {
+            			return;
+            		}
+            		if(!event.isControlDown()) {                    
+            			KeyCode code = event.getCode();
+            			if (code == KeyCode.UP || code == KeyCode.DOWN) {
 
+            				controller.getWindow3DController().getSubscene().getOnMouseDragged().handle(new MouseDragEvent(MouseDragEvent.ANY, 
+            						controller.getWindow3DController().getMousePosX(), 
+            						controller.getWindow3DController().getMousePosY() + (code==KeyCode.DOWN? 10:-10), 0, 0, 
+            						null, 1, event.isShiftDown(),false,false,false, true, false, false, false, false, null, null ));	
+
+            			} else if (code == KeyCode.RIGHT || code == KeyCode.LEFT) {
+
+            				controller.getWindow3DController().getSubscene().getOnMouseDragged().handle(new MouseDragEvent(MouseDragEvent.ANY, 
+            						controller.getWindow3DController().getMousePosX() + (code==KeyCode.RIGHT? 10:-10), 
+            						controller.getWindow3DController().getMousePosY(), 0, 0, 
+            						null, 1, event.isShiftDown(),false,false,false, true, false, false, false, false, null, null ));	
+
+            			}
+            		} else  {
+            			KeyCombination kbRIGHT = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.CONTROL_DOWN);
+            			KeyCombination kbLEFT = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.CONTROL_DOWN);
+            			KeyCode code = event.getCode();
+            			if (kbRIGHT.match(event)||kbLEFT.match(event)) {
+            				if(true) {
+            					controller.setTimePropertyValue(controller.getTimeProperty().get() + (kbRIGHT.match(event)?1:-1));
+            				}
+            			}
+            		}
+            		return;
+            	}
+            };
+
+//KeyEvent.ANY seems to be crucial thing in next line
+            rootLayout.addEventFilter(KeyEvent.KEY_PRESSED, keyHandler);
             final Parent root = scene.getRoot();
             for (Node node : root.getChildrenUnmodifiable()) {
-                node.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
+            	node.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
+            	node.setFocusTraversable(false);
             }
 
         } catch (IOException e) {

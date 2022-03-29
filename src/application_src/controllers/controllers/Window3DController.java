@@ -86,7 +86,6 @@ import application_src.application_model.data.LineageData;
 import application_src.application_model.data.CElegansData.Connectome.Connectome;
 import application_src.controllers.layers.SearchLayer;
 import application_src.controllers.layers.StoriesLayer;
-import application_src.application_model.threeD.camerageometry.Xform;
 import application_src.application_model.cell_case_logic.CasesLists;
 import application_src.application_model.annotation.color.Rule;
 import application_src.application_model.threeD.subscenegeometry.SceneElement;
@@ -2140,8 +2139,6 @@ public class Window3DController {
             }
         }
 
-//THIS STILL IS BUGGY FOR COUNTERROTATION OF TIMEVARYING AXIS.
-
         if (defaultEmbryoFlag) {
         	if (xform2.getChildren().contains(orientationIndicatorGroup))
         		xform2.getChildren().remove(orientationIndicatorGroup);
@@ -2485,6 +2482,15 @@ public class Window3DController {
                     final Sphere sphere = new Sphere(radius);
 
                     colors.sort(colorComparator);
+                    for (int c=0;c<colors.size();c++) {
+                    	colors.set(c, colors.get(c).darker().deriveColor(0, 1, 1, .4));
+                    	try {
+							Thread.sleep(1);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+                    }
                     material = colorHash.getMaterial(colors);
 
                     sphere.setMaterial(material);
@@ -2570,6 +2576,8 @@ public class Window3DController {
      *         3D shape to label
      */
     private void insertLabelFor(final String name, final Node entity) {
+    	//***THIS METHOD SEEMS TO BREAK (MAYBE) WHEN PREVIOUS TIMEPOINTS ARE TRACED...
+    	
         // if label is already in scene, make all labels white and highlight that one
         final Text label = entityLabelMap.get(entity);
         if (label != null) {
@@ -2596,7 +2604,8 @@ public class Window3DController {
         text.setWrappingWidth(-1);
 
         entityLabelMap.put(entity, text);
-        xform1.getChildren().add(text);
+        //Put new label at head of Children roster for opacity compliance
+        xform1.getChildren().add(0, text);
 
 //        spritesPane.getChildren().add(text);
 
@@ -2951,6 +2960,7 @@ public class Window3DController {
         final Text text = new Text(title);
 
         text.setFill(web(SPRITE_COLOR_HEX));
+        text.setSmooth(true);
         text.setFontSmoothingType(LCD);
         text.setWrappingWidth(storyOverlayVBox.getWidth());
         text.setFont(getBillboardFont());
@@ -3478,25 +3488,23 @@ public class Window3DController {
                     runLater(() -> {
                         refreshScene();
 
-                        //render previous time points
-                        int loop = (int)numPrev.get();
 
+                        //render current time point
+                        getSceneData();
+                        addEntitiesAndNotes();
+
+                        //render previous time points, AFTER current, so that their transparency transmits the current cells.
+                        int loop = (int)numPrev.get();
                         //avoid index out of bound
                         int loop_end = timeProperty.get() - loop;
                         if (loop_end < 0) {
                             loop_end = 0;
                         }
-
                         for(int i = timeProperty.get() - 1; i > loop_end; --i) {
                             getCellSceneData(i);
                             addEntitiesNoNotesWithColorRule();
                         }
-
-                        //render current time point
-                        getSceneData();
-                        addEntitiesAndNotes();
-//                        xform1.setScaleX(zoomProperty.get());
-//                        xform1.setScaleY(zoomProperty.get());
+                        
                         xform1.setTranslateZ(translateZProperty.get());
                         if (cumRotShiftCoords != null) {
                         	for (Node content:xform1.getChildren()) {

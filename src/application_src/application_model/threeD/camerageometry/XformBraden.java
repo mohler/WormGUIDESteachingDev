@@ -15,7 +15,7 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Translate;
 
-public class Xform extends Group {
+public class XformBraden extends Group {
 
 	public Translate t = new Translate();
 	public Translate p = new Translate();
@@ -37,12 +37,12 @@ public class Xform extends Group {
 		rz.setAxis(Rotate.Z_AXIS);
 	}
 
-	public Xform() {
+	public XformBraden() {
 		super();
 		getTransforms().addAll(t, rz, ry, rx, s);
 	}
 
-	public Xform(RotateOrder rotateOrder) {
+	public XformBraden(RotateOrder rotateOrder) {
 		super();
 		// choose the order of rotations based on the rotateOrder
 		switch (rotateOrder) {

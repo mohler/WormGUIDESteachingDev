@@ -333,27 +333,27 @@ public class LineageTreePane extends ScrollPane {
         this.selectedNameLabeledProperty = requireNonNull(selectedNameLabeledProperty);
 
         // keyboard shortcut for screenshot
-        ownStage.addEventHandler(KEY_PRESSED, keyEvent -> {
-            if (keyEvent.getCode() == F5) {
-                final Stage fileChooserStage = new Stage();
-
-                final FileChooser fileChooser = new FileChooser();
-                fileChooser.setTitle("Choose Save Location");
-                fileChooser.getExtensionFilters().add(new ExtensionFilter("PNG File", "*.png"));
-
-                final WritableImage screenCapture = mainPane.snapshot(new SnapshotParameters(), null);
-                // write the image to a file
-                try {
-                    final File file = fileChooser.showSaveDialog(fileChooserStage);
-                    if (file != null) {
-                        RenderedImage renderedImage = fromFXImage(screenCapture, null);
-                        write(renderedImage, "png", file);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+//        ownStage.addEventHandler(KEY_PRESSED, keyEvent -> {
+//            if (keyEvent.getCode() == F5) {
+//                final Stage fileChooserStage = new Stage();
+//
+//                final FileChooser fileChooser = new FileChooser();
+//                fileChooser.setTitle("Choose Save Location");
+//                fileChooser.getExtensionFilters().add(new ExtensionFilter("PNG File", "*.png"));
+//
+//                final WritableImage screenCapture = mainPane.snapshot(new SnapshotParameters(), null);
+//                // write the image to a file
+//                try {
+//                    final File file = fileChooser.showSaveDialog(fileChooserStage);
+//                    if (file != null) {
+//                        RenderedImage renderedImage = fromFXImage(screenCapture, null);
+//                        write(renderedImage, "png", file);
+//                    }
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
     }
 
     /**
