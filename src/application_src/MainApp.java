@@ -4,36 +4,34 @@
 
 package application_src;
   
+import static application_src.application_model.loaders.IconImageLoader.loadImages;
+import static java.time.Duration.between;
+import static java.time.Instant.now;
+import static javafx.application.Platform.setImplicitExit;
+
 import java.io.IOException;
 import java.time.Instant;
-import java.util.Map;
 
+import application_src.application_model.resources.NucleiMgrAdapterResource;
+import application_src.controllers.controllers.RootLayoutController;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
-
-import application_src.controllers.controllers.RootLayoutController;
-import application_src.application_model.resources.NucleiMgrAdapterResource;
-
-import static java.time.Duration.between;
-import static java.time.Instant.now;
-
-import static javafx.application.Platform.setImplicitExit;
-
-import static application_src.application_model.loaders.IconImageLoader.loadImages;
 
 /**
  * Driver class for the WormGUIDES desktop application
@@ -137,7 +135,7 @@ public class MainApp extends Application implements ObserveWormGUIDES {
             		if (scene == null) {
             			return;
             		}
-            		if(!event.isControlDown()) {                    
+            		if(event.isShortcutDown()) {                    
             			KeyCode code = event.getCode();
             			if (code == KeyCode.UP || code == KeyCode.DOWN) {
 
@@ -155,12 +153,10 @@ public class MainApp extends Application implements ObserveWormGUIDES {
 
             			}
             		} else  {
-            			KeyCombination kbRIGHT = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.CONTROL_DOWN);
-            			KeyCombination kbLEFT = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.CONTROL_DOWN);
             			KeyCode code = event.getCode();
-            			if (kbRIGHT.match(event)||kbLEFT.match(event)) {
+            			if (code == KeyCode.RIGHT || code == KeyCode.LEFT) {
             				if(true) {
-            					controller.setTimePropertyValue(controller.getTimeProperty().get() + (kbRIGHT.match(event)?1:-1));
+            					controller.setTimePropertyValue(controller.getTimeProperty().get() + (code == KeyCode.RIGHT?1:-1));
             				}
             			}
             		}
