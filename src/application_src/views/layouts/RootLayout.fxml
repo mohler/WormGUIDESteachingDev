@@ -81,9 +81,9 @@
     <center>
         <GridPane fx:id="mainGridPane" pickOnBounds="true" BorderPane.alignment="CENTER">
             <columnConstraints>
-                <ColumnConstraints hgrow="ALWAYS" maxWidth="0" minWidth="300.0" prefWidth="330.0" />
+                <ColumnConstraints hgrow="ALWAYS" maxWidth="0" minWidth="330.0" prefWidth="360.0" />
                 <ColumnConstraints hgrow="ALWAYS" maxWidth="Infinity" minWidth="230.0" prefWidth="360.0" />
-                <ColumnConstraints hgrow="ALWAYS" maxWidth="0" minWidth="300.0" prefWidth="330.0" />
+                <ColumnConstraints hgrow="ALWAYS" maxWidth="0" minWidth="330.0" prefWidth="360.0" />
             </columnConstraints>
             <rowConstraints>
                 <RowConstraints minHeight="20.0" prefHeight="30.0" vgrow="ALWAYS" />
@@ -567,7 +567,7 @@
                                                                     <children>
                                                                         <HBox prefHeight="32.0" prefWidth="317.0">
                                                                             <children>
-                                                                                <CheckBox fx:id="uniformSizeCheckBox" maxHeight="1.7976931348623157E308" mnemonicParsing="false" prefHeight="32.0" prefWidth="174.0" text="Uniform Small Nuclei" HBox.hgrow="ALWAYS">
+                                                                                <CheckBox fx:id="uniformSizeCheckBox" maxHeight="1.7976931348623157E308" mnemonicParsing="false" prefHeight="32.0" prefWidth="174.0" text="Mini-Nuclei" HBox.hgrow="ALWAYS">
                                                                                     <font>
                                                                                         <Font size="14.0" />
                                                                                     </font>
@@ -580,7 +580,7 @@
                                                                                 </Button>
                                                                             </children>
                                                                         </HBox>
-                                                                        <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Dim Other Cells:">
+                                                                        <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Visibility of Unpainted Cells:">
                                                                             <font>
                                                                                 <Font size="14.0" />
                                                                             </font>
@@ -593,12 +593,11 @@
                                                                         </Label>
                                                                         <HBox prefHeight="32.0" prefWidth="317.0">
                                                                             <children>
-                                                                                <Slider fx:id="prevSlider" prefWidth="290.0" majorTickUnit="60" showTickMarks="true" showTickLabels="true" value="1.0" VBox.vgrow="ALWAYS" />
-                                                                                <Label fx:id="prevValue" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="14.0" text="1.0">
-                                                                                    <font>
-                                                                                        <Font size="10.0" />
-                                                                                    </font>
-                                                                                </Label>
+                                                                                <Spinner fx:id="prevSpinner" VBox.vgrow="ALWAYS" >
+																			      <valueFactory>
+																			        <SpinnerValueFactory.IntegerSpinnerValueFactory min="0" max="10"/>
+																			      </valueFactory>
+                                                                                </Spinner>
                                                                             </children>
                                                                         </HBox>
                                                                         <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Coloring Rules:">

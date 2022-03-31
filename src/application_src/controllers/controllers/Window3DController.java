@@ -233,8 +233,7 @@ public class Window3DController {
     // opacity value for "other" cells (with no rule attached)
     private final DoubleProperty othersOpacityProperty;
     private final DoubleProperty numPrev;
-    private final Slider prevSlider;
-    private final Label prevValue;
+    private final Spinner<Integer> prevSpinner;
     private final double nonSelectableOpacity = 0.25;
     private final List<String> otherCells;
     private final Vector<JavaPicture> javaPictures;
@@ -417,8 +416,7 @@ public class Window3DController {
             final Button clearAllLabelsButton,
             final TextField searchField,
             final Slider opacitySlider,
-            final Slider prevSlider,
-            final Label prevValue,
+            final Spinner<Integer> prevSpinner,
             final CheckBox uniformSizeCheckBox,
             final CheckBox cellNucleusCheckBox,
             final CheckBox cellBodyCheckBox,
@@ -759,6 +757,9 @@ public class Window3DController {
             final double oldRounded = round(oldValue.doubleValue()) / 100.0;
             if (newRounded != oldRounded) {
                 othersOpacityProperty.set(newRounded);
+                opacitySlider.setBackground(new Background(new BackgroundFill((newRounded<=0.25?Color.BLACK:null),null,null)));
+                opacitySlider.setTooltip(new Tooltip("Objects are "+(newRounded>0.25?"visible":"invisible") +" to mouse"));
+                opacitySlider.opacityProperty().set(newRounded+0.3);
                 buildScene();
             }
         });
@@ -781,22 +782,28 @@ public class Window3DController {
         }
 
         this.numPrev = requireNonNull(numPrev);
-        this.prevValue = requireNonNull(prevValue);
-        this.prevSlider = requireNonNull(prevSlider);
-        requireNonNull(prevSlider).valueProperty().addListener((observable, oldValue, newValue) -> {
-            final double newRounded = round(newValue.doubleValue());
-            final double oldRounded = round(oldValue.doubleValue());
-            if (newRounded != oldRounded) {
-                numPrev.set(newRounded);
-                prevValue.setText(String.valueOf(newRounded));
-                buildScene();
-            }
+        this.prevSpinner = requireNonNull(prevSpinner);
+        requireNonNull(prevSpinner).valueProperty().addListener((observable, oldValue, newValue) -> {
+        	if (newValue != null) {            
+        		final int newRounded = newValue;
+        		if (oldValue != null) {
+        			final int oldRounded = oldValue;
+        			if (newRounded != oldRounded) {
+        				numPrev.set(newRounded);
+        				buildScene();
+        			}
+        		} else {
+        			numPrev.set(newRounded);
+        			buildScene();
+
+        		}
+        	}
         });
         this.numPrev.addListener((observable, oldValue, newValue) -> {
             final double newVal = newValue.doubleValue();
             final double oldVal = oldValue.doubleValue();
             if (newVal != oldVal && newVal >= 1 && newVal <= timeProperty.get()) {
-                prevSlider.setValue(newVal);
+                prevSpinner.getValueFactory().setValue((int) newVal);
             }
         });
         if (defaultEmbryoFlag) {

@@ -58,7 +58,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
-
+import javafx.util.StringConverter;
 import application_src.application_model.data.LineageData;
 import application_src.application_model.data.CElegansData.Connectome.Connectome;
 import application_src.application_model.data.CElegansData.PartsList.PartsList;
@@ -204,9 +204,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
     @FXML
     private Slider opacitySlider;
     @FXML
-    private Slider prevSlider;
-    @FXML
-    private Label prevValue;
+    private Spinner<Integer> prevSpinner;
 
     // Structures tab
     private StructuresLayer structuresLayer;
@@ -796,8 +794,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
                 clearAllLabelsButton,
                 searchField,
                 opacitySlider,
-                prevSlider,
-                prevValue,
+                prevSpinner,
                 uniformSizeCheckBox,
                 cellNucleusCheckBox,
                 cellBodyCheckBox,
@@ -1073,11 +1070,28 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
         opacitySlider.setMin(0);
         opacitySlider.setMax(100);
-
-        prevSlider.setMin(1);
-        prevSlider.setMax(lineageData.getNumberOfTimePoints() - 1);
+        prevSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, lineageData.getNumberOfTimePoints() - 1, 1, 1));
+        prevSpinner.setEditable(true);
+        prevSpinner.getEditor().textProperty().addListener((observable, oldValue, newValue) -> { 
+        		commitEditorText(prevSpinner); 
+        	});
     }
 
+    private <T> void commitEditorText(Spinner<T> spinner) {
+        if (!spinner.isEditable()) return;
+        String text = spinner.getEditor().getText();
+        SpinnerValueFactory<T> valueFactory = spinner.getValueFactory();
+        if (valueFactory != null) {
+            StringConverter<T> converter = valueFactory.getConverter();
+            if (converter != null) {
+                T value = converter.fromString(text);
+                if (value != null)
+                	valueFactory.setValue(value);
+            }
+        }
+    }
+
+    
     private void initSearchLayer() {
         cellNucleusCheckBox.setSelected(true);
         searchLayer = new SearchLayer(

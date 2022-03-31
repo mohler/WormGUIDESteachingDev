@@ -131,7 +131,6 @@ public class MainApp extends Application implements ObserveWormGUIDES {
 
             	@Override
             	public void handle(KeyEvent event) {
-            		event.consume();
             		if (scene == null) {
             			return;
             		}
@@ -143,6 +142,7 @@ public class MainApp extends Application implements ObserveWormGUIDES {
             						controller.getWindow3DController().getMousePosX(), 
             						controller.getWindow3DController().getMousePosY() + (code==KeyCode.DOWN? 10:-10), 0, 0, 
             						null, 1, event.isShiftDown(),false,false,false, true, false, false, false, false, null, null ));	
+                    		event.consume();
 
             			} else if (code == KeyCode.RIGHT || code == KeyCode.LEFT) {
 
@@ -150,6 +150,7 @@ public class MainApp extends Application implements ObserveWormGUIDES {
             						controller.getWindow3DController().getMousePosX() + (code==KeyCode.RIGHT? 10:-10), 
             						controller.getWindow3DController().getMousePosY(), 0, 0, 
             						null, 1, event.isShiftDown(),false,false,false, true, false, false, false, false, null, null ));	
+                    		event.consume();
 
             			}
             		} else  {
@@ -157,6 +158,8 @@ public class MainApp extends Application implements ObserveWormGUIDES {
             			if (code == KeyCode.RIGHT || code == KeyCode.LEFT) {
             				if(true) {
             					controller.setTimePropertyValue(controller.getTimeProperty().get() + (code == KeyCode.RIGHT?1:-1));
+                        		event.consume();
+
             				}
             			}
             		}
