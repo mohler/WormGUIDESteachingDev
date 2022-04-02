@@ -450,7 +450,7 @@ public class Window3DController {
     	this.parentStage = requireNonNull(parentStage);
         this.xform1 = new XformBox();
         this.xform2 = new XformBox();
-        this.xform1Pivot = new Point3D(111,0,0);
+        this.xform1Pivot = new Point3D(0,0,0);
         this.offsetX = offsetX;
         this.offsetY = offsetY;
         this.offsetZ = offsetZ;
