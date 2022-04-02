@@ -1941,16 +1941,18 @@ public class Window3DController {
         final int requestedTime = timeProperty.get();
         cellNames = new LinkedList<>(asList(lineageData.getNames(requestedTime)));
         positions = new LinkedList<>();
-        for (double[] position : lineageData.getPositions(requestedTime)) {
-            positions.add(new Double[]{
-                    position[0],
-                    position[1],
-                    position[2]
-            });
-        }
         diameters = new LinkedList<>();
         for (double diameter : lineageData.getDiameters(requestedTime)) {
             diameters.add(diameter);
+        }
+ //FIX THIS!!!  VERY CLOSE NOW!!!
+        for (double[] position : lineageData.getPositions(requestedTime)) {
+        	double displayRadius = uniformSize?getUniformRadius():diameters.get(positions.size());
+            positions.add(new Double[]{
+                    position[0] - displayRadius*1,
+                    position[1] - displayRadius*0,
+                    position[2] - displayRadius*0
+            });
         }
         otherCells.clear();
 
@@ -2088,16 +2090,17 @@ public class Window3DController {
         final int requestedTime = time;
         cellNames = new LinkedList<>(asList(lineageData.getNames(requestedTime)));
         positions = new LinkedList<>();
-        for (double[] position : lineageData.getPositions(requestedTime)) {
-            positions.add(new Double[]{
-                    position[0],
-                    position[1],
-                    position[2]
-            });
-        }
         diameters = new LinkedList<>();
         for (double diameter : lineageData.getDiameters(requestedTime)) {
             diameters.add(diameter);
+        }
+        for (double[] position : lineageData.getPositions(requestedTime)) {
+        	double displayRadius = uniformSize?getUniformRadius():diameters.get(positions.size());
+            positions.add(new Double[]{
+                    position[0] - displayRadius*1,
+                    position[1] - displayRadius*0,
+                    position[2] - displayRadius*0
+            });
         }
 
         totalNucleiProperty.set(cellNames.size());
@@ -2307,9 +2310,9 @@ public class Window3DController {
                     position[X_COR_INDEX] * xScale,
                     position[Y_COR_INDEX] * yScale,
                     position[Z_COR_INDEX] * zScale));
-            sphere.getTransforms().add(new Rotate(90, sphere.getBoundsInLocal().getMaxX() -sphere.getBoundsInLocal().getMinX() 
-            											, sphere.getBoundsInLocal().getMaxY() -sphere.getBoundsInLocal().getMinY() 
-            											, sphere.getBoundsInLocal().getMaxZ() -sphere.getBoundsInLocal().getMinZ() 
+            sphere.getTransforms().add(new Rotate(90, sphere.getBoundsInLocal().getWidth()/2 
+            											, sphere.getBoundsInLocal().getHeight()/2 
+            											, sphere.getBoundsInLocal().getDepth()/2 
             											, Z_AXIS));
             spheres.add(sphere);
 
@@ -2509,10 +2512,10 @@ public class Window3DController {
                             position[X_COR_INDEX] * xScale,
                             position[Y_COR_INDEX] * yScale,
                             position[Z_COR_INDEX] * zScale));
-                    sphere.getTransforms().add(new Rotate(90, sphere.getBoundsInLocal().getMaxX() -sphere.getBoundsInLocal().getMinX() 
-                    											, sphere.getBoundsInLocal().getMaxY() -sphere.getBoundsInLocal().getMinY() 
-                    											, sphere.getBoundsInLocal().getMaxZ() -sphere.getBoundsInLocal().getMinZ() 
-                    											, Z_AXIS));
+                    sphere.getTransforms().add(new Rotate(90, sphere.getBoundsInLocal().getWidth()/2 
+							, sphere.getBoundsInLocal().getHeight()/2 
+							, sphere.getBoundsInLocal().getDepth()/2 
+							, Z_AXIS));
                     spheres.add(sphere);
 
                     if (!sphere.isDisable()) {
@@ -2873,12 +2876,12 @@ public class Window3DController {
                         // cell attachment
                         final Sphere sphere = getSubsceneSphereWithName(note.getCellName());
                         if (sphere != null) {
-//                            double offset = 5;
-//                            if (!uniformSize) {
-//                                offset = sphere.getRadius() + 2;
-//                            }
+                            double offset = 5;
+                            if (!uniformSize) {
+                                offset = sphere.getRadius() + 2;
+                            }
                             noteGraphic.getTransforms().addAll(sphere.getTransforms());
-//                            noteGraphic.getTransforms().add(new Translate(offset, offset));
+                            noteGraphic.getTransforms().add(new Translate(offset, offset));
                         }
                     } else if (note.attachedToStructure() && defaultEmbryoFlag) {
                         // structure attachment
