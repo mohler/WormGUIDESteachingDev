@@ -229,7 +229,7 @@ public class Window3DController {
     // color rules stuff
     private final ColorHash colorHash;
     private final Comparator<Color> colorComparator;
-    private final Comparator<Shape3D> opacityComparator;
+    private final Comparator<Node> opacityComparator;
     // opacity value for "other" cells (with no rule attached)
     private final DoubleProperty othersOpacityProperty;
     private final DoubleProperty numPrev;
@@ -1945,7 +1945,8 @@ public class Window3DController {
         for (double diameter : lineageData.getDiameters(requestedTime)) {
             diameters.add(diameter);
         }
- //FIX THIS!!!  VERY CLOSE NOW!!!
+        
+ //FIXed THIS...
         for (double[] position : lineageData.getPositions(requestedTime)) {
         	double displayRadius = uniformSize?getUniformRadius():diameters.get(positions.size());
             positions.add(new Double[]{
@@ -2088,24 +2089,28 @@ public class Window3DController {
     //Only get the cell scene data to provide faster rendering speed for the previous time point feature
     private void getCellSceneData(int time) {
         final int requestedTime = time;
-        cellNames = new LinkedList<>(asList(lineageData.getNames(requestedTime)));
-        positions = new LinkedList<>();
-        diameters = new LinkedList<>();
+        List prevCellNames = new LinkedList<>(asList(lineageData.getNames(requestedTime)));
+        List prevPositions = new LinkedList<>();
+        List prevDiameters = new LinkedList<>();
         for (double diameter : lineageData.getDiameters(requestedTime)) {
-            diameters.add(diameter);
+        	prevDiameters.add(diameter);
         }
         for (double[] position : lineageData.getPositions(requestedTime)) {
-        	double displayRadius = uniformSize?getUniformRadius():diameters.get(positions.size());
-            positions.add(new Double[]{
+        	double displayRadius = uniformSize?getUniformRadius():diameters.get(prevPositions.size());
+        	prevPositions.add(new Double[]{
                     position[0] - displayRadius*1,
                     position[1] - displayRadius*0,
                     position[2] - displayRadius*0
             });
         }
 
-        totalNucleiProperty.set(cellNames.size());
+        cellNames.addAll(prevCellNames);
+        positions.addAll(prevPositions);
+        diameters.addAll(prevDiameters);
+        
+//        totalNucleiProperty.set(cellNames.size());
 
-        //spheres = new LinkedList<>();
+        List prevSpheres = new LinkedList<>();
         if (defaultEmbryoFlag) {
             meshes = new LinkedList<>();
         }
@@ -2211,10 +2216,12 @@ public class Window3DController {
     //For Adding previous time points graphics of cells that exist in the ruleslist
     //For previous time points feature
     private void addEntitiesNoNotesWithColorRule() {
-        List<Shape3D> entities = new ArrayList();
+        List<Node> entities = new ArrayList();
         this.addColoredGeometries(entities);
         entities.sort(this.opacityComparator);
         xform1.getChildren().addAll(entities);
+//        List<Node> entitiesAll = xform1.getChildren();
+//        entities.sort(this.opacityComparator);
     }
 
     /**
@@ -2455,7 +2462,7 @@ public class Window3DController {
      * @param entities
      *         list of subscene entities
      */
-    private void addColoredGeometries(final List<Shape3D> entities) {
+    private void addColoredGeometries(final List<Node> entities) {
         final Material othersMaterial = colorHash.getOthersMaterial(othersOpacityProperty.get());
         final ListIterator<String> iter = cellNames.listIterator();
         int index = -1;
@@ -3584,11 +3591,11 @@ public class Window3DController {
      * semi-opaque materials. Entities with opaque materials should be rendered last (added first to the
      * rootEntitiesGroup group.
      */
-    private final class OpacityComparator implements Comparator<Shape3D> {
+    private final class OpacityComparator implements Comparator<Node> {
         @Override
-        public int compare(Shape3D o1, Shape3D o2) {
-            double op1 = colorHash.getMaterialOpacity(o1.getMaterial());
-            double op2 = colorHash.getMaterialOpacity(o2.getMaterial());
+        public int compare(Node o1, Node o2) {
+            double op1 = colorHash.getMaterialOpacity(((Shape3D)o1).getMaterial());
+            double op2 = colorHash.getMaterialOpacity(((Shape3D)o2).getMaterial());
             if (op1 < op2) {
                 return 1;
             } else if (op1 > op2) {

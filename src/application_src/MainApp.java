@@ -140,14 +140,14 @@ public class MainApp extends Application implements ObserveWormGUIDES {
 
             				controller.getWindow3DController().getSubscene().getOnMouseDragged().handle(new MouseDragEvent(MouseDragEvent.ANY, 
             						controller.getWindow3DController().getMousePosX(), 
-            						controller.getWindow3DController().getMousePosY() + (code==KeyCode.DOWN? 10:-10), 0, 0, 
+            						controller.getWindow3DController().getMousePosY() + (code==KeyCode.DOWN? 20:-20), 0, 0, 
             						null, 1, event.isShiftDown(),false,false,false, true, false, false, false, false, null, null ));	
                     		event.consume();
 
             			} else if (code == KeyCode.RIGHT || code == KeyCode.LEFT) {
 
             				controller.getWindow3DController().getSubscene().getOnMouseDragged().handle(new MouseDragEvent(MouseDragEvent.ANY, 
-            						controller.getWindow3DController().getMousePosX() + (code==KeyCode.RIGHT? 10:-10), 
+            						controller.getWindow3DController().getMousePosX() + (code==KeyCode.RIGHT? 20:-20), 
             						controller.getWindow3DController().getMousePosY(), 0, 0, 
             						null, 1, event.isShiftDown(),false,false,false, true, false, false, false, false, null, null ));	
                     		event.consume();
