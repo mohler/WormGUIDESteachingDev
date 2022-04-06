@@ -4,6 +4,7 @@
 
 package application_src.controllers.controllers;
 
+
 import java.awt.Font;
 import java.awt.image.RenderedImage;
 import java.io.File;
@@ -81,6 +82,8 @@ import javafx.scene.transform.Translate;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+
+import application_src.NamedNucleusSphere;
 
 import application_src.application_model.data.LineageData;
 import application_src.application_model.data.CElegansData.Connectome.Connectome;
@@ -187,7 +190,7 @@ import static application_src.application_model.threeD.subsceneparameters.Parame
  * class.
  * <p>
  * An "entity" in the subscene is either a cell, cell body, or multicellular structure. These are graphically
- * represented by the Shape3Ds Sphere and MeshView available in JavaFX. {@link Sphere}s represent cells, and
+ * represented by the Shape3Ds NamedNucleusSphere and MeshView available in JavaFX. {@link NamedNucleusSphere}s represent cells, and
  * {@link MeshView}s represent cell bodies and multicellular structures. Notes and labels are rendered as
  * {@link Text}s. This class queries the {@link LineageData} and {@link SceneElementsList} for a certain timeProperty
  * and renders the entities, notes, story, and labels present in that timeProperty point.
@@ -235,7 +238,6 @@ public class Window3DController {
     private final DoubleProperty numPrev;
     private final Spinner<Integer> prevSpinner;
     private final double nonSelectableOpacity = 0.25;
-    private final List<String> otherCells;
     private final Vector<JavaPicture> javaPictures;
     private final SearchLayer searchLayer;
     private final Stage parentStage;
@@ -310,7 +312,7 @@ public class Window3DController {
     private double[] keyFramesRotate;
 
     // subscene state parameters
-    private LinkedList<Sphere> spheres;
+    private LinkedList<NamedNucleusSphere> spheres;
     private LinkedList<SceneElementMeshView> meshes;
     private LinkedList<String> cellNames;
     private LinkedList<String> meshNames;
@@ -624,8 +626,6 @@ public class Window3DController {
                 geneResultsUpdatedFlag.set(false);
             }
         });
-
-        otherCells = new ArrayList<>();
 
         oriIndRotX = new Rotate(90, X_AXIS);
         oriIndRotY = new Rotate(0, Y_AXIS);
@@ -1098,12 +1098,13 @@ public class Window3DController {
 
                 final Node node = me.getPickResult().getIntersectedNode();
 
-                if (node instanceof Sphere) {
+                if (node instanceof NamedNucleusSphere) {
                     // Nucleus
-                    Sphere picked = (Sphere) node;
-                    int index = getPickedSphereIndex(picked);
-                    String name = normalizeName(cellNames.get(index));
-
+                    NamedNucleusSphere picked = (NamedNucleusSphere) node;
+                    int index = getPickedNamedNucleusSphereIndex(picked);
+//                    String name = normalizeName(cellNames.get(index));
+                    String name = normalizeName(picked.getCellName());
+                    
                     cellClickedProperty.set(true);
                     selectedNameProperty.set(name);
                     selectedIndex.set(index);
@@ -1611,8 +1612,8 @@ public class Window3DController {
                             addCalloutSubsceneTranslation(
                                     noteOrLabelGraphic.getTransforms(),
                                     new Translate(calloutX, calloutY));
-                            if (entity instanceof Sphere) {
-                                realignCalloutLineToSphere(noteOrLabelGraphic, b, x, y, CALLOUT_UPPER_LEFT);
+                            if (entity instanceof NamedNucleusSphere) {
+                                realignCalloutLineToNamedNucleusSphere(noteOrLabelGraphic, b, x, y, CALLOUT_UPPER_LEFT);
                             } else if (entity instanceof SceneElementMeshView) {
                                 realignCalloutLineToSceneElementMesh(
                                         noteOrLabelGraphic,
@@ -1626,8 +1627,8 @@ public class Window3DController {
                             addCalloutSubsceneTranslation(
                                     noteOrLabelGraphic.getTransforms(),
                                     new Translate(calloutX, calloutY));
-                            if (entity instanceof Sphere) {
-                                realignCalloutLineToSphere(noteOrLabelGraphic, b, x, y, CALLOUT_LOWER_LEFT);
+                            if (entity instanceof NamedNucleusSphere) {
+                                realignCalloutLineToNamedNucleusSphere(noteOrLabelGraphic, b, x, y, CALLOUT_LOWER_LEFT);
                             } else if (entity instanceof SceneElementMeshView) {
                                 realignCalloutLineToSceneElementMesh(
                                         noteOrLabelGraphic,
@@ -1641,8 +1642,8 @@ public class Window3DController {
                             addCalloutSubsceneTranslation(
                                     noteOrLabelGraphic.getTransforms(),
                                     new Translate(calloutX, calloutY));
-                            if (entity instanceof Sphere) {
-                                realignCalloutLineToSphere(noteOrLabelGraphic, b, x, y, CALLOUT_UPPER_RIGHT);
+                            if (entity instanceof NamedNucleusSphere) {
+                                realignCalloutLineToNamedNucleusSphere(noteOrLabelGraphic, b, x, y, CALLOUT_UPPER_RIGHT);
                             } else if (entity instanceof SceneElementMeshView) {
                                 realignCalloutLineToSceneElementMesh(
                                         noteOrLabelGraphic,
@@ -1656,8 +1657,8 @@ public class Window3DController {
                             addCalloutSubsceneTranslation(
                                     noteOrLabelGraphic.getTransforms(),
                                     new Translate(calloutX, calloutY));
-                            if (entity instanceof Sphere) {
-                                realignCalloutLineToSphere(noteOrLabelGraphic, b, x, y, CALLOUT_LOWER_RIGHT);
+                            if (entity instanceof NamedNucleusSphere) {
+                                realignCalloutLineToNamedNucleusSphere(noteOrLabelGraphic, b, x, y, CALLOUT_LOWER_RIGHT);
                             } else if (entity instanceof SceneElementMeshView) {
                                 realignCalloutLineToSceneElementMesh(
                                         noteOrLabelGraphic,
@@ -1804,7 +1805,7 @@ public class Window3DController {
      * @param display
      *         the display type specifying the type of callout, not null
      */
-    private void realignCalloutLineToSphere(
+    private void realignCalloutLineToNamedNucleusSphere(
             final Node calloutGraphic,
             final Bounds entityBounds,
             final double entityCenterX,
@@ -1919,9 +1920,9 @@ public class Window3DController {
         return -1;
     }
 
-    private int getPickedSphereIndex(final Sphere picked) {
+    private int getPickedNamedNucleusSphereIndex(final NamedNucleusSphere picked) {
         for (int i = 0; i < cellNames.size(); i++) {
-            if (spheres.get(i).equals(picked)) {
+            if (cellNames.get(i).equals(picked.getCellName())) {
                 return i;
             }
         }
@@ -1955,7 +1956,6 @@ public class Window3DController {
                     position[2] - displayRadius*0
             });
         }
-        otherCells.clear();
 
         totalNucleiProperty.set(cellNames.size());
 
@@ -2089,28 +2089,23 @@ public class Window3DController {
     //Only get the cell scene data to provide faster rendering speed for the previous time point feature
     private void getCellSceneData(int time) {
         final int requestedTime = time;
-        List prevCellNames = new LinkedList<>(asList(lineageData.getNames(requestedTime)));
-        List prevPositions = new LinkedList<>();
-        List prevDiameters = new LinkedList<>();
-        for (double diameter : lineageData.getDiameters(requestedTime)) {
-        	prevDiameters.add(diameter);
-        }
+        cellNames = new LinkedList<>(asList(lineageData.getNames(requestedTime)));
+        positions = new LinkedList<>();
         for (double[] position : lineageData.getPositions(requestedTime)) {
-        	double displayRadius = uniformSize?getUniformRadius():diameters.get(prevPositions.size());
-        	prevPositions.add(new Double[]{
-                    position[0] - displayRadius*1,
-                    position[1] - displayRadius*0,
-                    position[2] - displayRadius*0
+            positions.add(new Double[]{
+                    position[0],
+                    position[1],
+                    position[2]
             });
         }
+        diameters = new LinkedList<>();
+        for (double diameter : lineageData.getDiameters(requestedTime)) {
+            diameters.add(diameter);
+        }
 
-        cellNames.addAll(prevCellNames);
-        positions.addAll(prevPositions);
-        diameters.addAll(prevDiameters);
-        
-//        totalNucleiProperty.set(cellNames.size());
+        totalNucleiProperty.set(cellNames.size());
 
-        List prevSpheres = new LinkedList<>();
+        //spheres = new LinkedList<>();
         if (defaultEmbryoFlag) {
             meshes = new LinkedList<>();
         }
@@ -2220,8 +2215,6 @@ public class Window3DController {
         this.addColoredGeometries(entities);
         entities.sort(this.opacityComparator);
         xform1.getChildren().addAll(entities);
-//        List<Node> entitiesAll = xform1.getChildren();
-//        entities.sort(this.opacityComparator);
     }
 
     /**
@@ -2259,7 +2252,7 @@ public class Window3DController {
             } else {
                 radius = getSizeScale() * getUniformRadius();
             }
-            final Sphere sphere = new Sphere(radius);
+            final NamedNucleusSphere sphere = new NamedNucleusSphere(cellName, radius);
 
             // create the color material
             Material material;
@@ -2295,6 +2288,7 @@ public class Window3DController {
                         iter.remove();
                         positions.remove(index);
                         diameters.remove(index);
+
                         index--;
                         continue;
                     } else {
@@ -2496,11 +2490,11 @@ public class Window3DController {
                     } else {
                         radius = getSizeScale() * getUniformRadius();
                     }
-                    final Sphere sphere = new Sphere(radius);
+                    final NamedNucleusSphere sphere = new NamedNucleusSphere(cellName, radius);
 
                     colors.sort(colorComparator);
                     for (int c=0;c<colors.size();c++) {
-                    	colors.set(c, colors.get(c).darker().deriveColor(0, 1, 1, .4));
+                    	colors.set(c, colors.get(c).darker().deriveColor(0, 1, 1, .3));
                     	try {
 							Thread.sleep(1);
 						} catch (InterruptedException e) {
@@ -2647,8 +2641,8 @@ public class Window3DController {
      */
     private Shape3D getEntityWithName(final String name) {
         // sphere label
-        for (int i = 0; i < cellNames.size(); i++) {
-            if (spheres.get(i) != null && cellNames.get(i).equalsIgnoreCase(name)) {
+        for (int i = 0; i < spheres.size(); i++) {
+            if (spheres.get(i) != null && spheres.get(i).getCellName().equalsIgnoreCase(name)) {
                 return spheres.get(i);
             }
         }
@@ -2881,7 +2875,7 @@ public class Window3DController {
                         noteGraphic.getTransforms().add(new Translate(note.getX(), note.getY(), note.getZ()));
                     } else if (note.attachedToCell()) {
                         // cell attachment
-                        final Sphere sphere = getSubsceneSphereWithName(note.getCellName());
+                        final NamedNucleusSphere sphere = getSubsceneSphereWithName(note.getCellName());
                         if (sphere != null) {
                             double offset = 5;
                             if (!uniformSize) {
@@ -2951,7 +2945,7 @@ public class Window3DController {
      * @return the sphere representing the cell with that lineage name, null if none were found in the current time
      * frame
      */
-    private Sphere getSubsceneSphereWithName(final String lineageName) {
+    private NamedNucleusSphere getSubsceneSphereWithName(final String lineageName) {
         for (int i = 0; i < cellNames.size(); i++) {
             if (cellNames.get(i).equalsIgnoreCase(lineageName) && spheres.get(i) != null) {
                 return spheres.get(i);
@@ -3530,8 +3524,12 @@ public class Window3DController {
             					double ctz = content.getTranslateZ();
             					Point3D newTranslateCoords = new Point3D(ctx+cumRotShiftCoords.getX(), cty+cumRotShiftCoords.getY(), ctz-cumRotShiftCoords.getZ());
 
-                        		content.getTransforms().set(0, new Translate(newTranslateCoords.getX(), newTranslateCoords.getY(), newTranslateCoords.getZ())
+                        		if (content.getTransforms().size() > 0) {
+                        			content.getTransforms().set(0, new Translate(newTranslateCoords.getX(), newTranslateCoords.getY(), newTranslateCoords.getZ())
                         				.createConcatenation(content.getTransforms().get(0)));
+                        		} else {
+                        			content.getTransforms().add(new Translate(newTranslateCoords.getX(), newTranslateCoords.getY(), newTranslateCoords.getZ()));
+                        		}
 
                         	}
                         }
