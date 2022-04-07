@@ -4,6 +4,7 @@
 
 package application_src.application_model.annotation.color;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -108,7 +109,7 @@ public class ColorHash {
         final Color[] temp = colors.toArray(new Color[colors.size()]);
         double opacity = 1.0;
 
-        final Color[] copy;
+        Color[] copy;
         if (colors.isEmpty()) {
             copy = new Color[1];
             copy[0] = WHITE;
@@ -117,9 +118,19 @@ public class ColorHash {
         } else {
             // we want first and last color to be the same because of JavaFX
             // material wrapping bug
-            copy = new Color[colors.size() + 1];
+//            copy = new Color[colors.size() + 1];
+//            arraycopy(temp, 0, copy, 0, colors.size());
+//            copy[colors.size()] = temp[0];
+// WHAT WE REALLY NEED HERE IS A SEQUENCE FLIP OF STRIPES ON THE TWO EQUATORS OF THE SPHERE,
+        	//SO ALL COLORS CAN BE SEEN FROM ALL ANGLES.
+            copy = new Color[colors.size() *2];
+            Color[] flipCopy = new Color[colors.size() *2];
             arraycopy(temp, 0, copy, 0, colors.size());
-            copy[colors.size()] = temp[0];
+            for (int c=0;c<copy.length;c++) {
+            	flipCopy[c] = copy[copy.length-1-c];
+            }
+            arraycopy(temp, 0, flipCopy, 0, colors.size());
+            copy = flipCopy;
         }
 
         // Set opacity to alpha value of least opaque color
@@ -133,7 +144,7 @@ public class ColorHash {
         int segmentLength = (int) (wImage.getHeight() / copy.length);
         Color color = BLACK;
         for (int i = 0; i < copy.length; i++) {
-            color = copy[i];
+             color = copy[i];
             for (int j = i * segmentLength; j < (i + 1) * segmentLength; j++) {
                 for (int k = 0; k < wImage.getWidth(); k++) {
                     writer.setColor(k, j, color);
