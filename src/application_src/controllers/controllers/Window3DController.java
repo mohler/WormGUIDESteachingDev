@@ -2288,7 +2288,7 @@ public class Window3DController {
                         iter.remove();
                         positions.remove(index);
                         diameters.remove(index);
-
+                        currentLabels.remove(cellName);
                         index--;
                         continue;
                     } else {
