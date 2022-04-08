@@ -16,6 +16,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 import application_src.application_model.annotation.color.Rule;
+import application_src.application_model.search.SearchConfiguration.SearchType;
 
 import static java.util.Objects.requireNonNull;
 
@@ -115,6 +116,11 @@ public class RuleGraphic extends HBox {
 
         toolTip.setFont(getFont());
         label.setTooltip(toolTip);
+        
+        if (rule.getSearchType() == SearchType.ALL_RULES_IN_LIST) {
+        	colorRectangle.setDisable(true);
+        	editBtn.setDisable(true);
+        }
 
         getChildren().addAll(label, r, colorRectangle, editBtn, visibleBtn, deleteBtn);
     }

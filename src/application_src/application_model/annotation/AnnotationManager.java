@@ -6,6 +6,7 @@ import application_src.application_model.search.CElegansSearch.CElegansSearch;
 import application_src.application_model.search.SearchConfiguration.SearchOption;
 import application_src.application_model.search.SearchConfiguration.SearchType;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
 import java.util.*;
@@ -13,6 +14,7 @@ import static application_src.application_model.data.GenericData.GenericLineageT
 import static application_src.application_model.search.SearchConfiguration.SearchOption.CELL_BODY;
 import static application_src.application_model.search.SearchConfiguration.SearchOption.CELL_NUCLEUS;
 import static application_src.application_model.search.SearchConfiguration.SearchType.*;
+import static javafx.scene.paint.Color.BLACK;
 
 /**
  * This class is one of two main interfaces between the model-agnostic Search pipeline
@@ -36,7 +38,18 @@ public class AnnotationManager {
 
     public AnnotationManager(ObservableList<Rule> rulesList, BooleanProperty rebuildSubsceneFlag, CElegansSearch cElegansSearch) {
         this.rulesList = rulesList;
-        this.rebuildSubsceneFlag = rebuildSubsceneFlag;
+        List<SearchOption> fakeOptions = new ArrayList<SearchOption>();
+        if (this.rulesList.size()==0 || this.rulesList.get(0).getSearchType()!=SearchType.ALL_RULES_IN_LIST) {
+        	this.rulesList.add(0, new Rule(
+        			new SimpleBooleanProperty(false),
+        			"All Rules...",
+        			BLACK,
+        			SearchType.ALL_RULES_IN_LIST,
+        			fakeOptions,
+        			null,
+        			this));
+        }
+       this.rebuildSubsceneFlag = rebuildSubsceneFlag;
         this.cElegansSearch = cElegansSearch;
 
     }
@@ -86,7 +99,8 @@ public class AnnotationManager {
                 color,
                 searchType,
                 options,
-                cElegansSearch);
+                cElegansSearch,
+                this);
         if (rule.getCells().isEmpty()) {
             rule.setCells(searchResults);
         }
@@ -117,7 +131,7 @@ public class AnnotationManager {
         final StringBuilder sb = createLabelForConnectomeRule(
                 searched,
                 presynapticTicked, postsynapticTicked, electricalTicked, neuromuscularTicked);
-        final Rule rule = new Rule(rebuildSubsceneFlag, sb.toString(), color, CONNECTOME, options, cElegansSearch);
+        final Rule rule = new Rule(rebuildSubsceneFlag, sb.toString(), color, CONNECTOME, options, cElegansSearch, this);
         rule.setCells(searchResults);
         rule.setSearchedText(sb.toString());
         rule.resetLabel(sb.toString());
@@ -149,7 +163,8 @@ public class AnnotationManager {
                 color,
                 SearchType.MSL,
                 options,
-                cElegansSearch
+                cElegansSearch,
+                this
         );
         rule.setCells(searchResults);
         rulesList.add(rule);
@@ -208,7 +223,7 @@ public class AnnotationManager {
         }
 
         final String label = createRuleLabel(searched, GENE);
-        final Rule rule = new Rule(rebuildSubsceneFlag, label, color, GENE, options, cElegansSearch);
+        final Rule rule = new Rule(rebuildSubsceneFlag, label, color, GENE, options, cElegansSearch, this);
         rule.setCells(searchResults);
         rulesList.add(rule);
         return rule;
@@ -315,5 +330,16 @@ public class AnnotationManager {
     }
     //////////////////////////////////////////////////////////////////////////////////////////////
     public ObservableList<Rule> getRulesList() { return this.rulesList; }
-    public void clearRulesList() { this.rulesList.clear(); }
+    public void clearRulesList() { 
+        List<SearchOption> fakeOptions = new ArrayList<SearchOption>();
+    	this.rulesList.clear(); 
+        this.rulesList.add(0, new Rule(
+        		new SimpleBooleanProperty(false),
+                "All Rules...",
+                BLACK,
+                SearchType.ALL_RULES_IN_LIST,
+                fakeOptions,
+                null,
+                this));
+    }
 } //end class

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import application_src.application_model.annotation.AnnotationManager;
 import application_src.application_model.data.OrganismDataType;
 import application_src.application_model.search.CElegansSearch.CElegansSearch;
 import application_src.application_model.search.CElegansSearch.CElegansSearchResults;
@@ -77,6 +78,8 @@ public class Rule {
     private Color color;
 
     private List<String> cells;
+    
+    private AnnotationManager annotationManager;
     /**
      * True if the list of cells has been set, false otherwise. The cells list of a structure rule based on a scene
      * name (with the search type {@link SearchType#STRUCTURE_BY_SCENE_NAME}) is never set.
@@ -104,10 +107,12 @@ public class Rule {
             Color color,
             SearchType type,
             List<SearchOption> options,
-            CElegansSearch cElegansSearch) {
+            CElegansSearch cElegansSearch,
+            AnnotationManager annotationManager) {
 
         this.rebuildSubsceneFlag = requireNonNull(rebuildSubsceneFlag);
-
+        this.annotationManager = annotationManager;
+        
         //fetch the search term from the 'searched' parameter
         String searchTemp = "";
         if (searched.contains("'")) {
@@ -227,7 +232,22 @@ public class Rule {
      *         true if the rule is visible, false otherwise
      */
     public void setVisible(final boolean isVisible) {
-        visible = isVisible;
+    	if (this.getSearchType() != SearchType.ALL_RULES_IN_LIST) {
+    		visible = isVisible;
+    	} else {
+    		visible = isVisible;
+    		if (annotationManager != null) {
+    			for (Rule nextRule:annotationManager.getRulesList()) {
+    				if (nextRule != this) {
+    					nextRule.setVisible(isVisible());
+    					nextRule.blackOutVisibleButton(!isVisible());
+    					nextRule.rebuildSubsceneFlag.set(true);
+    					nextRule.ruleChanged.set(true);
+    				}
+    			}
+    		}
+    	}
+
     }
 
     /**

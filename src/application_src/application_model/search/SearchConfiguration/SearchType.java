@@ -54,9 +54,10 @@ public enum SearchType {
     ////////////////////////////// OTHER ///////////////////////////////////////////////////////
     /** Manually Specified List. Non-searchable. The search type denoted in a {@link application_src.application_model.annotation.color.Rule}
      * that is created from a URL and is not searchable */
-    MSL("Manually Specified List");
+    MSL("Manually Specified List"),
     //////////////////////////////////////////////////////////////////////////////////////////
 
+    ALL_RULES_IN_LIST("Edit all rules in list");
 
     private final String description;
 

@@ -758,7 +758,7 @@ public class Window3DController {
             if (newRounded != oldRounded) {
                 othersOpacityProperty.set(newRounded);
                 opacitySlider.setBackground(new Background(new BackgroundFill((newRounded<=0.25?Color.BLACK:null),null,null)));
-                opacitySlider.setTooltip(new Tooltip("Objects are "+(newRounded>0.25?"visible":"invisible") +" to mouse"));
+                opacitySlider.setTooltip(new Tooltip("Unpainted cells are "+(newRounded>0.25?"":"UN") +"mousable"));
                 opacitySlider.opacityProperty().set(newRounded+0.3);
                 buildScene();
             }

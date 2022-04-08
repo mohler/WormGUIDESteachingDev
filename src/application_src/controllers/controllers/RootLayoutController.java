@@ -4,11 +4,13 @@
 
 package application_src.controllers.controllers;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -25,6 +27,7 @@ import application_src.application_model.search.ModelSearch.EstablishCorresponde
 import application_src.application_model.search.ModelSearch.ModelSpecificSearchOps.ModelSpecificSearchUtil;
 import application_src.application_model.search.ModelSearch.ModelSpecificSearchOps.NeighborsSearch;
 import application_src.application_model.search.ModelSearch.ModelSpecificSearchOps.StructuresSearch;
+import application_src.application_model.search.SearchConfiguration.SearchOption;
 import application_src.views.popups.LineageTreePane;
 import application_src.views.popups.TimelineChart;
 

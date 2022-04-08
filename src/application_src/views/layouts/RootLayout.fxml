@@ -565,19 +565,24 @@
                                                             <children>
                                                                 <VBox layoutX="6.0" layoutY="15.0" prefHeight="684.0" prefWidth="322.0" spacing="10.0" AnchorPane.bottomAnchor="6.0" AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="15.0">
                                                                     <children>
+                                                                        <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Trace Earlier Time Points:">
+                                                                            <font>
+                                                                                <Font size="14.0" />
+                                                                            </font>
+                                                                        </Label>
                                                                         <HBox prefHeight="32.0" prefWidth="317.0">
                                                                             <children>
+                                                                                 <Spinner fx:id="prevSpinner" VBox.vgrow="ALWAYS" >
+																			      <valueFactory>
+																			        <SpinnerValueFactory.IntegerSpinnerValueFactory min="0" max="10"/>
+																			      </valueFactory>
+                                                                                </Spinner>
+                                                                                <Region prefHeight="32.0" prefWidth="90.0" HBox.hgrow="ALWAYS" />
                                                                                 <CheckBox fx:id="uniformSizeCheckBox" maxHeight="1.7976931348623157E308" mnemonicParsing="false" prefHeight="32.0" prefWidth="174.0" text="Mini-Nuclei" HBox.hgrow="ALWAYS">
                                                                                     <font>
                                                                                         <Font size="14.0" />
                                                                                     </font>
                                                                                 </CheckBox>
-                                                                                <Region prefHeight="32.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
-                                                                                <Button fx:id="clearAllLabelsButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" prefHeight="32.0" prefWidth="132.0" text="Clear All Labels">
-                                                                                    <font>
-                                                                                        <Font size="14.0" />
-                                                                                    </font>
-                                                                                </Button>
                                                                             </children>
                                                                         </HBox>
                                                                         <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Visibility of Unpainted Cells:">
@@ -586,21 +591,16 @@
                                                                             </font>
                                                                         </Label>
                                                                         <Slider fx:id="opacitySlider" minorTickCount="5" value="25.0" VBox.vgrow="ALWAYS" />
-                                                                        <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Trace Earlier Time Points:">
-                                                                            <font>
-                                                                                <Font size="14.0" />
-                                                                            </font>
-                                                                        </Label>
                                                                         <HBox prefHeight="32.0" prefWidth="317.0">
                                                                             <children>
-                                                                                <Spinner fx:id="prevSpinner" VBox.vgrow="ALWAYS" >
-																			      <valueFactory>
-																			        <SpinnerValueFactory.IntegerSpinnerValueFactory min="0" max="10"/>
-																			      </valueFactory>
-                                                                                </Spinner>
+                                                                               <Button fx:id="clearAllLabelsButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" prefHeight="32.0" prefWidth="132.0" text="Clear Text Tags">
+                                                                                    <font>
+                                                                                        <Font size="14.0" />
+                                                                                    </font>
+                                                                                </Button>
                                                                             </children>
                                                                         </HBox>
-                                                                        <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Coloring Rules:">
+                                                                        <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Painting Rules:">
                                                                             <font>
                                                                                 <Font size="14.0" />
                                                                             </font>

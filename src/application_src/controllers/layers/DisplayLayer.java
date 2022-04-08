@@ -19,6 +19,7 @@ import javafx.scene.control.ListView;
 import javafx.util.Callback;
 
 import application_src.application_model.annotation.color.Rule;
+import application_src.application_model.search.SearchConfiguration.SearchType;
 
 import static java.util.Objects.requireNonNull;
 
@@ -69,9 +70,23 @@ public class DisplayLayer {
                     for (Rule rule : change.getAddedSubList()) {
                         buttonMap.put(rule, rule.getDeleteButton());
                         rule.getDeleteButton().setOnAction(event -> {
-                            currentRulesList.remove(rule);
-                            buttonMap.remove(rule);
-                            rebuildSubsceneFlag.set(true);
+                        	if (rule.getSearchType() != SearchType.ALL_RULES_IN_LIST) {
+                        		currentRulesList.remove(rule);
+                        		buttonMap.remove(rule);
+                        		rebuildSubsceneFlag.set(true);
+                        	} else {
+                        		if (annotationManager != null) {
+                        			while (annotationManager.getRulesList().size()>1) {
+                        				int last = annotationManager.getRulesList().size()-1;
+                        				Rule nextRule = annotationManager.getRulesList().get(last);
+                        				if (nextRule.getSearchType() != SearchType.ALL_RULES_IN_LIST) {
+                        					currentRulesList.remove(nextRule);
+                        					buttonMap.remove(nextRule);
+                        					rebuildSubsceneFlag.set(true);
+                        				}
+                        			}
+                        		}
+                        	}
                         });
                     }
                 }

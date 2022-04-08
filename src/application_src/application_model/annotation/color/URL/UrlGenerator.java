@@ -181,6 +181,8 @@ public class UrlGenerator {
                         break;
                     case MSL:
                         builder.append("-MSL");
+                    case ALL_RULES_IN_LIST:
+                        break;
                     default:
                         break;
                 }

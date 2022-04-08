@@ -16,16 +16,19 @@ import application_src.application_model.search.ModelSearch.ModelSpecificSearchO
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ObservableList;
 
 import application_src.controllers.layers.SearchLayer;
 import application_src.application_model.annotation.color.Rule;
 import application_src.application_model.search.SearchConfiguration.SearchOption;
+import application_src.application_model.search.SearchConfiguration.SearchType;
 
 import static java.lang.Double.parseDouble;
 import static java.lang.Integer.parseInt;
 import static java.util.Objects.requireNonNull;
-
+import static javafx.scene.paint.Color.BLACK;
 import static javafx.scene.paint.Color.web;
 
 import static application_src.application_model.search.SearchConfiguration.SearchType.LINEAGE;
