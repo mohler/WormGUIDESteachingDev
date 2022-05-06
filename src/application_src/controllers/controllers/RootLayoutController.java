@@ -205,7 +205,11 @@ public class RootLayoutController extends BorderPane implements Initializable {
     @FXML
     private Button clearAllLabelsButton;
     @FXML
-    private Slider opacitySlider;
+    private Slider nucOpacitySlider;
+    @FXML
+    private Slider cellOpacitySlider;
+    @FXML
+    private Slider structureOpacitySlider;
     @FXML
     private Spinner<Integer> prevSpinner;
 
@@ -325,7 +329,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
     private DoubleProperty translateYProperty;
     private DoubleProperty translateZProperty;
     private DoubleProperty zoomProperty;
-    private DoubleProperty othersOpacityProperty;
+    private DoubleProperty nucOpacityProperty;
+    private DoubleProperty cellOpacityProperty;
+    private DoubleProperty structureOpacityProperty;
     private DoubleProperty numPrev;
 
     // Other shared variables
@@ -428,7 +434,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
                     translateYProperty,
                     translateZProperty,
                     zoomProperty,
-                    othersOpacityProperty);
+                    nucOpacityProperty,
+                    cellOpacityProperty,
+                    structureOpacityProperty);
             urlShareWindow.getCloseButton().setOnAction(event -> urlDisplayStage.hide());
             urlDisplayStage.setScene(new Scene(urlShareWindow));
             urlDisplayStage.setTitle("Share Scene");
@@ -467,7 +475,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
                                 translateYProperty,
                                 translateZProperty,
                                 zoomProperty,
-                                othersOpacityProperty,
+                                nucOpacityProperty,
                                 rebuildSubsceneFlag);
                     }
                 } else {
@@ -486,7 +494,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
                             translateYProperty,
                             translateZProperty,
                             zoomProperty,
-                            othersOpacityProperty,
+                            nucOpacityProperty,
                             rebuildSubsceneFlag);
                 }
             });
@@ -796,7 +804,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
                 zoomInButton,
                 clearAllLabelsButton,
                 searchField,
-                opacitySlider,
+                nucOpacitySlider,
+                cellOpacitySlider,
+                structureOpacitySlider,
                 prevSpinner,
                 uniformSizeCheckBox,
                 cellNucleusCheckBox,
@@ -807,7 +817,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
                 timeProperty,
                 totalNucleiProperty,
                 zoomProperty,
-                othersOpacityProperty,
+                nucOpacityProperty,
+                cellOpacityProperty, 
+                structureOpacityProperty, 
                 numPrev,
                 rotateXAngleProperty,
                 rotateYAngleProperty,
@@ -1071,8 +1083,12 @@ public class RootLayoutController extends BorderPane implements Initializable {
         getTimeSlider().setMin(startTime);
         getTimeSlider().setMax(endTime);
 
-        opacitySlider.setMin(0);
-        opacitySlider.setMax(100);
+        nucOpacitySlider.setMin(0);
+        nucOpacitySlider.setMax(100);
+        cellOpacitySlider.setMin(0);
+        cellOpacitySlider.setMax(100);
+        structureOpacitySlider.setMin(0);
+        structureOpacitySlider.setMax(100);
         prevSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, lineageData.getNumberOfTimePoints() - 1, 1, 1));
         prevSpinner.setEditable(true);
         prevSpinner.getEditor().textProperty().addListener((observable, oldValue, newValue) -> { 
@@ -1196,7 +1212,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
                 translateYProperty,
                 translateZProperty,
                 zoomProperty,
-                othersOpacityProperty,
+                nucOpacityProperty,
+                cellOpacityProperty,
+                structureOpacityProperty,
                 usingInternalRulesFlag,
                 rebuildSubsceneFlag,
                 lineageData,
@@ -1410,7 +1428,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
         timeProperty = new SimpleIntegerProperty(startTime);
         totalNucleiProperty = new SimpleIntegerProperty(0);
 
-        othersOpacityProperty = new SimpleDoubleProperty(1.0);
+        nucOpacityProperty = new SimpleDoubleProperty(1.0);
+        cellOpacityProperty = new SimpleDoubleProperty(1.0);
+        structureOpacityProperty = new SimpleDoubleProperty(1.0);
         numPrev = new SimpleDoubleProperty(1.0);
         rotateXAngleProperty = new SimpleDoubleProperty();
         rotateYAngleProperty = new SimpleDoubleProperty();

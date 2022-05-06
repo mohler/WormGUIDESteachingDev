@@ -234,7 +234,9 @@ public class Window3DController {
     private final Comparator<Color> colorComparator;
     private final Comparator<Node> opacityComparator;
     // opacity value for "other" cells (with no rule attached)
-    private final DoubleProperty othersOpacityProperty;
+    private final DoubleProperty nucOpacityProperty;
+    private final DoubleProperty cellOpacityProperty;
+    private final DoubleProperty structureOpacityProperty;
     private final DoubleProperty numPrev;
     private final Spinner<Integer> prevSpinner;
     private final double nonSelectableOpacity = 0.25;
@@ -321,7 +323,7 @@ public class Window3DController {
     private LinkedList<Double[]> positions;
     private LinkedList<Double> diameters;
     private List<SceneElement> sceneElementsAtCurrentTime;
-    private List<SceneElementMeshView> currentSceneElementMeshes;
+    private List<SceneElementMeshView> currentSceneElementMeshViews;
 //    private List<MeshView> currentSceneElementMeshes;
     private List<SceneElement> currentSceneElements;
     private PerspectiveCamera camera;
@@ -417,7 +419,9 @@ public class Window3DController {
             final Button zoomInButton,
             final Button clearAllLabelsButton,
             final TextField searchField,
-            final Slider opacitySlider,
+            final Slider nucOpacitySlider,
+            final Slider cellOpacitySlider, 
+            final Slider structureOpacitySlider, 
             final Spinner<Integer> prevSpinner,
             final CheckBox uniformSizeCheckBox,
             final CheckBox cellNucleusCheckBox,
@@ -428,7 +432,9 @@ public class Window3DController {
             final IntegerProperty timeProperty,
             final IntegerProperty totalNucleiProperty,
             final DoubleProperty zoomProperty,
-            final DoubleProperty othersOpacityProperty,
+            final DoubleProperty nucOpacityProperty,
+            final DoubleProperty cellOpacityProperty,
+            final DoubleProperty structureOpacityProperty,
             final DoubleProperty numPrev,
             final DoubleProperty rotateXAngleProperty,
             final DoubleProperty rotateYAngleProperty,
@@ -663,7 +669,7 @@ public class Window3DController {
         opacityComparator = new OpacityComparator();
 
         if (defaultEmbryoFlag) {
-            currentSceneElementMeshes = new ArrayList<>();
+            currentSceneElementMeshViews = new ArrayList<>();
             currentSceneElements = new ArrayList<>();
         }
 
@@ -751,33 +757,93 @@ public class Window3DController {
         requireNonNull(zoomOutButton).setOnAction(getZoomOutButtonListener());
         requireNonNull(zoomInButton).setOnAction(getZoomInButtonListener());
 
-        this.othersOpacityProperty = requireNonNull(othersOpacityProperty);
-        requireNonNull(opacitySlider).valueProperty().addListener((observable, oldValue, newValue) -> {
+        this.nucOpacityProperty = requireNonNull(nucOpacityProperty);
+        requireNonNull(nucOpacitySlider).valueProperty().addListener((observable, oldValue, newValue) -> {
             final double newRounded = round(newValue.doubleValue()) / 100.0;
             final double oldRounded = round(oldValue.doubleValue()) / 100.0;
             if (newRounded != oldRounded) {
-                othersOpacityProperty.set(newRounded);
-                opacitySlider.setBackground(new Background(new BackgroundFill((newRounded<=0.25?Color.BLACK:null),null,null)));
-                opacitySlider.setTooltip(new Tooltip("Unpainted cells are "+(newRounded>0.25?"":"UN") +"mousable"));
-                opacitySlider.opacityProperty().set(newRounded+0.3);
+                nucOpacityProperty.set(newRounded);
+                nucOpacitySlider.setBackground(new Background(new BackgroundFill((newRounded<=0.25?Color.BLACK:null),null,null)));
+                nucOpacitySlider.setTooltip(new Tooltip("Unpainted nuclei are "+(newRounded>0.25?"":"UN") +"mousable"));
+                nucOpacitySlider.opacityProperty().set(newRounded+0.3);
                 buildScene();
             }
         });
-        this.othersOpacityProperty.addListener((observable, oldValue, newValue) -> {
+        this.nucOpacityProperty.addListener((observable, oldValue, newValue) -> {
             final double newVal = newValue.doubleValue();
             final double oldVal = oldValue.doubleValue();
             if (newVal != oldVal && newVal >= 0 && newVal <= 1.0) {
-                opacitySlider.setValue(newVal * 100);
+                nucOpacitySlider.setValue(newVal * 100);
             }
         });
         if (defaultEmbryoFlag) {
-            this.othersOpacityProperty.setValue(getDefaultOthersOpacity());
+            this.nucOpacityProperty.setValue(getDefaultOthersOpacity());
         } else {
             /*
              * if a non-default model has been loaded, set the opacity cutoff at the level where labels will
              * appear by default
              */
-            this.othersOpacityProperty.set(0.26);
+            this.nucOpacityProperty.set(0.26);
+
+        }
+
+        this.cellOpacityProperty = requireNonNull(cellOpacityProperty);
+        requireNonNull(cellOpacitySlider).valueProperty().addListener((observable, oldValue, newValue) -> {
+            final double newRounded = round(newValue.doubleValue()) / 100.0;
+            final double oldRounded = round(oldValue.doubleValue()) / 100.0;
+            if (newRounded != oldRounded) {
+                cellOpacityProperty.set(newRounded);
+                cellOpacitySlider.setBackground(new Background(new BackgroundFill((newRounded<=0.25?Color.BLACK:null),null,null)));
+                cellOpacitySlider.setTooltip(new Tooltip("Unpainted cells are "+(newRounded>0.25?"":"UN") +"mousable"));
+                cellOpacitySlider.opacityProperty().set(newRounded+0.3);
+                buildScene();
+            }
+        });
+        this.cellOpacityProperty.addListener((observable, oldValue, newValue) -> {
+            final double newVal = newValue.doubleValue();
+            final double oldVal = oldValue.doubleValue();
+            if (newVal != oldVal && newVal >= 0 && newVal <= 1.0) {
+                cellOpacitySlider.setValue(newVal * 100);
+            }
+        });
+        if (defaultEmbryoFlag) {
+            this.cellOpacityProperty.setValue(getDefaultOthersOpacity());
+        } else {
+            /*
+             * if a non-default model has been loaded, set the opacity cutoff at the level where labels will
+             * appear by default
+             */
+            this.cellOpacityProperty.set(0.26);
+
+        }
+
+        this.structureOpacityProperty = requireNonNull(structureOpacityProperty);
+        requireNonNull(structureOpacitySlider).valueProperty().addListener((observable, oldValue, newValue) -> {
+            final double newRounded = round(newValue.doubleValue()) / 100.0;
+            final double oldRounded = round(oldValue.doubleValue()) / 100.0;
+            if (newRounded != oldRounded) {
+                structureOpacityProperty.set(newRounded);
+                structureOpacitySlider.setBackground(new Background(new BackgroundFill((newRounded<=0.25?Color.BLACK:null),null,null)));
+                structureOpacitySlider.setTooltip(new Tooltip("Unpainted structures are "+(newRounded>0.25?"":"UN") +"mousable"));
+                structureOpacitySlider.opacityProperty().set(newRounded+0.3);
+                buildScene();
+            }
+        });
+        this.structureOpacityProperty.addListener((observable, oldValue, newValue) -> {
+            final double newVal = newValue.doubleValue();
+            final double oldVal = oldValue.doubleValue();
+            if (newVal != oldVal && newVal >= 0 && newVal <= 1.0) {
+                structureOpacitySlider.setValue(newVal * 100);
+            }
+        });
+        if (defaultEmbryoFlag) {
+            this.structureOpacityProperty.setValue(getDefaultOthersOpacity());
+        } else {
+            /*
+             * if a non-default model has been loaded, set the opacity cutoff at the level where labels will
+             * appear by default
+             */
+            this.structureOpacityProperty.set(0.26);
 
         }
 
@@ -967,12 +1033,12 @@ public class Window3DController {
      * 		Whether to include coloring rule hits for a given cell. 
      */
     private void insertTransientLabel(String name, final Shape3D entity, boolean longForm) {
-        final double opacity = othersOpacityProperty.get();
+        final double cellOpacity = cellOpacityProperty.get();
         if (entity != null) {
             // do not create transient label for "other" entities when their visibility is under the selectability
             // cutoff
-            if ((entity.getMaterial() == colorHash.getOthersMaterial(opacity))
-                    && (othersOpacityProperty.get() < getSelectabilityVisibilityCutoff())) {
+            if ((entity.getMaterial() == colorHash.getOtherNucleiMaterial(cellOpacity))
+                    && (nucOpacityProperty.get() < getSelectabilityVisibilityCutoff())) {
                 return;
             }
 //            if (!currentLabels.contains(name)) {
@@ -1148,8 +1214,8 @@ public class Window3DController {
 //                    MeshView curr;
                     SceneElement clickedSceneElement;
                     String funcName;
-                    for (int i = 0; i < currentSceneElementMeshes.size(); i++) {
-                        curr = currentSceneElementMeshes.get(i);
+                    for (int i = 0; i < currentSceneElementMeshViews.size(); i++) {
+                        curr = currentSceneElementMeshViews.get(i);
                         if (curr.equals(node)) {
                             clickedSceneElement = currentSceneElements.get(i);
                             if (!clickedSceneElement.isSelectable()) {
@@ -1972,8 +2038,8 @@ public class Window3DController {
                 meshNames = new LinkedList<>(asList(sceneElementsList.getSceneElementNamesAtTime(requestedTime)));
             }
 
-            if (!currentSceneElementMeshes.isEmpty()) {
-                currentSceneElementMeshes.clear();
+            if (!currentSceneElementMeshViews.isEmpty()) {
+                currentSceneElementMeshViews.clear();
                 currentSceneElements.clear();
             }
 
@@ -1998,7 +2064,7 @@ public class Window3DController {
                             -offsetZ * zScale));
 
                     // add rendered mesh to meshes list
-                    currentSceneElementMeshes.add(mesh);
+                    currentSceneElementMeshViews.add(mesh);
                     // add scene element to rendered scene element reference for on-click responsiveness
                     currentSceneElements.add(se);
                 }
@@ -2225,20 +2291,20 @@ public class Window3DController {
      */
     private void addEntities(final List<Shape3D> entities) {
         // add spheres
-        addCellGeometries(entities);
+        addNucleusGeometries(entities);
         // add scene element meshes (from notes and from scene elements list)
         addSceneElementGeometries(entities);
     }
 
     /**
-     * Inserts spherical cells into the list of entities that is later added to the subscene. "Other" cells with
+     * Inserts spherical nuclei into the list of entities that is later added to the subscene. "Other" nuclei with
      * visibility under the visibility cutoff are not rendered.
      *
      * @param entities
      *         list of subscene entities
      */
-    private void addCellGeometries(final List<Shape3D> entities) {
-        final Material othersMaterial = colorHash.getOthersMaterial(othersOpacityProperty.get());
+    private void addNucleusGeometries(final List<Shape3D> entities) {
+        final Material otherNucsMaterial = colorHash.getOtherNucleiMaterial(nucOpacityProperty.get());
         final ListIterator<String> iter = cellNames.listIterator();
         int index = -1;
         while (iter.hasNext()) {
@@ -2283,7 +2349,7 @@ public class Window3DController {
                 if (colors.isEmpty()) {
                     // do not render this "other" cell if visibility is under the cutoff
                     // remove this cell from scene data at current time point
-                    double opacity = othersOpacityProperty.get();
+                    double opacity = nucOpacityProperty.get();
                     if (opacity <= getVisibilityCutoff()) {
                         iter.remove();
                         positions.remove(index);
@@ -2292,7 +2358,7 @@ public class Window3DController {
                         index--;
                         continue;
                     } else {
-                        material = othersMaterial;
+                        material = otherNucsMaterial;
                         if (opacity <= getSelectabilityVisibilityCutoff()) {
                             sphere.setDisable(true);
                         }
@@ -2344,6 +2410,7 @@ public class Window3DController {
      *         list of subscene entities
      */
     private void addSceneElementGeometries(final List<Shape3D> entities) {
+        final Material otherElementsMaterial = colorHash.getOtherStructuresMaterial(structureOpacityProperty.get());
         if (defaultEmbryoFlag) {
             // add scene elements from notes
             entities.addAll(currentNotesToMeshesMap.keySet()
@@ -2360,7 +2427,7 @@ public class Window3DController {
             while (iter.hasNext()) {
                 index++;
                 sceneElement = iter.next();
-                meshView = currentSceneElementMeshes.get(index);
+                meshView = currentSceneElementMeshViews.get(index);
 
                 if (isInSearchMode) {
                     if (cellBodyTicked && isMeshSearchedFlags[index]) {
@@ -2409,13 +2476,13 @@ public class Window3DController {
                     if (colors.isEmpty()) {
                         // do not render this "other" scene element if visibility is under the cutoff
                         // remove scene element and its mesh from scene data at current time point
-                        final double opacity = othersOpacityProperty.get();
+                        final double opacity = nucOpacityProperty.get();
                         if (opacity <= getVisibilityCutoff()) {
                             iter.remove();
-                            currentSceneElementMeshes.remove(index--);
+                            currentSceneElementMeshViews.remove(index--);
                             continue;
                         } else {
-                            meshView.setMaterial(colorHash.getOthersMaterial(othersOpacityProperty.get()));
+                            meshView.setMaterial(colorHash.getOtherStructuresMaterial(structureOpacityProperty.get()));
                             if (opacity <= getSelectabilityVisibilityCutoff()) {
                                 meshView.setDisable(true);
                             }
@@ -2457,7 +2524,7 @@ public class Window3DController {
      *         list of subscene entities
      */
     private void addColoredGeometries(final List<Node> entities) {
-        final Material othersMaterial = colorHash.getOthersMaterial(othersOpacityProperty.get());
+        final Material othersMaterial = colorHash.getOtherNucleiMaterial(nucOpacityProperty.get());
         final ListIterator<String> iter = cellNames.listIterator();
         int index = -1;
         boolean needRender = false;
@@ -2650,8 +2717,8 @@ public class Window3DController {
         if (defaultEmbryoFlag) {
             for (int i = 0; i < currentSceneElements.size(); i++) {
                 if (normalizeName(currentSceneElements.get(i).getSceneName()).equalsIgnoreCase(name)
-                        && currentSceneElementMeshes.get(i) != null) {
-                    return currentSceneElementMeshes.get(i);
+                        && currentSceneElementMeshViews.get(i) != null) {
+                    return currentSceneElementMeshViews.get(i);
                 }
             }
         }
@@ -2932,7 +2999,7 @@ public class Window3DController {
     private SceneElementMeshView getSubsceneMeshWithName(final String sceneName) {
         for (int i = 0; i < currentSceneElements.size(); i++) {
             if (currentSceneElements.get(i).getSceneName().equalsIgnoreCase(sceneName)) {
-                return currentSceneElementMeshes.get(i);
+                return currentSceneElementMeshViews.get(i);
             }
         }
         return null;
@@ -3020,7 +3087,7 @@ public class Window3DController {
                 (-offsetY + y) * yScale,
                 (-offsetZ + z) * zScale));
         // make marker transparent
-        sphere.setMaterial(colorHash.getOthersMaterial(0));
+        sphere.setMaterial(colorHash.getOtherNucleiMaterial(0));
         return sphere;
     }
 

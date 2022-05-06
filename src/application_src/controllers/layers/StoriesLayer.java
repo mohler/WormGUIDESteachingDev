@@ -133,6 +133,8 @@ public class StoriesLayer {
             final DoubleProperty translateZProperty,
             final DoubleProperty zoomProperty,
             final DoubleProperty othersOpacityProperty,
+            final DoubleProperty cellOpacityProperty, 
+            final DoubleProperty structureOpacityProperty, 
             final BooleanProperty useInternalRulesFlag,
             final BooleanProperty rebuildSubsceneFlag,
             final LineageData lineageData,

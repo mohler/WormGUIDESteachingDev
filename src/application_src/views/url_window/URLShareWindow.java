@@ -61,7 +61,9 @@ public class URLShareWindow extends AnchorPane {
             final DoubleProperty translateYProperty,
             final DoubleProperty translateZProperty,
             final DoubleProperty zoomProperty,
-            final DoubleProperty othersOpacityProperty) {
+            final DoubleProperty othersOpacityProperty, 
+            final DoubleProperty cellOpacityProperty, 
+            final DoubleProperty structureOpacityProperty) {
 
         super();
         setPrefWidth(430);

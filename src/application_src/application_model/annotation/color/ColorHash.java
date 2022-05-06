@@ -66,7 +66,17 @@ public class ColorHash {
         return noteMaterial;
     }
 
-    public Material getOthersMaterial(double opacity) {
+    public Material getOtherNucleiMaterial(double opacity) {
+        if (opacityMaterialHash.get(opacity) == null) {
+            final Material material = makeOthersMaterial(opacity);
+            opacityMaterialHash.put(opacity, material);
+            opacityHash.put(material, opacity);
+        }
+
+        return opacityMaterialHash.get(opacity);
+    }
+
+    public Material getOtherStructuresMaterial(double opacity) {
         if (opacityMaterialHash.get(opacity) == null) {
             final Material material = makeOthersMaterial(opacity);
             opacityMaterialHash.put(opacity, material);
