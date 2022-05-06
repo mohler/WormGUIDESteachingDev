@@ -2046,9 +2046,9 @@ public class Window3DController {
 
             sceneElementsAtCurrentTime = sceneElementsList.getSceneElementsAtTime(requestedTime);
             for (SceneElement se : sceneElementsAtCurrentTime) {
-                final SceneElementMeshView mesh = se.buildGeometry(requestedTime - getShapesIndexPad());
-                if (mesh != null) {
-                    mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
+                final SceneElementMeshView meshView = se.buildGeometry(requestedTime - getShapesIndexPad());
+                if (meshView != null) {
+                    meshView.getTransforms().addAll(rotateX, rotateY, rotateZ);
 
                     // TRANSFORMS FOR LIBRARY LOADER
                     //mesh.getTransforms().add(new Rotate(180., new Point3D(1, 0, 0)));
@@ -2058,13 +2058,13 @@ public class Window3DController {
 //                            offsetZ * zScale));
 
                     // TRANSFORMS FOR MANUAL LOADER
-                    mesh.getTransforms().add(new Translate(
+                    meshView.getTransforms().add(new Translate(
                             -offsetX * xScale,
                             -offsetY * yScale,
                             -offsetZ * zScale));
 
                     // add rendered mesh to meshes list
-                    currentSceneElementMeshViews.add(mesh);
+                    currentSceneElementMeshViews.add(meshView);
                     // add scene element to rendered scene element reference for on-click responsiveness
                     currentSceneElements.add(se);
                 }
@@ -2476,13 +2476,17 @@ public class Window3DController {
                     if (colors.isEmpty()) {
                         // do not render this "other" scene element if visibility is under the cutoff
                         // remove scene element and its mesh from scene data at current time point
-                        final double opacity = nucOpacityProperty.get();
+                        final double structureOpacity = structureOpacityProperty.get();
+                        final double cellOpacity = cellOpacityProperty.get();
+                        final double opacity = (sceneElement.getSceneName().contains("Embryo")
+                        						|| sceneElement.getSceneName().contains("Pharynx")
+                        						|| sceneElement.getSceneName().contains("Hypoderm")) ?structureOpacity:cellOpacity;
                         if (opacity <= getVisibilityCutoff()) {
                             iter.remove();
                             currentSceneElementMeshViews.remove(index--);
                             continue;
                         } else {
-                            meshView.setMaterial(colorHash.getOtherStructuresMaterial(structureOpacityProperty.get()));
+                            meshView.setMaterial(colorHash.getOtherStructuresMaterial(opacity));
                             if (opacity <= getSelectabilityVisibilityCutoff()) {
                                 meshView.setDisable(true);
                             }
