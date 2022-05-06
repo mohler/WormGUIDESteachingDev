@@ -236,6 +236,7 @@ public class Window3DController {
     // opacity value for "other" cells (with no rule attached)
     private final DoubleProperty nucOpacityProperty;
     private final DoubleProperty cellOpacityProperty;
+    private final DoubleProperty tractOpacityProperty;
     private final DoubleProperty structureOpacityProperty;
     private final DoubleProperty numPrev;
     private final Spinner<Integer> prevSpinner;
@@ -421,6 +422,7 @@ public class Window3DController {
             final TextField searchField,
             final Slider nucOpacitySlider,
             final Slider cellOpacitySlider, 
+            final Slider tractOpacitySlider, 
             final Slider structureOpacitySlider, 
             final Spinner<Integer> prevSpinner,
             final CheckBox uniformSizeCheckBox,
@@ -434,6 +436,7 @@ public class Window3DController {
             final DoubleProperty zoomProperty,
             final DoubleProperty nucOpacityProperty,
             final DoubleProperty cellOpacityProperty,
+            final DoubleProperty tractOpacityProperty,
             final DoubleProperty structureOpacityProperty,
             final DoubleProperty numPrev,
             final DoubleProperty rotateXAngleProperty,
@@ -814,6 +817,36 @@ public class Window3DController {
              * appear by default
              */
             this.cellOpacityProperty.set(0.26);
+
+        }
+
+        this.tractOpacityProperty = requireNonNull(tractOpacityProperty);
+        requireNonNull(tractOpacitySlider).valueProperty().addListener((observable, oldValue, newValue) -> {
+            final double newRounded = round(newValue.doubleValue()) / 100.0;
+            final double oldRounded = round(oldValue.doubleValue()) / 100.0;
+            if (newRounded != oldRounded) {
+                tractOpacityProperty.set(newRounded);
+                tractOpacitySlider.setBackground(new Background(new BackgroundFill((newRounded<=0.25?Color.BLACK:null),null,null)));
+                tractOpacitySlider.setTooltip(new Tooltip("Unpainted tracts are "+(newRounded>0.25?"":"UN") +"mousable"));
+                tractOpacitySlider.opacityProperty().set(newRounded+0.3);
+                buildScene();
+            }
+        });
+        this.tractOpacityProperty.addListener((observable, oldValue, newValue) -> {
+            final double newVal = newValue.doubleValue();
+            final double oldVal = oldValue.doubleValue();
+            if (newVal != oldVal && newVal >= 0 && newVal <= 1.0) {
+                tractOpacitySlider.setValue(newVal * 100);
+            }
+        });
+        if (defaultEmbryoFlag) {
+            this.tractOpacityProperty.setValue(getDefaultOthersOpacity());
+        } else {
+            /*
+             * if a non-default model has been loaded, set the opacity cutoff at the level where labels will
+             * appear by default
+             */
+            this.tractOpacityProperty.set(0.26);
 
         }
 
@@ -2476,11 +2509,18 @@ public class Window3DController {
                     if (colors.isEmpty()) {
                         // do not render this "other" scene element if visibility is under the cutoff
                         // remove scene element and its mesh from scene data at current time point
-                        final double structureOpacity = structureOpacityProperty.get();
                         final double cellOpacity = cellOpacityProperty.get();
-                        final double opacity = (sceneElement.getSceneName().contains("Embryo")
+                        final double tractOpacity = tractOpacityProperty.get();
+                        final double structureOpacity = structureOpacityProperty.get();
+                        double tmpOpacity = cellOpacity;
+                        if (sceneElement.getSceneName().contains("Embryo")
                         						|| sceneElement.getSceneName().contains("Pharynx")
-                        						|| sceneElement.getSceneName().contains("Hypoderm")) ?structureOpacity:cellOpacity;
+                        						|| sceneElement.getSceneName().contains("Hypoderm")) {
+                        	tmpOpacity = structureOpacity;
+                        } else if (sceneElement.getSceneName().contains("tract")) {
+                        	tmpOpacity = tractOpacity;
+                        }
+                        final double opacity = tmpOpacity;
                         if (opacity <= getVisibilityCutoff()) {
                             iter.remove();
                             currentSceneElementMeshViews.remove(index--);

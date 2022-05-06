@@ -134,6 +134,7 @@ public class StoriesLayer {
             final DoubleProperty zoomProperty,
             final DoubleProperty othersOpacityProperty,
             final DoubleProperty cellOpacityProperty, 
+            final DoubleProperty tractOpacityProperty, 
             final DoubleProperty structureOpacityProperty, 
             final BooleanProperty useInternalRulesFlag,
             final BooleanProperty rebuildSubsceneFlag,

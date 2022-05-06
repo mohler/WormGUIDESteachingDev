@@ -585,13 +585,14 @@
                                                                                 </CheckBox>
                                                                             </children>
                                                                         </HBox>
-                                                                        <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Visibility of Unpainted Nuclei, Cells, Structures:">
+                                                                        <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Visibility of Unpainted Nuclei, Cells, Tracts, Structures:">
                                                                             <font>
                                                                                 <Font size="14.0" />
                                                                             </font>
                                                                         </Label>
                                                                         <Slider fx:id="nucOpacitySlider" minorTickCount="5" value="25.0" VBox.vgrow="ALWAYS" />
                                                                         <Slider fx:id="cellOpacitySlider" minorTickCount="5" value="25.0" VBox.vgrow="ALWAYS" />
+                                                                        <Slider fx:id="tractOpacitySlider" minorTickCount="5" value="25.0" VBox.vgrow="ALWAYS" />
                                                                         <Slider fx:id="structureOpacitySlider" minorTickCount="5" value="25.0" VBox.vgrow="ALWAYS" />
                                                                         <HBox prefHeight="32.0" prefWidth="317.0">
                                                                             <children>

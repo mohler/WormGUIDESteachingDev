@@ -209,6 +209,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
     @FXML
     private Slider cellOpacitySlider;
     @FXML
+    private Slider tractOpacitySlider;
+    @FXML
     private Slider structureOpacitySlider;
     @FXML
     private Spinner<Integer> prevSpinner;
@@ -331,6 +333,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
     private DoubleProperty zoomProperty;
     private DoubleProperty nucOpacityProperty;
     private DoubleProperty cellOpacityProperty;
+    private DoubleProperty tractOpacityProperty;
     private DoubleProperty structureOpacityProperty;
     private DoubleProperty numPrev;
 
@@ -806,6 +809,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
                 searchField,
                 nucOpacitySlider,
                 cellOpacitySlider,
+                tractOpacitySlider,
                 structureOpacitySlider,
                 prevSpinner,
                 uniformSizeCheckBox,
@@ -819,6 +823,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
                 zoomProperty,
                 nucOpacityProperty,
                 cellOpacityProperty, 
+                tractOpacityProperty, 
                 structureOpacityProperty, 
                 numPrev,
                 rotateXAngleProperty,
@@ -1087,6 +1092,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
         nucOpacitySlider.setMax(100);
         cellOpacitySlider.setMin(0);
         cellOpacitySlider.setMax(100);
+        tractOpacitySlider.setMin(0);
+        tractOpacitySlider.setMax(100);
         structureOpacitySlider.setMin(0);
         structureOpacitySlider.setMax(100);
         prevSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, lineageData.getNumberOfTimePoints() - 1, 1, 1));
@@ -1214,6 +1221,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
                 zoomProperty,
                 nucOpacityProperty,
                 cellOpacityProperty,
+                tractOpacityProperty,
                 structureOpacityProperty,
                 usingInternalRulesFlag,
                 rebuildSubsceneFlag,
@@ -1430,6 +1438,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
         nucOpacityProperty = new SimpleDoubleProperty(1.0);
         cellOpacityProperty = new SimpleDoubleProperty(1.0);
+        tractOpacityProperty = new SimpleDoubleProperty(1.0);
         structureOpacityProperty = new SimpleDoubleProperty(1.0);
         numPrev = new SimpleDoubleProperty(1.0);
         rotateXAngleProperty = new SimpleDoubleProperty();
