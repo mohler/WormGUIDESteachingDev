@@ -1,0 +1,29 @@
+ /*
+  *  CSS for RootLayoutController
+  */
+
+
+
+#nucOpacitySlider .thumb {
+
+    -fx-background-image: url("N-1.png");
+    -fx-padding: 8;
+}
+
+#cellOpacitySlider .thumb {
+
+    -fx-background-image: url("C-1.png");
+    -fx-padding: 8;
+}
+
+#tractOpacitySlider .thumb {
+
+    -fx-background-image: url("T-1.png");
+    -fx-padding: 8;
+}
+
+#structureOpacitySlider .thumb {
+
+    -fx-background-image: url("S-1.png");
+    -fx-padding: 8;
+}

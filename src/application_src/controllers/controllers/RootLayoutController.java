@@ -1093,17 +1093,17 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
         nucOpacitySlider.setMin(0);
         nucOpacitySlider.setMax(100);
-        nucOpacitySlider.getStylesheets().add(MainApp.class.getResource("StyleSheet.css").toExternalForm());
+        nucOpacitySlider.getStylesheets().add(MainApp.class.getResource("views/style/StyleSheet.css").toExternalForm());
 
         cellOpacitySlider.setMin(0);
         cellOpacitySlider.setMax(100);
-        cellOpacitySlider.getStylesheets().add(MainApp.class.getResource("StyleSheet.css").toExternalForm());
+        cellOpacitySlider.getStylesheets().add(MainApp.class.getResource("views/style/StyleSheet.css").toExternalForm());
         tractOpacitySlider.setMin(0);
         tractOpacitySlider.setMax(100);
-        tractOpacitySlider.getStylesheets().add(MainApp.class.getResource("StyleSheet.css").toExternalForm());
+        tractOpacitySlider.getStylesheets().add(MainApp.class.getResource("views/style/StyleSheet.css").toExternalForm());
         structureOpacitySlider.setMin(0);
         structureOpacitySlider.setMax(100);
-        structureOpacitySlider.getStylesheets().add(MainApp.class.getResource("StyleSheet.css").toExternalForm());
+        structureOpacitySlider.getStylesheets().add(MainApp.class.getResource("views/style/StyleSheet.css").toExternalForm());
         prevSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, lineageData.getNumberOfTimePoints() - 1, 1, 1));
         prevSpinner.setEditable(true);
         prevSpinner.getEditor().textProperty().addListener((observable, oldValue, newValue) -> { 
