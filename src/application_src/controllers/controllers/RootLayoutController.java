@@ -46,6 +46,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -55,6 +56,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
@@ -1090,12 +1093,17 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
         nucOpacitySlider.setMin(0);
         nucOpacitySlider.setMax(100);
+        nucOpacitySlider.getStylesheets().add(MainApp.class.getResource("StyleSheet.css").toExternalForm());
+
         cellOpacitySlider.setMin(0);
         cellOpacitySlider.setMax(100);
+        cellOpacitySlider.getStylesheets().add(MainApp.class.getResource("StyleSheet.css").toExternalForm());
         tractOpacitySlider.setMin(0);
         tractOpacitySlider.setMax(100);
+        tractOpacitySlider.getStylesheets().add(MainApp.class.getResource("StyleSheet.css").toExternalForm());
         structureOpacitySlider.setMin(0);
         structureOpacitySlider.setMax(100);
+        structureOpacitySlider.getStylesheets().add(MainApp.class.getResource("StyleSheet.css").toExternalForm());
         prevSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, lineageData.getNumberOfTimePoints() - 1, 1, 1));
         prevSpinner.setEditable(true);
         prevSpinner.getEditor().textProperty().addListener((observable, oldValue, newValue) -> { 

@@ -1,0 +1,29 @@
+ /*
+  *  CSS for RootLayoutController
+  */
+
+
+
+#nucOpacitySlider .thumb {
+
+    -fx-background-image: url("file:////Users/wmohler/Documents/N-1.png");
+    -fx-padding: 8;
+}
+
+#cellOpacitySlider .thumb {
+
+    -fx-background-image: url("file:////Users/wmohler/Documents/C-1.png");
+    -fx-padding: 8;
+}
+
+#tractOpacitySlider .thumb {
+
+    -fx-background-image: url("file:////Users/wmohler/Documents/T-1.png");
+    -fx-padding: 8;
+}
+
+#structureOpacitySlider .thumb {
+
+    -fx-background-image: url("file:////Users/wmohler/Documents/S-1.png");
+    -fx-padding: 8;
+}
