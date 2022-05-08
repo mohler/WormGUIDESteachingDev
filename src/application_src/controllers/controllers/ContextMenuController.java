@@ -290,9 +290,9 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 
     public void setColorButtonText(final boolean isStructure) {
         if (isStructure) {
-            color.setText("Color Structure");
+            color.setText("Paint Structure");
         } else {
-            color.setText("Color Cell");
+            color.setText("Paint Cell");
         }
     }
 
@@ -335,7 +335,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 
         String funcName = getFunctionalNameByLineageName(name);
         if (funcName != null) {
-            name = name + " (" + funcName + ")";
+            name = funcName + " (" + name + ")";
         }
 
         nameText.setText(name);
@@ -461,7 +461,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
             }
 
             // colors all connections
-            final MenuItem all = new MenuItem("Color All Connections");
+            final MenuItem all = new MenuItem("Paint All Connections");
             wiredToMenu.getItems().add(all);
             all.setOnAction(event -> {
                 ArrayList<String> allResults = new ArrayList<>();
@@ -487,7 +487,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
             // populate each of the respective menus
             if (!results.get(PRE_SYN_INDEX).isEmpty()) {
                 // add the Color All button for presynaptic results
-                final MenuItem allPresyn = new MenuItem("Color All");
+                final MenuItem allPresyn = new MenuItem("Paint All");
                 preSyn.getItems().add(allPresyn);
                 allPresyn.setOnAction(event -> {
                     List<SearchOption> options = new ArrayList<>();
@@ -516,7 +516,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
             }
 
             if (!results.get(POST_SYN_INDEX).isEmpty()) {
-                final MenuItem allPostyn = new MenuItem("Color All");
+                final MenuItem allPostyn = new MenuItem("Paint All");
                 postSyn.getItems().add(allPostyn);
                 allPostyn.setOnAction(event -> {
                     List<SearchOption> options = new ArrayList<>();
@@ -544,7 +544,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
             }
 
             if (!results.get(ELECTR_INDEX).isEmpty()) {
-                final MenuItem allElec = new MenuItem("Color All");
+                final MenuItem allElec = new MenuItem("Paint All");
                 electr.getItems().add(allElec);
                 allElec.setOnAction(event -> {
                     List<SearchOption> options = new ArrayList<>();
@@ -572,7 +572,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
             }
 
             if (!results.get(NEURO_INDEX).isEmpty()) {
-                final MenuItem allNeuro = new MenuItem("Color All");
+                final MenuItem allNeuro = new MenuItem("Paint All");
                 neuro.getItems().add(allNeuro);
                 allNeuro.setOnAction(event -> {
                     List<SearchOption> options = new ArrayList<>();
@@ -701,7 +701,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 
                 wiredToMenu.setAutoHide(true);
 
-                colorAll = new MenuItem("Color All");
+                colorAll = new MenuItem("Paint All");
                 preSyn = new Menu("Pre-Synaptic");
                 postSyn = new Menu("Post-Synaptic");
                 electr = new Menu("Electrical");

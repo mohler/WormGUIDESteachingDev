@@ -86,7 +86,7 @@ public class StoriesLayer {
     private final DoubleProperty translateXProperty;
     private final DoubleProperty translateYProperty;
     private final DoubleProperty zoomProperty;
-    private final DoubleProperty othersOpacityProperty;
+
     private final BooleanProperty useInternalRulesFlag;
     private final BooleanProperty rebuildSubsceneFlag;
     private final BooleanProperty cellClickedFlag;
@@ -111,6 +111,10 @@ public class StoriesLayer {
     private double width;
 
     private boolean defaultEmbryoFlag;
+	private DoubleProperty nucOpacityProperty;
+	private DoubleProperty cellOpacityProperty;
+	private DoubleProperty tractOpacityProperty;
+	private DoubleProperty structureOpacityProperty;
 
     public StoriesLayer(
             final Stage parentStage,
@@ -132,7 +136,7 @@ public class StoriesLayer {
             final DoubleProperty translateYProperty,
             final DoubleProperty translateZProperty,
             final DoubleProperty zoomProperty,
-            final DoubleProperty othersOpacityProperty,
+            final DoubleProperty nucOpacityProperty,
             final DoubleProperty cellOpacityProperty, 
             final DoubleProperty tractOpacityProperty, 
             final DoubleProperty structureOpacityProperty, 
@@ -168,7 +172,10 @@ public class StoriesLayer {
         this.translateXProperty = requireNonNull(translateXProperty);
         this.translateYProperty = requireNonNull(translateYProperty);
         this.zoomProperty = requireNonNull(zoomProperty);
-        this.othersOpacityProperty = requireNonNull(othersOpacityProperty);
+        this.nucOpacityProperty = requireNonNull(nucOpacityProperty);
+        this.cellOpacityProperty = requireNonNull(cellOpacityProperty);
+        this.tractOpacityProperty = requireNonNull(tractOpacityProperty);
+        this.structureOpacityProperty = requireNonNull(structureOpacityProperty);
 
         this.activeCellNameProperty = requireNonNull(activeCellNameProperty);
         this.activeStoryProperty = requireNonNull(activeStoryProperty);
@@ -213,11 +220,12 @@ public class StoriesLayer {
 
         width = 0;
 
+        addBlankStory();
+        
         if (defaultEmbryoFlag) {
             loadConfigFile(stories, this.movieTimeOffset);
         }
 
-        addBlankStory();
 
         noteComparator = (o1, o2) -> {
             final Integer t1 = getEffectiveStartTime(o1);
@@ -378,7 +386,10 @@ public class StoriesLayer {
                             translateXProperty.get(),
                             translateYProperty.get(),
                             zoomProperty.get(),
-                            othersOpacityProperty.get()));
+                            nucOpacityProperty.get(),
+                            cellOpacityProperty.get(),
+                            tractOpacityProperty.get(),
+                            structureOpacityProperty.get()));
                     annotationManager.clearRulesList();
                     //activeRulesList.addAll(rulesCopy);
                 } else {
@@ -391,7 +402,10 @@ public class StoriesLayer {
                             translateXProperty.get(),
                             translateYProperty.get(),
                             zoomProperty.get(),
-                            othersOpacityProperty.get()));
+                            nucOpacityProperty.get(),
+                            cellOpacityProperty.get(),
+                            tractOpacityProperty.get(),
+                            structureOpacityProperty.get()));
                 }
 
                 saveToCSVFile(activeStory, file, movieTimeOffset);
@@ -663,7 +677,10 @@ public class StoriesLayer {
                         translateXProperty.get(),
                         translateYProperty.get(),
                         zoomProperty.get(),
-                        othersOpacityProperty.get()));
+                        nucOpacityProperty.get(),
+                        cellOpacityProperty.get(),
+                        tractOpacityProperty.get(),
+                        structureOpacityProperty.get()));
             }
             useInternalRulesFlag.set(false);
             parseUrlRules(

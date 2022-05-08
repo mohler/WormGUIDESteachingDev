@@ -39,7 +39,7 @@
       </HBox>
       <HBox>
          <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS"/>
-         <Button fx:id="color" mnemonicParsing="false" text="Color This Cell">
+         <Button fx:id="color" mnemonicParsing="false" text="Paint This Cell">
             <font>
                <Font size="14.0"/>
             </font>
@@ -48,7 +48,7 @@
       </HBox>
       <HBox>
          <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS"/>
-         <Button fx:id="colorNeighbors" mnemonicParsing="false" text="Color Neighbors">
+         <Button fx:id="colorNeighbors" mnemonicParsing="false" text="Paint Neighbors">
             <font>
                <Font size="14.0"/>
             </font>

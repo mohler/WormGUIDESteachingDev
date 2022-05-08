@@ -348,7 +348,10 @@ public class UrlParser {
             final DoubleProperty translateYProperty,
             final DoubleProperty translateZProperty,
             final DoubleProperty zoomProperty,
-            final DoubleProperty othersOpacityProperty,
+            final DoubleProperty nucOpacityProperty,
+            final DoubleProperty cellOpacityProperty,
+            final DoubleProperty tractOpacityProperty,
+            final DoubleProperty structureOpacityProperty,
             final BooleanProperty rebuildSubsceneFlag) {
 
         parseUrlRules(url, cElegansSearchPipeline, structuresSearch, neighborsSearch, annotationManager);
@@ -365,7 +368,10 @@ public class UrlParser {
                 translateXProperty,
                 translateYProperty,
                 zoomProperty,
-                othersOpacityProperty);
+                nucOpacityProperty,
+                cellOpacityProperty,
+                tractOpacityProperty,
+                structureOpacityProperty);
 
         // no need to rebuild subscene again if we are not at a different timepoint than before
         // setting the time property triggers a subscene rebuild
@@ -383,7 +389,10 @@ public class UrlParser {
             final DoubleProperty translateXProperty,
             final DoubleProperty translateYProperty,
             final DoubleProperty zoomProperty,
-            final DoubleProperty othersOpacityProperty) {
+            final DoubleProperty nucOpacityProperty,
+            final DoubleProperty cellOpacityProperty,
+            final DoubleProperty tractOpacityProperty,
+            final DoubleProperty structureOpacityProperty) {
 
         // time component of the view args is parsed into this variable
         // time property updated after all other view args are updated since it triggers a subscene rebuild
@@ -450,9 +459,44 @@ public class UrlParser {
                             e.printStackTrace();
                         }
                         break;
-                    case "dim":
+                    case "dimN":
                         try {
-                            requireNonNull(othersOpacityProperty).set(parseDouble(tokens[1]));
+                            requireNonNull(nucOpacityProperty).set(parseDouble(tokens[1]));
+                        } catch (Exception e) {
+                            System.out.println("error in parsing dim variable");
+                            e.printStackTrace();
+                        }
+                        break;
+                   case "dimC":
+                        try {
+                            requireNonNull(cellOpacityProperty).set(parseDouble(tokens[1]));
+                        } catch (Exception e) {
+                            System.out.println("error in parsing dim variable");
+                            e.printStackTrace();
+                        }
+                        break;
+                   case "dimT":
+                        try {
+                            requireNonNull(tractOpacityProperty).set(parseDouble(tokens[1]));
+                        } catch (Exception e) {
+                            System.out.println("error in parsing dim variable");
+                            e.printStackTrace();
+                        }
+                        break;
+                   case "dimS":
+                        try {
+                            requireNonNull(structureOpacityProperty).set(parseDouble(tokens[1]));
+                        } catch (Exception e) {
+                            System.out.println("error in parsing dim variable");
+                            e.printStackTrace();
+                        }
+                        break;
+                   case "dim":
+                        try {
+                            requireNonNull(nucOpacityProperty).set(parseDouble(tokens[1]));
+                            requireNonNull(cellOpacityProperty).set(parseDouble(tokens[1]));
+                            requireNonNull(tractOpacityProperty).set(parseDouble(tokens[1]));
+                            requireNonNull(structureOpacityProperty).set(parseDouble(tokens[1]));
                         } catch (Exception e) {
                             System.out.println("error in parsing dim variable");
                             e.printStackTrace();

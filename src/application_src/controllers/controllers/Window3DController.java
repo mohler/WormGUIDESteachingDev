@@ -1080,7 +1080,7 @@ public class Window3DController {
                     final String funcName = getFunctionalNameByLineageName(name);
                     String goName = name;
                     if (funcName != null) {
-                        goName = name +" ("+funcName+")";
+                        goName = funcName +" ("+name+")";
                     }
                     String fullTextString = goName;
                     transientLabelText = new Text(fullTextString);

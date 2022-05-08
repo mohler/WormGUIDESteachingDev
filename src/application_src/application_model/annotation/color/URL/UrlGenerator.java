@@ -21,7 +21,10 @@ public class UrlGenerator {
             final double tX,
             final double tY,
             final double scale,
-            final double dim) {
+            final double dimN,
+            final double dimC,
+            final double dimT,
+            final double dimS) {
 
         return "wormguides://wormguides/testurlscript?"
                 + generateParameterString(
@@ -33,7 +36,10 @@ public class UrlGenerator {
                 tX,
                 tY,
                 scale,
-                dim)
+                dimN,
+                dimC,
+                dimT,
+                dimS)
                 + "/iOS/";
     }
 
@@ -46,7 +52,10 @@ public class UrlGenerator {
             final double tX,
             final double tY,
             final double scale,
-            final double dim) {
+            final double dimN,
+            final double dimC,
+            final double dimT,
+            final double dimS) {
 
         return "http://scene.wormguides.org/wormguides/testurlscript?"
                 + generateParameterString(
@@ -58,7 +67,10 @@ public class UrlGenerator {
                 tX,
                 tY,
                 scale,
-                dim)
+                dimN,
+                dimC,
+                dimT,
+                dimS)
                 + "/Android/";
     }
 
@@ -71,7 +83,10 @@ public class UrlGenerator {
             final double tX,
             final double tY,
             final double scale,
-            final double dim) {
+            final double dimN,
+            final double dimC,
+            final double dimT,
+            final double dimS) {
 
         return "http://scene.wormguides.org/wormguides/testurlscript?"
                 + generateParameterString(
@@ -83,7 +98,10 @@ public class UrlGenerator {
                 tX,
                 tY,
                 scale,
-                dim)
+                dimN,
+                dimC,
+                dimT,
+                dimS)
                 + "/browser/";
     }
 
@@ -96,7 +114,10 @@ public class UrlGenerator {
             final double tX,
             final double tY,
             final double scale,
-            final double dim) {
+            final double dimN,
+            final double dimC,
+            final double dimT,
+            final double dimS) {
 
         return "http://scene.wormguides.org/wormguides/testurlscript?"
                 + generateParameterString(
@@ -108,7 +129,10 @@ public class UrlGenerator {
                 tX,
                 tY,
                 scale,
-                dim)
+                dimN,
+                dimC,
+                dimT,
+                dimS)
                 + "/browser/";
     }
 
@@ -126,9 +150,16 @@ public class UrlGenerator {
             final double tX,
             final double tY,
             final double scale,
-            final double dim) {
+            final double dimN,
+            final double dimC,
+            final double dimT,
+            final double dimS) {
 
-        return generateSetParameters(rules) + generateViewParameters(time, rX, rY, rZ, tX, tY, scale, dim);
+        return generateSetParameters(rules) + generateViewParameters(time, rX, rY, rZ, tX, tY, scale,
+        		dimN,
+                dimC,
+                dimT,
+                dimS);
     }
 
     private static String generateSetParameters(final List<Rule> rules) {
@@ -227,7 +258,10 @@ public class UrlGenerator {
             final double tX,
             final double tY,
             final double scale,
-            final double dim) {
+            final double dimN,
+            final double dimC,
+            final double dimT,
+            final double dimS) {
 
         return "/view"
                 + "/time=" + time
@@ -237,6 +271,9 @@ public class UrlGenerator {
                 + "/tX=" + tX
                 + "/tY=" + tY +
                 "/scale=" + scale
-                + "/dim=" + dim;
+                + "/dimN=" + dimN
+                + "/dimC=" + dimC
+                + "/dimT=" + dimT
+                + "/dimS=" + dimS;
     }
 }

@@ -47,7 +47,10 @@ public class URLShareWindow extends AnchorPane {
     private final DoubleProperty translateYProperty;
     private final DoubleProperty translateZProperty;
     private final DoubleProperty zoomProperty;
-    private final DoubleProperty othersOpacityProperty;
+    private final DoubleProperty nucOpacityProperty;
+    private final DoubleProperty cellOpacityProperty;
+    private final DoubleProperty tractOpacityProperty;
+    private final DoubleProperty structureOpacityProperty;
 
     private String urlString;
 
@@ -61,8 +64,9 @@ public class URLShareWindow extends AnchorPane {
             final DoubleProperty translateYProperty,
             final DoubleProperty translateZProperty,
             final DoubleProperty zoomProperty,
-            final DoubleProperty othersOpacityProperty, 
+            final DoubleProperty nucOpacityProperty, 
             final DoubleProperty cellOpacityProperty, 
+            final DoubleProperty tractOpacityProperty, 
             final DoubleProperty structureOpacityProperty) {
 
         super();
@@ -77,7 +81,10 @@ public class URLShareWindow extends AnchorPane {
         this.translateYProperty = requireNonNull(translateYProperty);
         this.translateZProperty = requireNonNull(translateYProperty);
         this.zoomProperty = requireNonNull(zoomProperty);
-        this.othersOpacityProperty = requireNonNull(othersOpacityProperty);
+        this.nucOpacityProperty = requireNonNull(nucOpacityProperty);
+        this.cellOpacityProperty = requireNonNull(cellOpacityProperty);
+        this.tractOpacityProperty = requireNonNull(tractOpacityProperty);
+        this.structureOpacityProperty = requireNonNull(structureOpacityProperty);
 
         cb = getDefaultToolkit().getSystemClipboard();
         final Tooltip tooltip = new Tooltip("copy");
@@ -139,7 +146,10 @@ public class URLShareWindow extends AnchorPane {
                 translateXProperty.get(),
                 translateYProperty.get(),
                 zoomProperty.get(),
-                othersOpacityProperty.get());
+                nucOpacityProperty.get(),
+                cellOpacityProperty.get(),
+                tractOpacityProperty.get(),
+                structureOpacityProperty.get());
         urlField.setText(urlString);
     }
 

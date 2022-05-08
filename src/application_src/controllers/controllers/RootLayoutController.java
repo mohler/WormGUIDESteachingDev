@@ -442,6 +442,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
                     zoomProperty,
                     nucOpacityProperty,
                     cellOpacityProperty,
+                    tractOpacityProperty,
                     structureOpacityProperty);
             urlShareWindow.getCloseButton().setOnAction(event -> urlDisplayStage.hide());
             urlDisplayStage.setScene(new Scene(urlShareWindow));
@@ -482,6 +483,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
                                 translateZProperty,
                                 zoomProperty,
                                 nucOpacityProperty,
+                                cellOpacityProperty,
+                                tractOpacityProperty,
+                                structureOpacityProperty,
                                 rebuildSubsceneFlag);
                     }
                 } else {
@@ -501,6 +505,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
                             translateZProperty,
                             zoomProperty,
                             nucOpacityProperty,
+                            cellOpacityProperty,
+                            tractOpacityProperty,
+                            structureOpacityProperty,
                             rebuildSubsceneFlag);
                 }
             });
