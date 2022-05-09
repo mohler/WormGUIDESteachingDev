@@ -401,7 +401,7 @@ public class InfoWindowDOM {
                 "p",
                 "functionWORMATLASTitle",
                 "width: 95%; margin-top: 2%; float: left;",
-                "<strong> Wormatlas Function: </strong>");
+                "<strong> WormAtlas Description/Function: </strong>");
         functionWORMATLASTopContainerDiv.addChild(collapseFunctionButton);
         functionWORMATLASTopContainerDiv.addChild(functionWORMATLASTitle);
         HTMLNode functionWORMATLASDiv = new HTMLNode("div", "functionWORMATLAS", "height: 0px; visibility: hidden;");
@@ -426,7 +426,7 @@ public class InfoWindowDOM {
                 "p",
                 "wiringPartnersTitle",
                 "width: 95%; margin-top: 2%; float: left;",
-                "<strong> Wiring Partners: </strong>");
+                "<strong> Synaptic Partners: </strong>");
         wiringPartnersTopContainerDiv.addChild(collapseWiringPartnersButton);
         wiringPartnersTopContainerDiv.addChild(wiringPartnersTitle);
         HTMLNode wiringPartnersDiv = new HTMLNode("div", "wiringPartners", "height: 0px; visibility: hidden;");
@@ -569,7 +569,7 @@ public class InfoWindowDOM {
                 "p",
                 "homologuesTitle",
                 "width: 95%; margin-top: 2%; float: left;",
-                "<strong> Homologues: </strong>");
+                "<strong> Analogous Cells: </strong>");
         homologuesTopContainerDiv.addChild(collapseHomologuesButton);
         homologuesTopContainerDiv.addChild(homologuesTitle);
         HTMLNode homologuesDiv = new HTMLNode("div", "homologues", "height: 20%; height: 0px; visibility: hidden;");
@@ -748,7 +748,7 @@ public class InfoWindowDOM {
                 "p",
                 "productionInfoTitle",
                 "width: 95%; margin-top: 2%; float: left;",
-                "<strong> Primary Data: </strong>");
+                "<strong> Primary Image Data: </strong>");
         productionInfoTopContainerDiv.addChild(collapseProductionInfoButton);
         productionInfoTopContainerDiv.addChild(productionInfoTitle);
         HTMLNode productionInfoDiv = new HTMLNode("div", "productionInfo", "height: 0px; visibility: hidden;");

@@ -91,6 +91,7 @@ public class GeneSearchManager extends Service<Void> {
                             intendedResultsType);
 
                     // save results in cache
+                    results.getValue().sort(String.CASE_INSENSITIVE_ORDER);
                     geneResultsCache.put(searchTerm.toLowerCase(), results);
                 }
                 return null;

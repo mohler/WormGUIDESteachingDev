@@ -91,13 +91,13 @@
             <children>
                 <TabPane fx:id="mainTabPaneLeft" focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE">
                     <tabs>
-                        <Tab fx:id="storiesTab" closable="false" text="Stories">
+                        <Tab fx:id="storiesTab" closable="false" text="Scenes and Stories">
                             <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                     <children>
                                         <VBox layoutX="129.0" layoutY="151.0" prefHeight="735.0" prefWidth="300.0" spacing="15.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                                             <children>
-                                                <Label text="Stories: User created shareable annotations">
+                                                <Label text="User-created sharable annotations">
                                                     <font>
                                                         <Font size="14.0" />
                                                     </font>
@@ -106,13 +106,13 @@
                                                 <HBox>
                                                     <children>
                                                         <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                                                        <Button fx:id="newStoryButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="New Story">
+                                                        <Button fx:id="newStoryButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="New Scene">
                                                             <font>
                                                                 <Font size="14.0" />
                                                             </font>
                                                         </Button>
                                                         <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                                                        <Button fx:id="deleteStoryButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="Delete Active Story">
+                                                        <Button fx:id="deleteStoryButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="Delete Scene">
                                                             <font>
                                                                 <Font size="14.0" />
                                                             </font>
@@ -123,7 +123,7 @@
                                                 <HBox>
                                                     <children>
                                                         <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                                                        <Button fx:id="editNoteButton" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" text="Edit Active Story">
+                                                        <Button fx:id="editNoteButton" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" text="Edit Scene">
                                                             <font>
                                                                 <Font size="14.0" />
                                                             </font>

@@ -66,7 +66,7 @@ public class StoriesLayer {
 
     private static final String NEW_STORY_TITLE = "New Story";
     private static final String NEW_STORY_DESCRIPTION = "New story description here";
-    private static final String TEMPLATE_STORY_NAME = "Template to Make Your Own Story";
+    private static final String TEMPLATE_STORY_NAME = "Blank Scene Template";
     private static final String TEMPLATE_STORY_DESCRIPTION = "";
 
     private final Stage parentStage;
