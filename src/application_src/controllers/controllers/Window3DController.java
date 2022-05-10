@@ -6,6 +6,7 @@ package application_src.controllers.controllers;
 
 
 import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +20,9 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Timer;
 import java.util.Vector;
-
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 //import com.interactivemesh.jfx.importer.obj.ObjModelImporter;
 import application_src.MainApp;
@@ -390,7 +393,11 @@ public class Window3DController {
 	private Point3D cumRotShiftCoords;
 	private Point3D cumShiftCoords;
 	private Point3D xform1Pivot;
-
+    private static ScheduledThreadPoolExecutor blinkService;
+	private ScheduledFuture schfut;
+	private boolean blinkOn;
+	private Runnable runner;
+    NamedNucleusSphere blinkingSphere;
 
     public Window3DController(
             final RootLayoutController rootLC, 
@@ -508,6 +515,10 @@ public class Window3DController {
             }
 
         });
+        
+		if (blinkService ==null){
+			blinkService = new ScheduledThreadPoolExecutor(1);
+		}
 
         // set orientation indicator frames and rotation from production info
         keyFramesRotate = productionInfo.getKeyFramesRotate();
@@ -1241,18 +1252,51 @@ public class Window3DController {
                                 hasFunctionalName);
 
                     } else if (me.getButton() == PRIMARY) {
-                        // regular click
-                        if (allLabels.contains(name)) {
-                            removeLabelFor(name);
-                        } else {
-                            if (!allLabels.contains(name)) {
-                                allLabels.add(name);
-                                currentLabels.add(name);
-                                final Shape3D entity = getEntityWithName(name);
-                                insertLabelFor(name, entity);
-                                highlightActiveCellLabel(entity);                               
-                            }
-                        }
+                    	// regular click
+                    	if (allLabels.contains(name)) {
+                    		removeLabelFor(name);
+                			if (schfut != null) {
+                				schfut.cancel(true);
+                			}
+                    		if (blinkingSphere != null){
+                    			blinkingSphere.setMaterial(colorHash.getMaterial(blinkingSphere.getColors()));
+                    		}
+                    		blinkingSphere = null;
+                    	} else {
+                    		if (!allLabels.contains(name)) {
+                    			allLabels.add(name);
+                    			currentLabels.add(name);
+                    			final Shape3D entity = getEntityWithName(name);
+                    			insertLabelFor(name, entity);
+                    			highlightActiveCellLabel(entity);                               
+                    		}
+                    		if (true) {
+                        		if (blinkingSphere != null){
+                        			blinkingSphere.setMaterial(colorHash.getMaterial(blinkingSphere.getColors()));
+                        		}
+                    			blinkingSphere = picked;
+                    			if (schfut != null) {
+                    				schfut.cancel(true);
+                    			}
+                    			schfut = null;
+                    			runner = new Runnable() {
+
+                    				public void run()
+                    				{
+
+                    					if (blinkOn){
+                    						picked.setMaterial(colorHash.getBlinkMaterial(picked.getColors()));
+                    						blinkOn = false;
+                    					} else {
+                    						picked.setMaterial(colorHash.getMaterial(picked.getColors()));
+                    						blinkOn =true;
+                    					}                        			
+                    				}
+                    			};
+                    			
+                    			schfut = blinkService.scheduleAtFixedRate(runner, 0, 500, TimeUnit.MILLISECONDS);
+                    		}
+                    	}
                     }
 
                 } else if (node instanceof SceneElementMeshView) {
@@ -2366,7 +2410,7 @@ public class Window3DController {
             } else {
                 radius = getSizeScale() * getUniformRadius();
             }
-            final NamedNucleusSphere sphere = new NamedNucleusSphere(cellName, radius);
+            final NamedNucleusSphere sphere = new NamedNucleusSphere(cellName, radius, null);
 
             // create the color material
             Material material;
@@ -2413,8 +2457,9 @@ public class Window3DController {
                     }
                 } else {
                     colors.sort(colorComparator);
+                    sphere.setColors(colors);
                     material = colorHash.getMaterial(colors);
-                }
+               }
             }
             sphere.setMaterial(material);
 
@@ -2616,7 +2661,7 @@ public class Window3DController {
                     } else {
                         radius = getSizeScale() * getUniformRadius();
                     }
-                    final NamedNucleusSphere sphere = new NamedNucleusSphere(cellName, radius);
+                    final NamedNucleusSphere sphere = new NamedNucleusSphere(cellName, radius, null);
 
                     colors.sort(colorComparator);
                     for (int c=0;c<colors.size();c++) {
@@ -2629,7 +2674,7 @@ public class Window3DController {
 						}
                     }
                     material = colorHash.getMaterial(colors);
-
+                    sphere.setColors(colors);
                     sphere.setMaterial(material);
 
                     // transform and add sphere to list
