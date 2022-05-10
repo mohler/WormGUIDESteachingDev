@@ -1066,12 +1066,27 @@ public class Window3DController {
      * 		Whether to include coloring rule hits for a given cell. 
      */
     private void insertTransientLabel(String name, final Shape3D entity, boolean longForm) {
+        final double nucOpacity = nucOpacityProperty.get();
         final double cellOpacity = cellOpacityProperty.get();
+        final double tractOpacity = tractOpacityProperty.get();
+        final double structureOpacity = structureOpacityProperty.get();
         if (entity != null) {
             // do not create transient label for "other" entities when their visibility is under the selectability
             // cutoff
-            if ((entity.getMaterial() == colorHash.getOtherNucleiMaterial(cellOpacity))
-                    && (nucOpacityProperty.get() < getSelectabilityVisibilityCutoff())) {
+            if ((entity instanceof Sphere && entity.getMaterial() == colorHash.getOtherNucleiMaterial(nucOpacity))
+                    && (nucOpacity < getSelectabilityVisibilityCutoff())) {
+                return;
+            }
+            if ((entity instanceof Shape3D && entity.getMaterial() == colorHash.getOtherCellsMaterial(cellOpacity))
+                    && (cellOpacity < getSelectabilityVisibilityCutoff())) {
+                return;
+            }
+            if ((entity instanceof Shape3D && entity.getMaterial() == colorHash.getOtherTractsMaterial(tractOpacity))
+                    && (tractOpacity < getSelectabilityVisibilityCutoff())) {
+                return;
+            }
+            if ((entity instanceof Shape3D && entity.getMaterial() == colorHash.getOtherStructuresMaterial(structureOpacity))
+                    && (structureOpacity < getSelectabilityVisibilityCutoff())) {
                 return;
             }
 //            if (!currentLabels.contains(name)) {
@@ -2751,20 +2766,24 @@ public class Window3DController {
      * then the nucleus sphere is returned).
      */
     private Shape3D getEntityWithName(final String name) {
-        // sphere label
-        for (int i = 0; i < spheres.size(); i++) {
-            if (spheres.get(i) != null && spheres.get(i).getCellName().equalsIgnoreCase(name)) {
-                return spheres.get(i);
-            }
-        }
         // mesh view label
         if (defaultEmbryoFlag) {
-            for (int i = 0; i < currentSceneElements.size(); i++) {
-                if (normalizeName(currentSceneElements.get(i).getSceneName()).equalsIgnoreCase(name)
-                        && currentSceneElementMeshViews.get(i) != null) {
-                    return currentSceneElementMeshViews.get(i);
-                }
-            }
+        	if (cellOpacityProperty.get() > nonSelectableOpacity) {
+        		for (int i = 0; i < currentSceneElements.size(); i++) {
+        			if (normalizeName(currentSceneElements.get(i).getSceneName()).equalsIgnoreCase(name)
+        					&& currentSceneElementMeshViews.get(i) != null) {
+        				return currentSceneElementMeshViews.get(i);
+        			}
+        		}
+        	}
+        }
+        // sphere label
+        if (nucOpacityProperty.get() > nonSelectableOpacity) {
+        	for (int i = 0; i < spheres.size(); i++) {
+        		if (spheres.get(i) != null && spheres.get(i).getCellName().equalsIgnoreCase(name)) {
+        			return spheres.get(i);
+        		}
+        	}
         }
         return null;
     }

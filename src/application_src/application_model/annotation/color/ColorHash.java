@@ -76,6 +76,26 @@ public class ColorHash {
         return opacityMaterialHash.get(opacity);
     }
 
+    public Material getOtherCellsMaterial(double opacity) {
+        if (opacityMaterialHash.get(opacity) == null) {
+            final Material material = makeOthersMaterial(opacity);
+            opacityMaterialHash.put(opacity, material);
+            opacityHash.put(material, opacity);
+        }
+
+        return opacityMaterialHash.get(opacity);
+    }
+
+    public Material getOtherTractsMaterial(double opacity) {
+        if (opacityMaterialHash.get(opacity) == null) {
+            final Material material = makeOthersMaterial(opacity);
+            opacityMaterialHash.put(opacity, material);
+            opacityHash.put(material, opacity);
+        }
+
+        return opacityMaterialHash.get(opacity);
+    }
+
     public Material getOtherStructuresMaterial(double opacity) {
         if (opacityMaterialHash.get(opacity) == null) {
             final Material material = makeOthersMaterial(opacity);
