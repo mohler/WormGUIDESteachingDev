@@ -396,9 +396,10 @@ public class Window3DController {
     private static ScheduledThreadPoolExecutor blinkService;
 	private ScheduledFuture schfut;
 	private boolean blinkOn;
-	private Runnable runner;
+	private Runnable blinkRunner;
     NamedNucleusSphere blinkingSphere;
-
+    SceneElementMeshView blinkingSceneElementMeshView;
+    
     public Window3DController(
             final RootLayoutController rootLC, 
             final Stage parentStage,
@@ -1084,22 +1085,26 @@ public class Window3DController {
         if (entity != null) {
             // do not create transient label for "other" entities when their visibility is under the selectability
             // cutoff
-            if ((entity instanceof Sphere && entity.getMaterial() == colorHash.getOtherNucleiMaterial(nucOpacity))
-                    && (nucOpacity < getSelectabilityVisibilityCutoff())) {
-                return;
+ // NEED TO WORK THROUGH THE COMPLICATED CHECKLIST FOR THESE...THEY CURRENTLY DON'T MAKE SENSE!!!!
+            if (entity instanceof Sphere ) {
+	            if (entity.getMaterial() == colorHash.getOtherNucleiMaterial(nucOpacity)
+	            		&& nucOpacity < getSelectabilityVisibilityCutoff()) {
+	            	return;
+	            }
+            } else if(entity instanceof Shape3D) {
+            	if (entity.getMaterial() == colorHash.getOtherCellsMaterial(cellOpacity)
+            			&& cellOpacity < getSelectabilityVisibilityCutoff()) {
+            		return;
+            	} else if (entity.getMaterial() == colorHash.getOtherTractsMaterial(tractOpacity)
+            			&& tractOpacity < getSelectabilityVisibilityCutoff()) {
+            		return;
+            	}else if (entity.getMaterial() == colorHash.getOtherStructuresMaterial(structureOpacity)
+            			&& structureOpacity < getSelectabilityVisibilityCutoff()) {
+            		return;
+            	}
             }
-            if ((entity instanceof Shape3D && entity.getMaterial() == colorHash.getOtherCellsMaterial(cellOpacity))
-                    && (cellOpacity < getSelectabilityVisibilityCutoff())) {
-                return;
-            }
-            if ((entity instanceof Shape3D && entity.getMaterial() == colorHash.getOtherTractsMaterial(tractOpacity))
-                    && (tractOpacity < getSelectabilityVisibilityCutoff())) {
-                return;
-            }
-            if ((entity instanceof Shape3D && entity.getMaterial() == colorHash.getOtherStructuresMaterial(structureOpacity))
-                    && (structureOpacity < getSelectabilityVisibilityCutoff())) {
-                return;
-            }
+            
+///////////////
 //            if (!currentLabels.contains(name)) {
                 final Bounds b = entity.getBoundsInParent();
                 if (b != null) {
@@ -1108,7 +1113,7 @@ public class Window3DController {
                     if (funcName != null) {
                         goName = funcName +" ("+name+")";
                     }
-                    String fullTextString = goName;
+					String fullTextString = /* ""+ (entity instanceof Sphere?"n":"")+ */ goName;
                     transientLabelText = new Text(fullTextString);
                     transientLabelTextFlow = new TextFlow(transientLabelText);
                     if (longForm) {
@@ -1258,11 +1263,17 @@ public class Window3DController {
                 			if (schfut != null) {
                 				schfut.cancel(true);
                 			}
-                    		if (blinkingSphere != null){
+                    		if (blinkingSphere != null && blinkingSphere.getColors() !=null && blinkingSphere.getColors().size() >0){
                     			blinkingSphere.setMaterial(colorHash.getMaterial(blinkingSphere.getColors()));
                     		}
                     		blinkingSphere = null;
-                    	} else {
+
+                    		if (blinkingSceneElementMeshView != null && blinkingSceneElementMeshView.getColors() !=null && blinkingSceneElementMeshView.getColors().size() >0){
+                    			blinkingSceneElementMeshView.setMaterial(colorHash.getMaterial(blinkingSceneElementMeshView.getColors()));
+                    		}
+                    		blinkingSceneElementMeshView = null;
+                			
+                   	} else {
                     		if (!allLabels.contains(name)) {
                     			allLabels.add(name);
                     			currentLabels.add(name);
@@ -1271,15 +1282,22 @@ public class Window3DController {
                     			highlightActiveCellLabel(entity);                               
                     		}
                     		if (true) {
-                        		if (blinkingSphere != null){
+                        		if (blinkingSphere != null && blinkingSphere.getColors() !=null && blinkingSphere.getColors().size() >0){
                         			blinkingSphere.setMaterial(colorHash.getMaterial(blinkingSphere.getColors()));
                         		}
-                    			blinkingSphere = picked;
+                        		blinkingSphere = null;
+
+                        		if (blinkingSceneElementMeshView != null && blinkingSceneElementMeshView.getColors() !=null && blinkingSceneElementMeshView.getColors().size() >0){
+                        			blinkingSceneElementMeshView.setMaterial(colorHash.getMaterial(blinkingSceneElementMeshView.getColors()));
+                        		}
+                        		blinkingSceneElementMeshView = null;
+                    			
+                        		blinkingSphere = picked;
                     			if (schfut != null) {
                     				schfut.cancel(true);
                     			}
                     			schfut = null;
-                    			runner = new Runnable() {
+                    			blinkRunner = new Runnable() {
 
                     				public void run()
                     				{
@@ -1294,7 +1312,7 @@ public class Window3DController {
                     				}
                     			};
                     			
-                    			schfut = blinkService.scheduleAtFixedRate(runner, 0, 500, TimeUnit.MILLISECONDS);
+                    			schfut = blinkService.scheduleAtFixedRate(blinkRunner, 0, 500, TimeUnit.MILLISECONDS);
                     		}
                     	}
                     }
@@ -1339,16 +1357,64 @@ public class Window3DController {
                                 }
 
                             } else if (me.getButton() == PRIMARY) {
-                                // regular click
-                                if (allLabels.contains(name)) {
-                                    removeLabelFor(name);
-                                } else {
-                                    allLabels.add(name);
-                                    currentLabels.add(name);
-                                    final Shape3D entity = getEntityWithName(name);
-                                    insertLabelFor(name, entity);
-                                    highlightActiveCellLabel(entity);
-                                }
+                            	// regular click
+                            	if (allLabels.contains(name)) {
+                            		removeLabelFor(name);
+                        			if (schfut != null) {
+                        				schfut.cancel(true);
+                        			}
+                            		if (blinkingSphere != null && blinkingSphere.getColors() !=null && blinkingSphere.getColors().size() >0){
+                            			blinkingSphere.setMaterial(colorHash.getMaterial(blinkingSphere.getColors()));
+                            		}
+                            		blinkingSphere = null;
+
+                            		if (blinkingSceneElementMeshView != null && blinkingSceneElementMeshView.getColors() !=null && blinkingSceneElementMeshView.getColors().size() >0){
+                            			blinkingSceneElementMeshView.setMaterial(colorHash.getMaterial(blinkingSceneElementMeshView.getColors()));
+                            		}
+                            		blinkingSceneElementMeshView = null;
+                        			
+                            	} else {
+                            		if (!allLabels.contains(name)) {
+                            			allLabels.add(name);
+                            			currentLabels.add(name);
+                            			final Shape3D entity = getEntityWithName(name);
+                            			insertLabelFor(name, entity);
+                            			highlightActiveCellLabel(entity);                               
+                            		}
+                            		if (true) {
+                                		if (blinkingSphere != null && blinkingSphere.getColors() !=null && blinkingSphere.getColors().size() >0){
+                                			blinkingSphere.setMaterial(colorHash.getMaterial(blinkingSphere.getColors()));
+                                		}
+                                		blinkingSphere = null;
+
+                                		if (blinkingSceneElementMeshView != null && blinkingSceneElementMeshView.getColors() !=null && blinkingSceneElementMeshView.getColors().size() >0){
+                                			blinkingSceneElementMeshView.setMaterial(colorHash.getMaterial(blinkingSceneElementMeshView.getColors()));
+                                		}
+                                		blinkingSceneElementMeshView = null;
+                            			                                		
+                                		blinkingSceneElementMeshView = curr;
+                            			if (schfut != null) {
+                            				schfut.cancel(true);
+                            			}
+                            			schfut = null;
+                            			blinkRunner = new Runnable() {
+
+                            				public void run()
+                            				{
+
+                            					if (blinkOn){
+                            						blinkingSceneElementMeshView.setMaterial(colorHash.getBlinkMaterial(blinkingSceneElementMeshView.getColors()));
+                            						blinkOn = false;
+                            					} else {
+                            						blinkingSceneElementMeshView.setMaterial(colorHash.getMaterial(blinkingSceneElementMeshView.getColors()));
+                            						blinkOn =true;
+                            					}                        			
+                            				}
+                            			};
+                            			
+                            			schfut = blinkService.scheduleAtFixedRate(blinkRunner, 0, 500, TimeUnit.MILLISECONDS);
+                            		}
+                            	}
                             }
                             break;
                         }
@@ -1833,7 +1899,7 @@ public class Window3DController {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-}
+            }
         }
     }
 
@@ -2593,6 +2659,7 @@ public class Window3DController {
                         }
                     } else {
                         colors.sort(colorComparator);
+                        ((SceneElementMeshView) meshView).setColors(colors);
                         meshView.setMaterial(colorHash.getMaterial(colors));
                     }
                 }
@@ -2603,9 +2670,9 @@ public class Window3DController {
                         spritesPane.setCursor(HAND);
                         // make label appear
                         final String name = normalizeName(sceneName);
-                        if (!currentLabels.contains(name.toLowerCase())) {
+//                        if (!currentLabels.contains(name.toLowerCase())) {
                             insertTransientLabel(name, getEntityWithName(name), event.isShiftDown());
-                        }
+//                        }
                     });
                     meshView.setOnMouseExited(event -> {
                         spritesPane.setCursor(DEFAULT);
@@ -2813,7 +2880,7 @@ public class Window3DController {
     private Shape3D getEntityWithName(final String name) {
         // mesh view label
         if (defaultEmbryoFlag) {
-        	if (cellOpacityProperty.get() > nonSelectableOpacity) {
+        	if (true ||cellOpacityProperty.get() > nonSelectableOpacity) {
         		for (int i = 0; i < currentSceneElements.size(); i++) {
         			if (normalizeName(currentSceneElements.get(i).getSceneName()).equalsIgnoreCase(name)
         					&& currentSceneElementMeshViews.get(i) != null) {
@@ -2823,7 +2890,7 @@ public class Window3DController {
         	}
         }
         // sphere label
-        if (nucOpacityProperty.get() > nonSelectableOpacity) {
+        if (true || nucOpacityProperty.get() > nonSelectableOpacity) {
         	for (int i = 0; i < spheres.size(); i++) {
         		if (spheres.get(i) != null && spheres.get(i).getCellName().equalsIgnoreCase(name)) {
         			return spheres.get(i);

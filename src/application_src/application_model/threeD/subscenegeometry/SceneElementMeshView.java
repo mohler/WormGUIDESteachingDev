@@ -3,6 +3,7 @@ package application_src.application_model.threeD.subscenegeometry;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.scene.paint.Color;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 
@@ -20,6 +21,10 @@ public class SceneElementMeshView extends MeshView {
 
     /** The list of marker points **/
     private final List<double[]> markerCoordinates;
+
+	String cellName;
+
+	List<Color> colors;
 
     /**
      * Class constructor
@@ -60,4 +65,21 @@ public class SceneElementMeshView extends MeshView {
     public List<double[]> getMarkerCoordinates() {
         return new ArrayList<>(markerCoordinates);
     }
+    
+	public String getCellName() {
+		return cellName;
+	}
+
+	public void setCellName(String cellName) {
+		this.cellName = cellName;
+	}
+
+	public List<Color> getColors() {
+		return colors;
+	}
+
+	public void setColors(List<Color> colors) {
+		this.colors = colors;
+	}
+
 }
