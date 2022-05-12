@@ -399,6 +399,7 @@ public class Window3DController {
 	private Runnable blinkRunner;
     NamedNucleusSphere blinkingSphere;
     SceneElementMeshView blinkingSceneElementMeshView;
+	private String currentBlinkName;
     
     public Window3DController(
             final RootLayoutController rootLC, 
@@ -1272,14 +1273,16 @@ public class Window3DController {
                     			blinkingSceneElementMeshView.setMaterial(colorHash.getMaterial(blinkingSceneElementMeshView.getColors()));
                     		}
                     		blinkingSceneElementMeshView = null;
-                			
+                			currentBlinkName = "";
+
                    	} else {
                     		if (!allLabels.contains(name)) {
                     			allLabels.add(name);
                     			currentLabels.add(name);
                     			final Shape3D entity = getEntityWithName(name);
                     			insertLabelFor(name, entity);
-                    			highlightActiveCellLabel(entity);                               
+                    			highlightActiveCellLabel(entity); 
+                    			currentBlinkName = name;
                     		}
                     		if (true) {
                         		if (blinkingSphere != null && blinkingSphere.getColors() !=null && blinkingSphere.getColors().size() >0){
@@ -1303,10 +1306,10 @@ public class Window3DController {
                     				{
 
                     					if (blinkOn){
-                    						picked.setMaterial(colorHash.getBlinkMaterial(picked.getColors()));
+                    						blinkingSphere.setMaterial(colorHash.getBlinkMaterial(picked.getColors()));
                     						blinkOn = false;
                     					} else {
-                    						picked.setMaterial(colorHash.getMaterial(picked.getColors()));
+                    						blinkingSphere.setMaterial(colorHash.getMaterial(picked.getColors()));
                     						blinkOn =true;
                     					}                        			
                     				}
@@ -1372,7 +1375,8 @@ public class Window3DController {
                             			blinkingSceneElementMeshView.setMaterial(colorHash.getMaterial(blinkingSceneElementMeshView.getColors()));
                             		}
                             		blinkingSceneElementMeshView = null;
-                        			
+                        			currentBlinkName = "";
+
                             	} else {
                             		if (!allLabels.contains(name)) {
                             			allLabels.add(name);
@@ -1380,6 +1384,7 @@ public class Window3DController {
                             			final Shape3D entity = getEntityWithName(name);
                             			insertLabelFor(name, entity);
                             			highlightActiveCellLabel(entity);                               
+                            			currentBlinkName = name;
                             		}
                             		if (true) {
                                 		if (blinkingSphere != null && blinkingSphere.getColors() !=null && blinkingSphere.getColors().size() >0){
@@ -2206,6 +2211,7 @@ public class Window3DController {
             for (SceneElement se : sceneElementsAtCurrentTime) {
                 final SceneElementMeshView meshView = se.buildGeometry(requestedTime - getShapesIndexPad());
                 if (meshView != null) {
+                	meshView.setCellName(se.getSceneName());
                     meshView.getTransforms().addAll(rotateX, rotateY, rotateZ);
 
                     // TRANSFORMS FOR LIBRARY LOADER
@@ -2874,8 +2880,7 @@ public class Window3DController {
     }
 
     /**
-     * @return The 3D entity with input name. Priority is given to nuclei (if a mesh and a nucleus have the same name,
-     * then the nucleus sphere is returned).
+     * @return The 3D entity with input name. .
      */
     private Shape3D getEntityWithName(final String name) {
         // mesh view label
@@ -2889,6 +2894,39 @@ public class Window3DController {
         		}
         	}
         }
+        // sphere label
+        if (true || nucOpacityProperty.get() > nonSelectableOpacity) {
+        	for (int i = 0; i < spheres.size(); i++) {
+        		if (spheres.get(i) != null && spheres.get(i).getCellName().equalsIgnoreCase(name)) {
+        			return spheres.get(i);
+        		}
+        	}
+        }
+        return null;
+    }
+
+    /**
+     * @return The 3D entity with input name. .
+     */
+    private Shape3D getMeshViewWithName(final String name) {
+        // mesh view label
+        if (defaultEmbryoFlag) {
+        	if (true ||cellOpacityProperty.get() > nonSelectableOpacity) {
+        		for (int i = 0; i < currentSceneElements.size(); i++) {
+        			if (normalizeName(currentSceneElements.get(i).getSceneName()).equalsIgnoreCase(name)
+        					&& currentSceneElementMeshViews.get(i) != null) {
+        				return currentSceneElementMeshViews.get(i);
+        			}
+        		}
+        	}
+        }
+        return null;
+    }
+
+    /**
+     * @return The 3D entity with input name. .
+     */
+    private Shape3D getSphereWithName(final String name) {
         // sphere label
         if (true || nucOpacityProperty.get() > nonSelectableOpacity) {
         	for (int i = 0; i < spheres.size(); i++) {
@@ -3736,7 +3774,8 @@ public class Window3DController {
         @Override
         protected Task<Void> createTask() {
             return new Task<Void>() {
-                @Override
+
+				@Override
                 protected Void call() throws Exception {
                     runLater(() -> {
                         refreshScene();
@@ -3777,6 +3816,22 @@ public class Window3DController {
                         }
                         xform2.setTranslateZ(600);
                         repositionNotes();
+
+                    		if (blinkingSceneElementMeshView != null && blinkingSceneElementMeshView.getColors() !=null && blinkingSceneElementMeshView.getColors().size() >0){
+                    			currentBlinkName = blinkingSceneElementMeshView.getCellName();
+                    			blinkingSceneElementMeshView.setMaterial(colorHash.getMaterial(blinkingSceneElementMeshView.getColors()));
+//                    			blinkingSceneElementMeshView = null;
+                    			if (getMeshViewWithName(currentBlinkName) != null)
+                    				blinkingSceneElementMeshView = (SceneElementMeshView) getMeshViewWithName(currentBlinkName);
+                    		}
+                    	
+                    		if (blinkingSphere != null && blinkingSphere.getColors() !=null && blinkingSphere.getColors().size() >0){
+                    			currentBlinkName = blinkingSphere.getCellName();
+                    			blinkingSphere.setMaterial(colorHash.getMaterial(blinkingSphere.getColors()));
+//                    			blinkingSphere = null;
+                    			if (getEntityWithName(currentBlinkName) instanceof Sphere)
+                    				blinkingSphere = (NamedNucleusSphere) getSphereWithName(currentBlinkName);
+                    		}
 
                     });
                     return null;
