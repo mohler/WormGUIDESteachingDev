@@ -1905,6 +1905,13 @@ public class Window3DController {
 					e.printStackTrace();
 				}
             }
+        } else {//entity == null
+        	try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
     }
 
@@ -2832,9 +2839,12 @@ public class Window3DController {
      */
     private void insertLabelFor(final String name, final Node entity) {
     	//***THIS METHOD SEEMS TO BREAK (MAYBE) WHEN PREVIOUS TIMEPOINTS ARE TRACED...
+    	//...issue may now be solved
     	
-        // if label is already in scene, make all labels white and highlight that one
-        final Text label = entityLabelMap.get(entity);
+         if (entity == null)
+        	return;
+       // if label is already in scene, make all labels white and highlight that one
+    	final Text label = entityLabelMap.get(entity);
         if (label != null) {
             for (Node shape : entityLabelMap.keySet()) {
                 entityLabelMap.get(shape).setFill(web(SPRITE_COLOR_HEX));
