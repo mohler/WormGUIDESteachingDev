@@ -4,6 +4,7 @@
 
 package application_src.application_model.annotation.color;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -61,7 +62,7 @@ public class ColorHash {
 
         highlightMaterial = makeMaterial(GOLD);
         translucentMaterial = makeMaterial(web("#555555", 0.40));
-        makeMaterial(WHITE);
+        makeMaterial(WHITE);   //// why?
         noteMaterial = makeMaterial(web("#749bc9"));
     }
 
@@ -124,10 +125,16 @@ public class ColorHash {
         if (builder.length() < 2) {
             builder.insert(0, "0");
         }
-        for (int i = 0; i < 3; i++) {
-            colorString += builder.toString();
+        for (int i = 0; i < 4; i++) {
+        	if (i<3)
+        		colorString += "ff";
+        	else
+        		colorString += builder.toString();
         }
-        return new PhongMaterial(web(colorString, opacity));
+//        return new PhongMaterial(web(colorString));
+        List<Color> clist = new ArrayList<Color>();
+        clist.add(web(colorString));
+        return getMaterial(clist);
     }
 
     private Material makeMaterial(final Color color) {
@@ -154,7 +161,7 @@ public class ColorHash {
 //            copy = new Color[colors.size() + 1];
 //            arraycopy(temp, 0, copy, 0, colors.size());
 //            copy[colors.size()] = temp[0];
-// WHAT WE REALLY NEED HERE IS A SEQUENCE FLIP OF STRIPES ON THE TWO EQUATORS OF THE SPHERE,
+// WHAT WE REALLY NEED HERE IS A SEQUENCE FLIP OF STRIPES ON THE TWO hemispheres OF THE SPHERE,
         	//SO ALL COLORS CAN BE SEEN FROM ALL ANGLES.
             copy = new Color[colors.size() *2];
             Color[] flipCopy = new Color[colors.size() *2];
@@ -187,6 +194,7 @@ public class ColorHash {
 
         final PhongMaterial material = new PhongMaterial();
         material.setDiffuseMap(wImage);
+//        material.setSpecularMap(wImage);
         opacityHash.put(material, opacity);
         return material;
     }
@@ -219,7 +227,7 @@ public class ColorHash {
         final Set<Color> colorSet = new HashSet<>();
         if (colors != null) {
             colorSet.addAll(colors);
-        }
+        } 
         if (!trueMaterialHash.containsKey(colorSet)) {
             trueMaterialHash.put(colorSet, makeMaterial(colorSet));
         }

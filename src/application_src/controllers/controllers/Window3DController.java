@@ -2529,7 +2529,10 @@ public class Window3DController {
                         index--;
                         continue;
                     } else {
-                        material = otherNucsMaterial;
+                    	colors.add(web("#ffffff"));
+                    	sphere.setColors(colors);
+                    	colorHash.getMaterial(colors);
+                        material = colorHash.getOtherNucleiMaterial(opacity);
                         if (opacity <= getSelectabilityVisibilityCutoff()) {
                             sphere.setDisable(true);
                         }
@@ -2731,6 +2734,10 @@ public class Window3DController {
                         colors.add(web(rule.getColor().toString()));
                         needRender = true;
                     }
+                }
+                if (colors.size()==0) {
+                	colors.add(web("ffffff"));
+                    needRender = true;
                 }
 
                 if (needRender) { //render the cell if conditions are met
