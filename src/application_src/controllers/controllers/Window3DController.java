@@ -561,6 +561,7 @@ public class Window3DController {
                 }
 
                 final Shape3D entity = getEntityWithName(lineageName);
+                NamedNucleusSphere picked = getSphereWithName(lineageName);
 
                 // go to labeled name
                 int startTime1;
@@ -583,6 +584,42 @@ public class Window3DController {
 
                 insertLabelFor(lineageName, entity);
                 highlightActiveCellLabel(entity);
+                
+           		if (entity instanceof NamedNucleusSphere) {
+
+            		if (blinkingSphere != null && blinkingSphere.getColors() !=null && blinkingSphere.getColors().size() >0){
+            			blinkingSphere.setMaterial(colorHash.getMaterial(blinkingSphere.getColors()));
+            		}
+            		blinkingSphere = null;
+
+            		if (blinkingSceneElementMeshView != null && blinkingSceneElementMeshView.getColors() !=null && blinkingSceneElementMeshView.getColors().size() >0){
+            			blinkingSceneElementMeshView.setMaterial(colorHash.getMaterial(blinkingSceneElementMeshView.getColors()));
+            		}
+            		blinkingSceneElementMeshView = null;
+            		
+            		blinkingSphere = picked;
+        			if (schfut != null) {
+        				schfut.cancel(true);
+        			}
+        			schfut = null;
+        			blinkRunner = new Runnable() {
+
+        				public void run()
+        				{
+
+        					if (blinkOn){
+        						blinkingSphere.setMaterial(colorHash.getBlinkMaterial(picked.getColors()));
+        						blinkOn = false;
+        					} else {
+        						blinkingSphere.setMaterial(colorHash.getMaterial(picked.getColors()));
+        						blinkOn =true;
+        					}                        			
+        				}
+        			};
+        			
+        			schfut = blinkService.scheduleAtFixedRate(blinkRunner, 0, 500, TimeUnit.MILLISECONDS);
+        		}
+
             }
         });
 
@@ -1275,7 +1312,7 @@ public class Window3DController {
                     		blinkingSceneElementMeshView = null;
                 			currentBlinkName = "";
 
-                   	} else {
+                    	} else {
                     		if (!allLabels.contains(name)) {
                     			allLabels.add(name);
                     			currentLabels.add(name);
@@ -2943,7 +2980,7 @@ public class Window3DController {
     /**
      * @return The 3D entity with input name. .
      */
-    private Shape3D getSphereWithName(final String name) {
+    private NamedNucleusSphere getSphereWithName(final String name) {
         // sphere label
         if (true || nucOpacityProperty.get() > nonSelectableOpacity) {
         	for (int i = 0; i < spheres.size(); i++) {
