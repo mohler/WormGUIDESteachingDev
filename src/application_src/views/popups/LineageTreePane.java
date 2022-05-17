@@ -198,8 +198,20 @@ public class LineageTreePane extends ScrollPane {
                         updateDrawing();
                     } else {
                         // reset the name to activate navigate3d in 3d cell window
-                        resetSelectedNameLabeled(sourceName);
                         timeProperty.set(((int) round(event.getY())) - movieTimeOffset - 11); //11 ot offset the increase on iymin
+                        try {
+
+            				Thread.sleep(100);
+
+            			} catch (InterruptedException e1) {
+
+            				// TODO Auto-generated catch block
+
+            				e1.printStackTrace();
+
+            			}
+
+                        resetSelectedNameLabeled(sourceName);
                     }
                 }
             }
@@ -399,7 +411,7 @@ public class LineageTreePane extends ScrollPane {
     }
 
     private void resetSelectedNameLabeled(final String name) {
-        selectedNameLabeledProperty.set("");
+//        selectedNameLabeledProperty.set("");
         if (name != null) {
             selectedNameLabeledProperty.set(name);
         }

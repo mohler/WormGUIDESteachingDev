@@ -39,6 +39,8 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -400,6 +402,7 @@ public class Window3DController {
     NamedNucleusSphere blinkingSphere;
     SceneElementMeshView blinkingSceneElementMeshView;
 	private String currentBlinkName;
+	protected boolean renderComplete;
     
     public Window3DController(
             final RootLayoutController rootLC, 
@@ -555,7 +558,66 @@ public class Window3DController {
                 String lineageName = newValue;
 
                 this.selectedNameProperty.set(lineageName);
+                
+ ////vvvvv     non-threaded steps of what is normally called by RenderService               
+				/////this is needed to allow scene to build before searching out named entities from the lineage map click the triggers this listener
+                
+				refreshScene();
+				
+				//render current time point
+				getSceneData();
+				addEntitiesAndNotes();
 
+				//render previous time points, AFTER current, so that their transparency transmits the current cells.
+				int loop = (int)numPrev.get();
+				//avoid index out of bound
+				int loop_end = timeProperty.get() - loop;
+				if (loop_end < 0) {
+					loop_end = 0;
+				}
+				for(int i = timeProperty.get() - 1; i > loop_end; --i) {
+					getCellSceneData(i);
+					addEntitiesNoNotesWithColorRule();
+				}
+
+				xform1.setTranslateZ(translateZProperty.get());
+				if (cumRotShiftCoords != null) {
+					for (Node content:xform1.getChildren()) {
+						double ctx = content.getTranslateX();
+						double cty = content.getTranslateY();
+						double ctz = content.getTranslateZ();
+						Point3D newTranslateCoords = new Point3D(ctx+cumRotShiftCoords.getX(), cty+cumRotShiftCoords.getY(), ctz-cumRotShiftCoords.getZ());
+
+						if (content.getTransforms().size() > 0) {
+							content.getTransforms().set(0, new Translate(newTranslateCoords.getX(), newTranslateCoords.getY(), newTranslateCoords.getZ())
+									.createConcatenation(content.getTransforms().get(0)));
+						} else {
+							content.getTransforms().add(new Translate(newTranslateCoords.getX(), newTranslateCoords.getY(), newTranslateCoords.getZ()));
+						}
+
+					}
+				}
+				xform2.setTranslateZ(600);
+				repositionNotes();
+
+				if (blinkingSceneElementMeshView != null && blinkingSceneElementMeshView.getColors() !=null && blinkingSceneElementMeshView.getColors().size() >0){
+					currentBlinkName = blinkingSceneElementMeshView.getCellName();
+					blinkingSceneElementMeshView.setMaterial(colorHash.getMaterial(blinkingSceneElementMeshView.getColors()));
+					//                    			blinkingSceneElementMeshView = null;
+					if (getMeshViewWithName(currentBlinkName) != null)
+						blinkingSceneElementMeshView = (SceneElementMeshView) getMeshViewWithName(currentBlinkName);
+				}
+
+				if (blinkingSphere != null && blinkingSphere.getColors() !=null && blinkingSphere.getColors().size() >0){
+					currentBlinkName = blinkingSphere.getCellName();
+					blinkingSphere.setMaterial(colorHash.getMaterial(blinkingSphere.getColors()));
+					//                    			blinkingSphere = null;
+					if (getEntityWithName(currentBlinkName) instanceof Sphere)
+						blinkingSphere = (NamedNucleusSphere) getSphereWithName(currentBlinkName);
+				}
+	////^^^^^^     non-threaded steps of what is normally called by RenderService    
+					/////this is needed to allow scene to build before searching out named entities from the lineage map click the triggers this listener
+				                
                 if (!allLabels.contains(lineageName)) {
                     allLabels.add(lineageName);
                 }
@@ -585,7 +647,7 @@ public class Window3DController {
                 insertLabelFor(lineageName, entity);
                 highlightActiveCellLabel(entity);
                 
-           		if (entity instanceof NamedNucleusSphere) {
+           		if (picked instanceof NamedNucleusSphere) {
 
             		if (blinkingSphere != null && blinkingSphere.getColors() !=null && blinkingSphere.getColors().size() >0){
             			blinkingSphere.setMaterial(colorHash.getMaterial(blinkingSphere.getColors()));
@@ -2208,7 +2270,8 @@ public class Window3DController {
      */
     public void buildScene() {
         // Spool thread for actual rendering to subscene
-        renderService.restart();
+    	renderService.restart();
+        	
     }
 
     private void getSceneData() {
@@ -3825,72 +3888,78 @@ public class Window3DController {
      * 4) adds previous time points if requested.
      */
     private final class RenderService extends Service<Void> {
-        @Override
+
+    	
+		@Override
         protected Task<Void> createTask() {
-            return new Task<Void>() {
+			return new Task<Void>() {
+
 
 				@Override
-                protected Void call() throws Exception {
-                    runLater(() -> {
-                        refreshScene();
+				protected Void call() throws Exception {
+					runLater(() -> {
+						refreshScene();
 
 
-                        //render current time point
-                        getSceneData();
-                        addEntitiesAndNotes();
+						//render current time point
+						getSceneData();
+						addEntitiesAndNotes();
 
-                        //render previous time points, AFTER current, so that their transparency transmits the current cells.
-                        int loop = (int)numPrev.get();
-                        //avoid index out of bound
-                        int loop_end = timeProperty.get() - loop;
-                        if (loop_end < 0) {
-                            loop_end = 0;
-                        }
-                        for(int i = timeProperty.get() - 1; i > loop_end; --i) {
-                            getCellSceneData(i);
-                            addEntitiesNoNotesWithColorRule();
-                        }
-                        
-                        xform1.setTranslateZ(translateZProperty.get());
-                        if (cumRotShiftCoords != null) {
-                        	for (Node content:xform1.getChildren()) {
-            					double ctx = content.getTranslateX();
-            					double cty = content.getTranslateY();
-            					double ctz = content.getTranslateZ();
-            					Point3D newTranslateCoords = new Point3D(ctx+cumRotShiftCoords.getX(), cty+cumRotShiftCoords.getY(), ctz-cumRotShiftCoords.getZ());
+						//render previous time points, AFTER current, so that their transparency transmits the current cells.
+						int loop = (int)numPrev.get();
+						//avoid index out of bound
+						int loop_end = timeProperty.get() - loop;
+						if (loop_end < 0) {
+							loop_end = 0;
+						}
+						for(int i = timeProperty.get() - 1; i > loop_end; --i) {
+							getCellSceneData(i);
+							addEntitiesNoNotesWithColorRule();
+						}
 
-                        		if (content.getTransforms().size() > 0) {
-                        			content.getTransforms().set(0, new Translate(newTranslateCoords.getX(), newTranslateCoords.getY(), newTranslateCoords.getZ())
-                        				.createConcatenation(content.getTransforms().get(0)));
-                        		} else {
-                        			content.getTransforms().add(new Translate(newTranslateCoords.getX(), newTranslateCoords.getY(), newTranslateCoords.getZ()));
-                        		}
+						xform1.setTranslateZ(translateZProperty.get());
+						if (cumRotShiftCoords != null) {
+							for (Node content:xform1.getChildren()) {
+								double ctx = content.getTranslateX();
+								double cty = content.getTranslateY();
+								double ctz = content.getTranslateZ();
+								Point3D newTranslateCoords = new Point3D(ctx+cumRotShiftCoords.getX(), cty+cumRotShiftCoords.getY(), ctz-cumRotShiftCoords.getZ());
 
-                        	}
-                        }
-                        xform2.setTranslateZ(600);
-                        repositionNotes();
+								if (content.getTransforms().size() > 0) {
+									content.getTransforms().set(0, new Translate(newTranslateCoords.getX(), newTranslateCoords.getY(), newTranslateCoords.getZ())
+											.createConcatenation(content.getTransforms().get(0)));
+								} else {
+									content.getTransforms().add(new Translate(newTranslateCoords.getX(), newTranslateCoords.getY(), newTranslateCoords.getZ()));
+								}
 
-                    		if (blinkingSceneElementMeshView != null && blinkingSceneElementMeshView.getColors() !=null && blinkingSceneElementMeshView.getColors().size() >0){
-                    			currentBlinkName = blinkingSceneElementMeshView.getCellName();
-                    			blinkingSceneElementMeshView.setMaterial(colorHash.getMaterial(blinkingSceneElementMeshView.getColors()));
-//                    			blinkingSceneElementMeshView = null;
-                    			if (getMeshViewWithName(currentBlinkName) != null)
-                    				blinkingSceneElementMeshView = (SceneElementMeshView) getMeshViewWithName(currentBlinkName);
-                    		}
-                    	
-                    		if (blinkingSphere != null && blinkingSphere.getColors() !=null && blinkingSphere.getColors().size() >0){
-                    			currentBlinkName = blinkingSphere.getCellName();
-                    			blinkingSphere.setMaterial(colorHash.getMaterial(blinkingSphere.getColors()));
-//                    			blinkingSphere = null;
-                    			if (getEntityWithName(currentBlinkName) instanceof Sphere)
-                    				blinkingSphere = (NamedNucleusSphere) getSphereWithName(currentBlinkName);
-                    		}
+							}
+						}
+						xform2.setTranslateZ(600);
+						repositionNotes();
 
-                    });
-                    return null;
-                }
-            };
+						if (blinkingSceneElementMeshView != null && blinkingSceneElementMeshView.getColors() !=null && blinkingSceneElementMeshView.getColors().size() >0){
+							currentBlinkName = blinkingSceneElementMeshView.getCellName();
+							blinkingSceneElementMeshView.setMaterial(colorHash.getMaterial(blinkingSceneElementMeshView.getColors()));
+							//                    			blinkingSceneElementMeshView = null;
+							if (getMeshViewWithName(currentBlinkName) != null)
+								blinkingSceneElementMeshView = (SceneElementMeshView) getMeshViewWithName(currentBlinkName);
+						}
+
+						if (blinkingSphere != null && blinkingSphere.getColors() !=null && blinkingSphere.getColors().size() >0){
+							currentBlinkName = blinkingSphere.getCellName();
+							blinkingSphere.setMaterial(colorHash.getMaterial(blinkingSphere.getColors()));
+							//                    			blinkingSphere = null;
+							if (getEntityWithName(currentBlinkName) instanceof Sphere)
+								blinkingSphere = (NamedNucleusSphere) getSphereWithName(currentBlinkName);
+						}
+						
+						renderComplete = true;
+
+
+					});
+					return null;
+				}
+			};
         }
     }
 
