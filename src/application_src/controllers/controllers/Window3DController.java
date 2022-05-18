@@ -260,7 +260,7 @@ public class Window3DController {
     private final DoubleProperty rotateZAngleProperty;
     private final DoubleProperty translateXProperty;
     private final DoubleProperty translateYProperty;
-    private final DoubleProperty translateZProperty;
+    public final DoubleProperty translateZProperty;
     private final IntegerProperty timeProperty;
     private final IntegerProperty totalNucleiProperty;
     private final double[] initialRotation;

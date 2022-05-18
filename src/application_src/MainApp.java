@@ -155,7 +155,22 @@ public class MainApp extends Application implements ObserveWormGUIDES {
             			}
             		} else  {
             			KeyCode code = event.getCode();
-            			if (code == KeyCode.RIGHT || code == KeyCode.LEFT) {
+            			if (code == KeyCode.UP || code == KeyCode.DOWN) {
+
+            	            double z = controller.getWindow3DController().translateZProperty.get();
+            	            if (code == KeyCode.UP ) {
+            	                // zoom out
+            	            	z = (z * 1.125);
+            	             } else if (code == KeyCode.DOWN) {
+            	                // zoom in
+            	             	z = (z / 1.125);
+            	            }
+            	            controller.getWindow3DController().translateZProperty.set(z);
+            	        
+
+
+
+            			} else if (code == KeyCode.RIGHT || code == KeyCode.LEFT) {
             				if(true) {
             					controller.setTimePropertyValue(controller.getTimeProperty().get() + (code == KeyCode.RIGHT?1:-1));
                         		event.consume();
