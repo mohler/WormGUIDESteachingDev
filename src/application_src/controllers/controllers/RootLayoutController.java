@@ -264,7 +264,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
     // Other windows
     private Stage aboutStage;
-    private Stage sulstonTreeStage;
+    public Stage sulstonTreeStage;
     private Stage urlDisplayStage;
     private Stage urlLoadStage;
     private Stage rotationControllerStage;
@@ -351,6 +351,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
     private ColorHash colorHash;
     private SubScene subscene;
     private Group rootEntitiesGroup;
+	public LineageTreePane treePane;
 
     @FXML
     public void menuLoadStory() {
@@ -392,7 +393,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
     public void viewTreeAction() {
         if (sulstonTreeStage == null) {
             sulstonTreeStage = new Stage();
-            final LineageTreePane treePane = new LineageTreePane(
+            treePane = new LineageTreePane(
                     sulstonTreeStage,
                     searchLayer,
                     lineageData,

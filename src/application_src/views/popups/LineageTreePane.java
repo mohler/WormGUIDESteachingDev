@@ -47,6 +47,7 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.Paint;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -123,22 +124,22 @@ public class LineageTreePane extends ScrollPane {
 
     private final int movieTimeOffset;
 
-    private final Map<String, Integer> nameXUseMap;
+    public final Map<String, Integer> nameXUseMap;
     private final Map<String, Integer> nameYStartUseMap;
-    private final List<String> hiddenNodes;
+    public final List<String> hiddenNodes;
     private final TreeItem<String> lineageTreeRoot;
     private final ColorHash colorHash;
     private final IntegerProperty timeProperty;
 
     private final ObservableList<Rule> rules;
-    private final AnchorPane mainPane;
+    public final AnchorPane mainPane;
     private final Group zoomGroup;
 
     /** Keeps track of the current x layout position */
     private int maxX = 0;
 
     // branch gap seems to be some multiple of this?
-    private Scale scaleTransform;
+    public Scale scaleTransform;
     private Line timeIndicatorBar;
     private Text timeIndicator;
     private int ttduration = 0;
@@ -147,13 +148,30 @@ public class LineageTreePane extends ScrollPane {
     private int xsc = 5;
     // left margin
     private int iXmax = 30;
-    private int iYmin = 30;  //testing 19
+    public int iYmin = 30;  //testing 19
 
     private boolean defaultEmbryoFlag;
     private AnnotationManager annotationManager;
 
     private ArrayList<String> currMatchCellNames;
+	public Ellipse pickedCellMarker;
 
+    public static void ensureVisible(ScrollPane pane, Node node, Scale scaleTransform) {
+        double width = pane.getContent().getBoundsInLocal().getWidth();
+        double height = pane.getContent().getBoundsInLocal().getHeight();
+
+        double x = node.getBoundsInParent().getMaxX();
+        double y = node.getBoundsInParent().getMaxY();
+
+        // scrolling values range from 0 to 1
+        pane.setVvalue(y*scaleTransform.getY()/height);
+        pane.setHvalue(x*scaleTransform.getX()/width);
+
+        // just for usability
+        node.requestFocus();
+    }
+
+	
     public LineageTreePane(
             final Stage ownStage,
             final SearchLayer searchLayer,
@@ -177,6 +195,18 @@ public class LineageTreePane extends ScrollPane {
 
         hiddenNodes = new ArrayList<>();
 
+
+        this.ownStage = requireNonNull(ownStage);
+
+        this.canvas = new AnchorPane();
+        this.mainPane = requireNonNull(canvas);
+        this.lineageData = requireNonNull(lineageData);
+        this.movieTimeOffset = movieTimeOffset;
+
+        this.timeProperty = requireNonNull(timeProperty);
+        this.timeProperty.addListener((observable, oldValue, newValue) -> repositionTimeLine());
+
+        this.annotationManager = annotationManager;
         clickHandler = event -> {
             final String sourceName = ((Node) event.getSource()).getId();
             if (sourceName != null && !sourceName.isEmpty()) {
@@ -198,36 +228,23 @@ public class LineageTreePane extends ScrollPane {
                         updateDrawing();
                     } else {
                         // reset the name to activate navigate3d in 3d cell window
+        				if (pickedCellMarker != null) {
+        					mainPane.getChildren().remove(pickedCellMarker);
+        				}
                         timeProperty.set(((int) round(event.getY())) - movieTimeOffset - 11); //11 ot offset the increase on iymin
-                        try {
-
-            				Thread.sleep(100);
-
-            			} catch (InterruptedException e1) {
-
-            				// TODO Auto-generated catch block
-
-            				e1.printStackTrace();
-
-            			}
-
+                        pickedCellMarker = new Ellipse(event.getX(), event.getY(), 5,5);
+                        pickedCellMarker.setFill(web("#ffffff00"));
+                        pickedCellMarker.setStroke(Color.MAGENTA);
+                        pickedCellMarker.setStrokeWidth(1);
+    					if (pickedCellMarker != null) {
+    						mainPane.getChildren().addAll(pickedCellMarker);
+    						pickedCellMarker.toBack();    	
+    					}
                         resetSelectedNameLabeled(sourceName);
                     }
                 }
             }
         };
-
-        this.ownStage = requireNonNull(ownStage);
-
-        this.canvas = new AnchorPane();
-        this.mainPane = requireNonNull(canvas);
-        this.lineageData = requireNonNull(lineageData);
-        this.movieTimeOffset = movieTimeOffset;
-
-        this.timeProperty = requireNonNull(timeProperty);
-        this.timeProperty.addListener((observable, oldValue, newValue) -> repositionTimeLine());
-
-        this.annotationManager = annotationManager;
 
         setUpDefaultView();
 
@@ -650,7 +667,7 @@ public class LineageTreePane extends ScrollPane {
                         .multiply(scontent.widthProperty().subtract(new ScrollPaneViewPortWidthBinding(s))));
     }
 
-    private void updateDrawing() {
+    public void updateDrawing() {
         // clear drawing
         mainPane.getChildren().clear();
         maxX = 0;
@@ -712,7 +729,7 @@ public class LineageTreePane extends ScrollPane {
             timeIndicator.setId("timeValue");
             mainPane.getChildren().addAll(timeIndicatorBar, timeIndicator);
             timeIndicatorBar.toBack();
-
+            
             drawTimeTicks();
         }
     }

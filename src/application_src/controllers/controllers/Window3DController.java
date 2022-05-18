@@ -69,6 +69,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Material;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Cylinder;
+import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.Shape3D;
@@ -94,6 +95,7 @@ import application_src.application_model.data.LineageData;
 import application_src.application_model.data.CElegansData.Connectome.Connectome;
 import application_src.controllers.layers.SearchLayer;
 import application_src.controllers.layers.StoriesLayer;
+import application_src.views.popups.LineageTreePane;
 import application_src.application_model.cell_case_logic.CasesLists;
 import application_src.application_model.annotation.color.Rule;
 import application_src.application_model.threeD.subscenegeometry.SceneElement;
@@ -138,6 +140,7 @@ import static javafx.scene.input.MouseEvent.MOUSE_RELEASED;
 import static javafx.scene.input.ScrollEvent.SCROLL;
 import static javafx.scene.layout.AnchorPane.setRightAnchor;
 import static javafx.scene.layout.AnchorPane.setTopAnchor;
+import static javafx.scene.paint.Color.BLACK;
 import static javafx.scene.paint.Color.RED;
 import static javafx.scene.paint.Color.WHITE;
 import static javafx.scene.paint.Color.web;
@@ -1382,6 +1385,36 @@ public class Window3DController {
                     			insertLabelFor(name, entity);
                     			highlightActiveCellLabel(entity); 
                     			currentBlinkName = name;
+                    			if (rootLC.treePane !=null) {
+                    				if (rootLC.treePane.pickedCellMarker != null) {
+                    					rootLC.treePane.mainPane.getChildren().remove(rootLC.treePane.pickedCellMarker);
+                    				}
+
+                    				if (rootLC.treePane.nameXUseMap.get(name) == null) {
+                    					String zapIt = "";
+                    					for (String hiddenRootName : rootLC.treePane.hiddenNodes) {
+                    						if (name.contains(hiddenRootName))
+                    							zapIt = hiddenRootName;
+                    					}
+                    					rootLC.treePane.hiddenNodes.remove(zapIt);
+                    					rootLC.treePane.updateDrawing();
+                    				} else {
+                    					//                    					rootLC.treePane.hiddenNodes.add(name);
+                    				}
+                    				if (rootLC.treePane.nameXUseMap.get(name) != null) {
+                    					rootLC.treePane.pickedCellMarker = new Ellipse(rootLC.treePane.nameXUseMap.get(name),  rootLC.treePane.iYmin + timeProperty.getValue(), 5,5);
+                    					rootLC.treePane.pickedCellMarker.setFill(web("#ffffff00"));
+                    					rootLC.treePane.pickedCellMarker.setStroke(Color.MAGENTA);
+                    					rootLC.treePane.pickedCellMarker.setStrokeWidth(1);
+                    					if (rootLC.treePane.pickedCellMarker != null) {
+                    						rootLC.treePane.mainPane.getChildren().addAll(rootLC.treePane.pickedCellMarker);
+                    						rootLC.treePane.pickedCellMarker.toBack();
+                    					}
+                    					LineageTreePane.ensureVisible(rootLC.treePane, rootLC.treePane.pickedCellMarker, rootLC.treePane.scaleTransform);
+                    				}
+                    			}
+                    			
+                     			
                     		}
                     		if (true) {
                         		if (blinkingSphere != null && blinkingSphere.getColors() !=null && blinkingSphere.getColors().size() >0){
