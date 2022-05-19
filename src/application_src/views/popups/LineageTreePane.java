@@ -569,19 +569,22 @@ public class LineageTreePane extends ScrollPane {
         //check if a match exist
         //check by lineage name
         TreeItem<String> targetnode = null;
+        String properName = name;
         targetnode = GenericLineageTree.getNodeWithName(name);
         //check by function name
         List<String> cellnamesbyfunc = getLineageNamesByFunctionalName(name);
         //check by description
         List<String> cellnamesbyDescip = getLineageNamesByDescription(name);
         if (targetnode != null) {
+        	
             System.out.println("Searched by lineage name.");
             //set current match cell name for highlighting
             currMatchCellNames.add(targetnode.getValue());
+            properName = targetnode.getValue();
             //show the cell and its ancestors
-            if(!hiddenNodes.contains(targetnode.getValue())) {
-                hiddenNodes.add(targetnode.getValue());
-            }
+//            if(!hiddenNodes.contains(targetnode.getValue())) {
+//                hiddenNodes.add(targetnode.getValue());
+//            }
             TreeItem<String> currnode = targetnode.getParent();
             while (currnode != null) {
                 if (hiddenNodes.contains(currnode.getValue())) {
@@ -592,6 +595,7 @@ public class LineageTreePane extends ScrollPane {
         } else if (cellnamesbyfunc.size() > 0 && lineageData.isSulstonMode()){
             System.out.println("Searched by function name.");
             for (String cname:cellnamesbyfunc) {
+            	properName = cname;
                 //add current match cell name for highlighting
                 if (GenericLineageTree.getNodeWithName(cname) != null) {
                     currMatchCellNames.add(cname);
@@ -608,6 +612,7 @@ public class LineageTreePane extends ScrollPane {
         } else if (cellnamesbyDescip.size() > 0 && lineageData.isSulstonMode()) {
             System.out.println("Searched by cell description.");
             for (String cname:cellnamesbyDescip) {
+            	properName = cname;
                 //add current match cell name for highlighting
                 if (GenericLineageTree.getNodeWithName(cname) != null) {
                     currMatchCellNames.add(cname);
@@ -625,6 +630,20 @@ public class LineageTreePane extends ScrollPane {
             System.out.println("No result found.");
         }
         updateDrawing();
+		if (pickedCellMarker != null) {
+			mainPane.getChildren().remove(pickedCellMarker);
+		}
+        timeProperty.set(((int) round(nameYStartUseMap.get(properName))) - movieTimeOffset - 11); //11 ot offset the increase on iymin
+        pickedCellMarker = new Ellipse(nameXUseMap.get(properName), nameYStartUseMap.get(properName), 5,5);
+        pickedCellMarker.setFill(web("#ffffff00"));
+        pickedCellMarker.setStroke(Color.MAGENTA);
+        pickedCellMarker.setStrokeWidth(1);
+		if (pickedCellMarker != null) {
+			mainPane.getChildren().addAll(pickedCellMarker);
+			pickedCellMarker.toBack();    	
+		}
+        resetSelectedNameLabeled(properName);
+
     }
 
     private void repositionTimeLine() {

@@ -1323,6 +1323,9 @@ public class Window3DController {
         System.out.printf("handleMouse%n");
         
         subscene.setOnMouseClicked(me -> {
+        	if (!me.isStillSincePress())
+        		return;
+        	
         	if(me.getClickCount() > 1) {
         		this.playingMovieProperty.set(!this.playingMovieProperty.get());
         	} else {
@@ -1570,9 +1573,19 @@ public class Window3DController {
                     selectedNameProperty.set("");
                 }
             }
+        	buildScene();
         });
         
         subscene.setOnMousePressed(me -> {
+            mouseStartPosX = me.getSceneX();
+            mouseStartPosY = me.getSceneY();
+            mousePosX = me.getSceneX();
+            mousePosY = me.getSceneY();
+            mouseOldX = me.getSceneX();
+            mouseOldY = me.getSceneY();
+        });
+
+        subscene.setOnMouseReleased(me -> {
             mouseStartPosX = me.getSceneX();
             mouseStartPosY = me.getSceneY();
             mousePosX = me.getSceneX();
@@ -2544,6 +2557,35 @@ public class Window3DController {
         // add cell and cell body geometries
         addEntities(entities);
         entities.sort(opacityComparator);
+        
+		if (blinkingSceneElementMeshView != null && blinkingSceneElementMeshView.getColors() !=null && blinkingSceneElementMeshView.getColors().size() >0){
+			currentBlinkName = blinkingSceneElementMeshView.getCellName();
+			blinkingSceneElementMeshView.setMaterial(colorHash.getMaterial(blinkingSceneElementMeshView.getColors()));
+			//                    			blinkingSceneElementMeshView = null;
+			if (getMeshViewWithName(currentBlinkName) != null) {
+				blinkingSceneElementMeshView = (SceneElementMeshView) getMeshViewWithName(currentBlinkName);
+				// set to load blinker first so all others are transparent to it.
+				entities.remove(blinkingSceneElementMeshView);
+				entities.add(0,blinkingSceneElementMeshView);
+				
+			}
+		}
+
+		if (blinkingSphere != null && blinkingSphere.getColors() !=null && blinkingSphere.getColors().size() >0){
+			currentBlinkName = blinkingSphere.getCellName();
+			blinkingSphere.setMaterial(colorHash.getMaterial(blinkingSphere.getColors()));
+			//                    			blinkingSphere = null;
+			if (getEntityWithName(currentBlinkName) instanceof Sphere) {
+				blinkingSphere = (NamedNucleusSphere) getSphereWithName(currentBlinkName);
+				// set to load blinker first so all others are transparent to it.
+				entities.remove(blinkingSphere);
+				entities.add(0,blinkingSphere);
+				
+			}
+		}
+		
+
+        
         xform1.getChildren().addAll(entities);
 
         // add notes
@@ -3970,22 +4012,6 @@ public class Window3DController {
 						xform2.setTranslateZ(600);
 						repositionNotes();
 
-						if (blinkingSceneElementMeshView != null && blinkingSceneElementMeshView.getColors() !=null && blinkingSceneElementMeshView.getColors().size() >0){
-							currentBlinkName = blinkingSceneElementMeshView.getCellName();
-							blinkingSceneElementMeshView.setMaterial(colorHash.getMaterial(blinkingSceneElementMeshView.getColors()));
-							//                    			blinkingSceneElementMeshView = null;
-							if (getMeshViewWithName(currentBlinkName) != null)
-								blinkingSceneElementMeshView = (SceneElementMeshView) getMeshViewWithName(currentBlinkName);
-						}
-
-						if (blinkingSphere != null && blinkingSphere.getColors() !=null && blinkingSphere.getColors().size() >0){
-							currentBlinkName = blinkingSphere.getCellName();
-							blinkingSphere.setMaterial(colorHash.getMaterial(blinkingSphere.getColors()));
-							//                    			blinkingSphere = null;
-							if (getEntityWithName(currentBlinkName) instanceof Sphere)
-								blinkingSphere = (NamedNucleusSphere) getSphereWithName(currentBlinkName);
-						}
-						
 						renderComplete = true;
 
 
