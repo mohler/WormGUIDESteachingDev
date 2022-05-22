@@ -41,7 +41,7 @@ public class ColorHash {
 
     private final Color othersColor = WHITE;
 
-    private final Map<Set<Color>, Material> trueMaterialHash;
+    private final Map<String, Material> trueMaterialHash;
     private final Map<Material, Double> opacityHash;
     private final Material highlightMaterial;
     private final Material translucentMaterial;
@@ -50,7 +50,7 @@ public class ColorHash {
     // Used for 'others' opacity
     private final HashMap<Double, Material> opacityMaterialHash;
 
-	private final Map<Set<Color>, Material> blinkMaterialHash;
+	private final Map<String, Material> blinkMaterialHash;
 
     public ColorHash() {
         trueMaterialHash = new HashMap<>();
@@ -134,7 +134,7 @@ public class ColorHash {
 //        return new PhongMaterial(web(colorString));
         List<Color> clist = new ArrayList<Color>();
         clist.add(web(colorString));
-        return getMaterial(clist);
+        return getMaterial(clist, clist.toString());
     }
 
     private Material makeMaterial(final Color color) {
@@ -223,31 +223,27 @@ public class ColorHash {
         return translucentMaterial;
     }
 
-    public Material getMaterial(final List<Color> colors) {
+    public Material getMaterial(final List<Color> colors, final String colorsString) {
         final Set<Color> colorSet = new HashSet<>();
         if (colors != null) {
             colorSet.addAll(colors);
         } 
-        if (!trueMaterialHash.containsKey(colorSet)) {
-            trueMaterialHash.put(colorSet, makeMaterial(colorSet));
+        if (!trueMaterialHash.containsKey(colorsString)) {
+            trueMaterialHash.put(colorsString, makeMaterial(colorSet));
         }
         
         final Set<Color> blinkColorSet = new HashSet<>();
         for (Color color:colors) {
         	blinkColorSet.add(color.darker().darker());
         }
-        if (!blinkMaterialHash.containsKey(colorSet)) {
-            blinkMaterialHash.put(colorSet, makeMaterial(blinkColorSet));
+        if (!blinkMaterialHash.containsKey(colorsString)) {
+            blinkMaterialHash.put(colorsString, makeMaterial(blinkColorSet));
         }
-        return trueMaterialHash.get(colorSet);
+        return trueMaterialHash.get(colorsString);
     }
 
-    public Material getBlinkMaterial(final List<Color> colors) {
-        final Set<Color> colorSet = new HashSet<>();
-        if (colors != null) {
-            colorSet.addAll(colors);
-        }
-        return blinkMaterialHash.get(colorSet);
+    public Material getBlinkMaterial(final List<Color> colors, final String colorsString) {
+        return blinkMaterialHash.get(colorsString);
     }
 
 }
