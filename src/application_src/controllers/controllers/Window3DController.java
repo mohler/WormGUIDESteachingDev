@@ -407,8 +407,8 @@ public class Window3DController {
 	private Runnable blinkRunner;
     ObservableList<NamedNucleusSphere> blinkingSpheres;
     ObservableList<SceneElementMeshView> blinkingSceneElementMeshViews;
-	private String currentBlinkName;
-	private String currentBlinkNameMeshViews;
+    ObservableList<String> currentBlinkNames;
+    ObservableList<String> currentBlinkNamesMeshViews;
 	protected boolean renderComplete;
 	private Runnable blinkRunnerMeshViews;
 	private ScheduledFuture schfutMeshViews;
@@ -542,14 +542,20 @@ public class Window3DController {
 
 			public void run()
 			{
-				if (blinkingSpheres.size()>0  && blinkingSpheres.get(0) != null) {
-					if (blinkOn){
-						blinkingSpheres.get(0).setMaterial(colorHash.getBlinkMaterial(blinkingSpheres.get(0).getColors()));
-						blinkOn = false;
-					} else {
-						blinkingSpheres.get(0).setMaterial(colorHash.getMaterial(blinkingSpheres.get(0).getColors()));
-						blinkOn =true;
-					}                        			
+				if (blinkingSpheres != null) {
+					if (blinkingSpheres.size()>0) {
+						if (blinkOn){
+							for (int b=0; b<blinkingSpheres.size(); b++)
+								if (blinkingSpheres.get(b) != null)
+									blinkingSpheres.get(b).setMaterial(colorHash.getBlinkMaterial(blinkingSpheres.get(b).getColors()));
+							blinkOn = false;
+						} else {
+							for (int b=0; b<blinkingSpheres.size(); b++)
+								if (blinkingSpheres.get(b) != null)
+									blinkingSpheres.get(b).setMaterial(colorHash.getMaterial(blinkingSpheres.get(b).getColors()));
+							blinkOn =true;
+						}                        			
+					}
 				}
 			}
 		};
@@ -574,7 +580,6 @@ public class Window3DController {
 
 		schfutMeshViews = blinkServiceMeshViews.scheduleAtFixedRate(blinkRunnerMeshViews, 0, 500, TimeUnit.MILLISECONDS);
 
-//		schfutMeshViews = blinkServiceMeshViews.scheduleAtFixedRate(blinkRunnerMeshViews, 0, 500, TimeUnit.MILLISECONDS);
 
         // set orientation indicator frames and rotation from production info
         keyFramesRotate = productionInfo.getKeyFramesRotate();
@@ -592,8 +597,9 @@ public class Window3DController {
         
         this.blinkingSceneElementMeshViews = FXCollections.observableArrayList();
         this.blinkingSpheres = FXCollections.observableArrayList();
-
-        
+        this.currentBlinkNames = FXCollections.observableArrayList();
+        this.currentBlinkNamesMeshViews = FXCollections.observableArrayList();
+       
         isCellSearchedFlags = new boolean[1];
         isMeshSearchedFlags = new boolean[1];
 
@@ -614,6 +620,8 @@ public class Window3DController {
                 String lineageName = newValue;
 
                 this.selectedNameProperty.set(lineageName);
+                this.currentBlinkNames.addAll(rootLC.treePane.currMatchCellNames);
+                this.allLabels.addAll(rootLC.treePane.currMatchCellNames);
                 
  ////vvvvv     non-threaded steps of what is normally called by RenderService               
 				/////this is needed to allow scene to build before searching out named entities from the lineage map click the triggers this listener
@@ -657,20 +665,30 @@ public class Window3DController {
 				repositionNotes();
 
 				if (blinkingSceneElementMeshViews.size()>0  && blinkingSceneElementMeshViews.get(0) != null && blinkingSceneElementMeshViews.get(0).getColors() !=null && blinkingSceneElementMeshViews.get(0).getColors().size() >0){
-					currentBlinkNameMeshViews = blinkingSceneElementMeshViews.get(0).getCellName();
-					blinkingSceneElementMeshViews.get(0).setMaterial(colorHash.getMaterial(blinkingSceneElementMeshViews.get(0).getColors()));
+					for (int b=0; b<blinkingSceneElementMeshViews.size(); b++) {
+						currentBlinkNamesMeshViews.add(0, blinkingSceneElementMeshViews.get(b).getCellName());
+						blinkingSceneElementMeshViews.get(b).setMaterial(colorHash.getMaterial(blinkingSceneElementMeshViews.get(b).getColors()));
+					}
 				}
 				blinkingSceneElementMeshViews.clear();
-				if (getMeshViewWithName(currentBlinkNameMeshViews) != null)
-					blinkingSceneElementMeshViews.add(0,  (SceneElementMeshView) getMeshViewWithName(currentBlinkNameMeshViews));
-
+				for (int n=0; n<currentBlinkNamesMeshViews.size(); n++) {
+					if (getMeshViewWithName(currentBlinkNamesMeshViews.get(n)) != null)
+						blinkingSceneElementMeshViews.add(0,  (SceneElementMeshView) getMeshViewWithName(currentBlinkNamesMeshViews.get(n)));
+				}
+				
 				if (blinkingSpheres.size()>0  && blinkingSpheres.get(0) != null && blinkingSpheres.get(0).getColors() !=null && blinkingSpheres.get(0).getColors().size() >0){
-					currentBlinkName = blinkingSpheres.get(0).getCellName();
-					blinkingSpheres.get(0).setMaterial(colorHash.getMaterial(blinkingSpheres.get(0).getColors()));
+					for (int b=0; b<blinkingSpheres.size(); b++) {
+						currentBlinkNames.add(0,blinkingSpheres.get(b).getCellName());
+						blinkingSpheres.get(b).setMaterial(colorHash.getMaterial(blinkingSpheres.get(b).getColors()));
+					}
 				}
 				blinkingSpheres.clear();
-				if (getEntityWithName(currentBlinkName) instanceof Sphere)
-					blinkingSpheres.add(0,  (NamedNucleusSphere) getSphereWithName(currentBlinkName));
+		        if (currentBlinkNames != null && currentBlinkNames.size() >0) {
+		        	for (int n=0; n<currentBlinkNames.size(); n++) {
+		        		if (getSphereWithName(currentBlinkNames.get(n)) != null)
+		        			blinkingSpheres.add(0,  (NamedNucleusSphere) getSphereWithName(currentBlinkNames.get(n)));
+		        	}
+		        }
 	////^^^^^^     non-threaded steps of what is normally called by RenderService    
 					/////this is needed to allow scene to build before searching out named entities from the lineage map click the triggers this listener
 				                
@@ -1400,21 +1418,33 @@ public class Window3DController {
 //                		schfut = blinkService.scheduleAtFixedRate(blinkRunner, 0, 500, TimeUnit.MILLISECONDS);
 
                     	
-                    	if (allLabels.contains(name)) {
+                    	if (currentBlinkNames.contains(name)) {
                     		removeLabelFor(name);
 //                			if (schfut != null) {
 //                				schfut.cancel(true);
 //                			}
-                    		if (blinkingSpheres.size()>0  && blinkingSpheres.get(0) != null && blinkingSpheres.get(0).getColors() !=null && blinkingSpheres.get(0).getColors().size() >0){
-                    			blinkingSpheres.get(0).setMaterial(colorHash.getMaterial(blinkingSpheres.get(0).getColors()));
+//                    		if (blinkingSpheres.size()>0  && blinkingSpheres.get(0) != null && blinkingSpheres.get(0).getColors() !=null && blinkingSpheres.get(0).getColors().size() >0){
+//                    			blinkingSpheres.get(0).setMaterial(colorHash.getMaterial(blinkingSpheres.get(0).getColors()));
+//                    		}
+//                    		blinkingSpheres.clear();
+//
+//                    		if (blinkingSceneElementMeshViews.size()>0  && blinkingSceneElementMeshViews.get(0) != null && blinkingSceneElementMeshViews.get(0).getColors() !=null && blinkingSceneElementMeshViews.get(0).getColors().size() >0){
+//                    			blinkingSceneElementMeshViews.get(0).setMaterial(colorHash.getMaterial(blinkingSceneElementMeshViews.get(0).getColors()));
+//                    		}
+//                    		blinkingSceneElementMeshViews.clear();
+                			currentBlinkNames.remove(name);
+                   			if (blinkingSpheres.size()>0  && blinkingSpheres.get(0) != null && blinkingSpheres.get(0).getColors() !=null && blinkingSpheres.get(0).getColors().size() >0){
+                    			for (int b=0; b<blinkingSpheres.size(); b++)
+                    				if (blinkingSpheres.get(b) != null)
+                    					blinkingSpheres.get(b).setMaterial(colorHash.getMaterial(blinkingSpheres.get(b).getColors()));
                     		}
                     		blinkingSpheres.clear();
-
-                    		if (blinkingSceneElementMeshViews.size()>0  && blinkingSceneElementMeshViews.get(0) != null && blinkingSceneElementMeshViews.get(0).getColors() !=null && blinkingSceneElementMeshViews.get(0).getColors().size() >0){
-                    			blinkingSceneElementMeshViews.get(0).setMaterial(colorHash.getMaterial(blinkingSceneElementMeshViews.get(0).getColors()));
-                    		}
-                    		blinkingSceneElementMeshViews.clear();
-                			currentBlinkName = "";
+                			if (currentBlinkNames != null && currentBlinkNames.size() >0 && getSphereWithName(currentBlinkNames.get(0)) !=null) {
+                				for (int n=0; n<currentBlinkNames.size(); n++) {
+                					if (getSphereWithName(currentBlinkNames.get(n)) != null && getSphereWithName(currentBlinkNames.get(n)) instanceof Sphere)
+                						blinkingSpheres.add(0,  (NamedNucleusSphere) getSphereWithName(currentBlinkNames.get(n)));
+                				}
+                			}
 
                     	} else {
                     		if (!allLabels.contains(name)) {
@@ -1423,51 +1453,66 @@ public class Window3DController {
                     			final Shape3D entity = getEntityWithName(name);
                     			insertLabelFor(name, entity);
                     			highlightActiveCellLabel(entity); 
-                    			currentBlinkName = name;
+                    			currentBlinkNames.add(name);
                     			if (rootLC.treePane !=null) {
-                    				if (rootLC.treePane.pickedCellMarker != null) {
-                    					rootLC.treePane.mainPane.getChildren().remove(rootLC.treePane.pickedCellMarker);
+                    				if (rootLC.treePane.pickedCellMarkers != null) {
+                    					rootLC.treePane.mainPane.getChildren().removeAll(rootLC.treePane.pickedCellMarkers);
+                    				} else {
+                    					rootLC.treePane.pickedCellMarkers = new ArrayList<Ellipse>();
                     				}
 
-                    				if (rootLC.treePane.nameXUseMap.get(name) == null) {
-                    					String zapIt = "";
-                    					for (String hiddenRootName : rootLC.treePane.hiddenNodes) {
-                    						if (name.contains(hiddenRootName))
-                    							zapIt = hiddenRootName;
+                    				for (String cbn:currentBlinkNames) {
+                    					if (rootLC.treePane.nameXUseMap.get(cbn) == null) {
+                    						String zapIt = "";
+                    						for (String hiddenRootName : rootLC.treePane.hiddenNodes) {
+                    							if (cbn.contains(hiddenRootName))
+                    								zapIt = hiddenRootName;
+                    						}
+                    						rootLC.treePane.hiddenNodes.remove(zapIt);
+                    						rootLC.treePane.updateDrawing();
+                    					} else {
+                    						//                    					rootLC.treePane.hiddenNodes.add(name);
                     					}
-                    					rootLC.treePane.hiddenNodes.remove(zapIt);
-                    					rootLC.treePane.updateDrawing();
-                    				} else {
-                    					//                    					rootLC.treePane.hiddenNodes.add(name);
-                    				}
-                    				if (rootLC.treePane.nameXUseMap.get(name) != null) {
-                    					rootLC.treePane.pickedCellMarker = new Ellipse(rootLC.treePane.nameXUseMap.get(name),  rootLC.treePane.iYmin + timeProperty.getValue(), 5,5);
-                    					rootLC.treePane.pickedCellMarker.setFill(web("#ffffff00"));
-                    					rootLC.treePane.pickedCellMarker.setStroke(Color.MAGENTA);
-                    					rootLC.treePane.pickedCellMarker.setStrokeWidth(1);
-                    					if (rootLC.treePane.pickedCellMarker != null) {
-                    						rootLC.treePane.mainPane.getChildren().addAll(rootLC.treePane.pickedCellMarker);
-                    						rootLC.treePane.pickedCellMarker.toBack();
+                    					if (rootLC.treePane.nameXUseMap.get(cbn) != null) {
+                    						rootLC.treePane.pickedCellMarkers.add(0, new Ellipse(rootLC.treePane.nameXUseMap.get(cbn),  rootLC.treePane.iYmin + timeProperty.getValue(), 5,5));
+                    						rootLC.treePane.pickedCellMarkers.get(0).setFill(web("#ffffff00"));
+                    						rootLC.treePane.pickedCellMarkers.get(0).setStroke(Color.MAGENTA);
+                    						rootLC.treePane.pickedCellMarkers.get(0).setStrokeWidth(1);
                     					}
-                    					LineageTreePane.ensureVisible(rootLC.treePane, rootLC.treePane.pickedCellMarker, rootLC.treePane.scaleTransform);
+                    					rootLC.treePane.mainPane.getChildren().clear();
+                    					for (int pcm=0; pcm<rootLC.treePane.pickedCellMarkers.size(); pcm++) {
+                    						if (rootLC.treePane.pickedCellMarkers.get(pcm) != null) {
+                    							rootLC.treePane.mainPane.getChildren().add(rootLC.treePane.pickedCellMarkers.get(pcm));
+                    							rootLC.treePane.pickedCellMarkers.get(pcm).toBack();
+                    						}
+                    					}
+                    					LineageTreePane.ensureVisible(rootLC.treePane, rootLC.treePane.pickedCellMarkers.get(0), rootLC.treePane.scaleTransform);
                     				}
                     			}
-                    			
-                     			
                     		}
-                    		if (true) {
-                        		if (blinkingSpheres.size()>0  && blinkingSpheres.get(0) != null && blinkingSpheres.get(0).getColors() !=null && blinkingSpheres.get(0).getColors().size() >0){
-                        			blinkingSpheres.get(0).setMaterial(colorHash.getMaterial(blinkingSpheres.get(0).getColors()));
-                        		}
-                        		blinkingSpheres.clear();
 
-                        		if (blinkingSceneElementMeshViews.size()>0  && blinkingSceneElementMeshViews.get(0) != null && blinkingSceneElementMeshViews.get(0).getColors() !=null && blinkingSceneElementMeshViews.get(0).getColors().size() >0){
-                        			blinkingSceneElementMeshViews.get(0).setMaterial(colorHash.getMaterial(blinkingSceneElementMeshViews.get(0).getColors()));
-                        		}
-                        		blinkingSceneElementMeshViews.clear();
-                    			
-                        		blinkingSpheres.add(0,  picked);
- 
+
+
+                    		if (true) {
+                    			if (blinkingSpheres.size()>0  && blinkingSpheres.get(0) != null && blinkingSpheres.get(0).getColors() !=null && blinkingSpheres.get(0).getColors().size() >0){
+                    				for (int b=0; b<blinkingSpheres.size(); b++)
+                    					if (blinkingSpheres.get(b) != null)
+                    						blinkingSpheres.get(b).setMaterial(colorHash.getMaterial(blinkingSpheres.get(b).getColors()));
+                    			}
+                    			blinkingSpheres.clear();
+
+                    			if (currentBlinkNames != null && currentBlinkNames.size() >0) {
+                    				for (int n=0; n<currentBlinkNames.size(); n++) {
+                    					if ( getSphereWithName(currentBlinkNames.get(n)) !=null)
+                    						blinkingSpheres.add(0,  (NamedNucleusSphere) getSphereWithName(currentBlinkNames.get(n)));
+                    				}
+                    			}
+
+                    			if (blinkingSceneElementMeshViews.size()>0  && blinkingSceneElementMeshViews.get(0) != null && blinkingSceneElementMeshViews.get(0).getColors() !=null && blinkingSceneElementMeshViews.get(0).getColors().size() >0){
+                    				blinkingSceneElementMeshViews.get(0).setMaterial(colorHash.getMaterial(blinkingSceneElementMeshViews.get(0).getColors()));
+                    			}
+                    			blinkingSceneElementMeshViews.clear();
+
                     		}
                     	}
                     }
@@ -1527,7 +1572,7 @@ public class Window3DController {
                             			blinkingSceneElementMeshViews.get(0).setMaterial(colorHash.getMaterial(blinkingSceneElementMeshViews.get(0).getColors()));
                             		}
                             		blinkingSceneElementMeshViews.clear();
-                        			currentBlinkName = "";
+                        			currentBlinkNamesMeshViews.clear();
 
                             	} else {
                             		if (!allLabels.contains(name)) {
@@ -1536,7 +1581,7 @@ public class Window3DController {
                             			final Shape3D entity = getEntityWithName(name);
                             			insertLabelFor(name, entity);
                             			highlightActiveCellLabel(entity);                               
-                            			currentBlinkName = name;
+                            			currentBlinkNamesMeshViews.add(name);
                             		}
                             		if (true) {
                                 		if (blinkingSpheres.size()>0  && blinkingSpheres.get(0) != null && blinkingSpheres.get(0).getColors() !=null && blinkingSpheres.get(0).getColors().size() >0){
@@ -1548,9 +1593,14 @@ public class Window3DController {
                                 			blinkingSceneElementMeshViews.get(0).setMaterial(colorHash.getMaterial(blinkingSceneElementMeshViews.get(0).getColors()));
                                 		}
                                 		blinkingSceneElementMeshViews.clear();
-                            			                                		
-                                		blinkingSceneElementMeshViews.add(0,  curr);
-
+                                		
+                                		currentBlinkNamesMeshViews.add(0,  curr.getCellName());
+                                        if (currentBlinkNamesMeshViews != null && currentBlinkNamesMeshViews.size() >0 && getSphereWithName(currentBlinkNamesMeshViews.get(0)) !=null) {
+                                        	for (int n=0; n<currentBlinkNamesMeshViews.size(); n++) {
+                                        		if ( getMeshViewWithName(currentBlinkNamesMeshViews.get(n)) !=null)
+                                        		blinkingSceneElementMeshViews.add(0,  (SceneElementMeshView) getMeshViewWithName(currentBlinkNamesMeshViews.get(n)));
+                                        	}
+                                        }                             		
                             		}
                             	}
                             }
@@ -2556,32 +2606,41 @@ public class Window3DController {
         entities.sort(opacityComparator);
 
         if (blinkingSceneElementMeshViews.size()>0  && blinkingSceneElementMeshViews.get(0) != null && blinkingSceneElementMeshViews.get(0).getColors() !=null && blinkingSceneElementMeshViews.get(0).getColors().size() >0){
-        	currentBlinkNameMeshViews = blinkingSceneElementMeshViews.get(0).getCellName();
-        	blinkingSceneElementMeshViews.get(0).setMaterial(colorHash.getMaterial(blinkingSceneElementMeshViews.get(0).getColors()));
+        	for (int b=0; b<blinkingSceneElementMeshViews.size(); b++) {
+        	blinkingSceneElementMeshViews.get(b).setMaterial(colorHash.getMaterial(blinkingSceneElementMeshViews.get(b).getColors()));
+        	}
         }
         blinkingSceneElementMeshViews.clear();
-        if (getMeshViewWithName(currentBlinkNameMeshViews) != null) {
-        	blinkingSceneElementMeshViews.add(0,  (SceneElementMeshView) getMeshViewWithName(currentBlinkNameMeshViews));
+        if (currentBlinkNamesMeshViews != null && currentBlinkNamesMeshViews.size() >0 && getSphereWithName(currentBlinkNamesMeshViews.get(0)) !=null) {
+        	for (int n=0; n<currentBlinkNamesMeshViews.size(); n++) {
+        		blinkingSceneElementMeshViews.add(0,  (SceneElementMeshView) getMeshViewWithName(currentBlinkNamesMeshViews.get(n)));
+        	}
         	// set to load blinker first so all others are transparent to it.
-        	entities.remove(blinkingSceneElementMeshViews.get(0));
-        	entities.add(0,blinkingSceneElementMeshViews.get(0));				
+        	for (int b=0; b<blinkingSceneElementMeshViews.size(); b++) {
+        		entities.remove(blinkingSceneElementMeshViews.get(b));
+        		entities.add(0,blinkingSceneElementMeshViews.get(b));
+        	}
         }
 
         if (blinkingSpheres.size()>0  && blinkingSpheres.get(0) != null && blinkingSpheres.get(0).getColors() !=null && blinkingSpheres.get(0).getColors().size() >0){
-        	currentBlinkName = blinkingSpheres.get(0).getCellName();
-        	blinkingSpheres.get(0).setMaterial(colorHash.getMaterial(blinkingSpheres.get(0).getColors()));
+        	for (int b=0; b<blinkingSpheres.size(); b++) {
+        		if (blinkingSpheres.get(b) != null)
+        			blinkingSpheres.get(b).setMaterial(colorHash.getMaterial(blinkingSpheres.get(b).getColors()));
+        	}
         }
         blinkingSpheres.clear();
-        if (getEntityWithName(currentBlinkName) instanceof Sphere) {
-        	blinkingSpheres.add(0,  (NamedNucleusSphere) getSphereWithName(currentBlinkName));
+        if (currentBlinkNames != null && currentBlinkNames.size() >0) {
+        	for (int n=0; n<currentBlinkNames.size(); n++) {
+        		if (getSphereWithName(currentBlinkNames.get(n)) != null)
+        			blinkingSpheres.add(0,  (NamedNucleusSphere) getSphereWithName(currentBlinkNames.get(n)));
+        	}
         	// set to load blinker first so all others are transparent to it.
-        	entities.remove(blinkingSpheres.get(0));
-        	entities.add(0,blinkingSpheres.get(0));
-
+        	for (int b=0; b<blinkingSpheres.size(); b++) {
+        		entities.remove(blinkingSpheres.get(b));
+        		entities.add(0,blinkingSpheres.get(b));
+        	}
         }
 
-
-        
         xform1.getChildren().addAll(entities);
 
         // add notes
