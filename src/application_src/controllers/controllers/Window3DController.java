@@ -659,18 +659,18 @@ public class Window3DController {
 				if (blinkingSceneElementMeshViews.size()>0  && blinkingSceneElementMeshViews.get(0) != null && blinkingSceneElementMeshViews.get(0).getColors() !=null && blinkingSceneElementMeshViews.get(0).getColors().size() >0){
 					currentBlinkNameMeshViews = blinkingSceneElementMeshViews.get(0).getCellName();
 					blinkingSceneElementMeshViews.get(0).setMaterial(colorHash.getMaterial(blinkingSceneElementMeshViews.get(0).getColors()));
-					blinkingSceneElementMeshViews.clear();
-					if (getMeshViewWithName(currentBlinkNameMeshViews) != null)
-						blinkingSceneElementMeshViews.add(0,  (SceneElementMeshView) getMeshViewWithName(currentBlinkNameMeshViews));
 				}
+				blinkingSceneElementMeshViews.clear();
+				if (getMeshViewWithName(currentBlinkNameMeshViews) != null)
+					blinkingSceneElementMeshViews.add(0,  (SceneElementMeshView) getMeshViewWithName(currentBlinkNameMeshViews));
 
 				if (blinkingSpheres.size()>0  && blinkingSpheres.get(0) != null && blinkingSpheres.get(0).getColors() !=null && blinkingSpheres.get(0).getColors().size() >0){
 					currentBlinkName = blinkingSpheres.get(0).getCellName();
 					blinkingSpheres.get(0).setMaterial(colorHash.getMaterial(blinkingSpheres.get(0).getColors()));
-					blinkingSpheres.clear();
-					if (getEntityWithName(currentBlinkName) instanceof Sphere)
-						blinkingSpheres.add(0,  (NamedNucleusSphere) getSphereWithName(currentBlinkName));
 				}
+				blinkingSpheres.clear();
+				if (getEntityWithName(currentBlinkName) instanceof Sphere)
+					blinkingSpheres.add(0,  (NamedNucleusSphere) getSphereWithName(currentBlinkName));
 	////^^^^^^     non-threaded steps of what is normally called by RenderService    
 					/////this is needed to allow scene to build before searching out named entities from the lineage map click the triggers this listener
 				                
@@ -2554,33 +2554,32 @@ public class Window3DController {
         // add cell and cell body geometries
         addEntities(entities);
         entities.sort(opacityComparator);
-        
-		if (blinkingSceneElementMeshViews.size()>0  && blinkingSceneElementMeshViews.get(0) != null && blinkingSceneElementMeshViews.get(0).getColors() !=null && blinkingSceneElementMeshViews.get(0).getColors().size() >0){
-			currentBlinkNameMeshViews = blinkingSceneElementMeshViews.get(0).getCellName();
-			blinkingSceneElementMeshViews.get(0).setMaterial(colorHash.getMaterial(blinkingSceneElementMeshViews.get(0).getColors()));
-			blinkingSceneElementMeshViews.clear();
-			if (getMeshViewWithName(currentBlinkNameMeshViews) != null) {
-				blinkingSceneElementMeshViews.add(0,  (SceneElementMeshView) getMeshViewWithName(currentBlinkNameMeshViews));
-				// set to load blinker first so all others are transparent to it.
-				entities.remove(blinkingSceneElementMeshViews.get(0));
-				entities.add(0,blinkingSceneElementMeshViews.get(0));
-				
-			}
-		}
 
-		if (blinkingSpheres.size()>0  && blinkingSpheres.get(0) != null && blinkingSpheres.get(0).getColors() !=null && blinkingSpheres.get(0).getColors().size() >0){
-			currentBlinkName = blinkingSpheres.get(0).getCellName();
-			blinkingSpheres.get(0).setMaterial(colorHash.getMaterial(blinkingSpheres.get(0).getColors()));
-			blinkingSpheres.clear();
-			if (getEntityWithName(currentBlinkName) instanceof Sphere) {
-				blinkingSpheres.add(0,  (NamedNucleusSphere) getSphereWithName(currentBlinkName));
-				// set to load blinker first so all others are transparent to it.
-				entities.remove(blinkingSpheres.get(0));
-				entities.add(0,blinkingSpheres.get(0));
-				
-			}
-		}
-		
+        if (blinkingSceneElementMeshViews.size()>0  && blinkingSceneElementMeshViews.get(0) != null && blinkingSceneElementMeshViews.get(0).getColors() !=null && blinkingSceneElementMeshViews.get(0).getColors().size() >0){
+        	currentBlinkNameMeshViews = blinkingSceneElementMeshViews.get(0).getCellName();
+        	blinkingSceneElementMeshViews.get(0).setMaterial(colorHash.getMaterial(blinkingSceneElementMeshViews.get(0).getColors()));
+        }
+        blinkingSceneElementMeshViews.clear();
+        if (getMeshViewWithName(currentBlinkNameMeshViews) != null) {
+        	blinkingSceneElementMeshViews.add(0,  (SceneElementMeshView) getMeshViewWithName(currentBlinkNameMeshViews));
+        	// set to load blinker first so all others are transparent to it.
+        	entities.remove(blinkingSceneElementMeshViews.get(0));
+        	entities.add(0,blinkingSceneElementMeshViews.get(0));				
+        }
+
+        if (blinkingSpheres.size()>0  && blinkingSpheres.get(0) != null && blinkingSpheres.get(0).getColors() !=null && blinkingSpheres.get(0).getColors().size() >0){
+        	currentBlinkName = blinkingSpheres.get(0).getCellName();
+        	blinkingSpheres.get(0).setMaterial(colorHash.getMaterial(blinkingSpheres.get(0).getColors()));
+        }
+        blinkingSpheres.clear();
+        if (getEntityWithName(currentBlinkName) instanceof Sphere) {
+        	blinkingSpheres.add(0,  (NamedNucleusSphere) getSphereWithName(currentBlinkName));
+        	// set to load blinker first so all others are transparent to it.
+        	entities.remove(blinkingSpheres.get(0));
+        	entities.add(0,blinkingSpheres.get(0));
+
+        }
+
 
         
         xform1.getChildren().addAll(entities);
