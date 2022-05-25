@@ -410,6 +410,11 @@ public class RootLayoutController extends BorderPane implements Initializable {
             sulstonTreeStage.setScene(new Scene(treePane));
             sulstonTreeStage.setTitle("LineageTree");
             sulstonTreeStage.initModality(NONE);
+            sulstonTreeStage.setOnCloseRequest(event -> {
+                System.out.println("Lineage is closing");
+	            sulstonTreeStage.hide();
+	            System.gc();
+            });
             sulstonTreeStage.show();
             treePane.addDrawing();
             mainStage.show();

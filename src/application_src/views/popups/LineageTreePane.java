@@ -637,7 +637,8 @@ public class LineageTreePane extends ScrollPane {
     		mainPane.getChildren().removeAll(pickedCellMarkers);
     		pickedCellMarkers.clear();;
     	}
-    	timeProperty.set(((int) round(nameYStartUseMap.get(currMatchCellNames.get(0)))) - movieTimeOffset - 11); //11 ot offset the increase on iymin
+    	if (currMatchCellNames != null && currMatchCellNames.size() >0)
+    		timeProperty.set(((int) round(nameYStartUseMap.get(currMatchCellNames.get(0)))) - movieTimeOffset - 11); //11 ot offset the increase on iymin
     	for (String cmcn:currMatchCellNames) {
     		pickedCellMarkers.add(0, new Ellipse(nameXUseMap.get(cmcn), nameYStartUseMap.get(cmcn), 5,5));
     		pickedCellMarkers.get(0).setFill(web("#ffffff00"));
