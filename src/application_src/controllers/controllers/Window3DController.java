@@ -366,6 +366,7 @@ public class Window3DController {
     private Pane spritesPane;
     /** Labels that exist in any of the timeProperty frames */
     private List<String> allLabels;
+    private List<List<String>> undoableLabels;
     /** Labels currently visible in the frame */
     private List<String> currentLabels;
     /** Label that shows up on hover */
@@ -622,6 +623,8 @@ public class Window3DController {
                 this.selectedNameProperty.set(lineageName);
                 this.currentBlinkNames.addAll(rootLC.treePane.currMatchCellNames);
                 this.allLabels.addAll(rootLC.treePane.currMatchCellNames);
+                this.undoableLabels.add(0, new ArrayList<String>());
+                this.undoableLabels.get(0).addAll(rootLC.treePane.currMatchCellNames);
                 
  ////vvvvv     non-threaded steps of what is normally called by RenderService               
 				/////this is needed to allow scene to build before searching out named entities from the lineage map click the triggers this listener
@@ -694,6 +697,8 @@ public class Window3DController {
 				                
                 if (!allLabels.contains(lineageName)) {
                     allLabels.add(lineageName);
+                    this.undoableLabels.add(0, new ArrayList<String>());
+                    this.undoableLabels.get(0).add(lineageName);
                 }
 
                 final Shape3D entity = getEntityWithName(lineageName);
@@ -856,6 +861,7 @@ public class Window3DController {
         calloutLineMap = new HashMap<>();
 
         allLabels = new ArrayList<>();
+        undoableLabels = new ArrayList<>();
         currentLabels = new ArrayList<>();
         entityLabelMap = new HashMap<>();
 
@@ -1091,6 +1097,13 @@ public class Window3DController {
         });
 
         requireNonNull(clearAllLabelsButton).setOnAction(getClearAllLabelsButtonListener());
+        requireNonNull(clearAllLabelsButton).setOnMouseClicked(new EventHandler<MouseEvent>() {  
+        	  @Override  
+        	  public void handle(MouseEvent event) {  
+        	    if (event.getClickCount()==2) {  
+        	    }  
+        	  }  
+        	});
         requireNonNull(cellNucleusCheckBox).selectedProperty().addListener(getCellNucleusTickListener());
         requireNonNull(cellBodyCheckBox).selectedProperty().addListener(getCellBodyTickListener());
         //requireNonNull(multiRadioBtn).selectedProperty().addListener(getMulticellModeListener());
@@ -1450,7 +1463,9 @@ public class Window3DController {
                     		if (!allLabels.contains(name)) {
                     			allLabels.add(name);
                     			currentLabels.add(name);
-                    			final Shape3D entity = getEntityWithName(name);
+                    			this.undoableLabels.add(0, new ArrayList<String>());
+                                this.undoableLabels.get(0).add(name);
+                                final Shape3D entity = getEntityWithName(name);
                     			insertLabelFor(name, entity);
                     			highlightActiveCellLabel(entity); 
                     			currentBlinkNames.add(name);
@@ -1578,7 +1593,9 @@ public class Window3DController {
                             		if (!allLabels.contains(name)) {
                             			allLabels.add(name);
                             			currentLabels.add(name);
-                            			final Shape3D entity = getEntityWithName(name);
+                            			this.undoableLabels.add(0, new ArrayList<String>());
+                                        this.undoableLabels.get(0).add(name);
+                                        final Shape3D entity = getEntityWithName(name);
                             			insertLabelFor(name, entity);
                             			highlightActiveCellLabel(entity);                               
                             			currentBlinkNamesMeshViews.add(name);
@@ -3935,11 +3952,16 @@ public class Window3DController {
     }
 
     private EventHandler<ActionEvent> getClearAllLabelsButtonListener() {
-        return event -> {
-            allLabels.clear();
-            currentLabels.clear();
-            buildScene();
-        };
+    	return event -> {
+    		List<String> lastSelection = this.undoableLabels.get(0);
+    		currentBlinkNames.removeAll(lastSelection);
+    		allLabels.removeAll(lastSelection);
+    		currentLabels.removeAll(lastSelection);
+    		undoableLabels.remove(lastSelection);
+
+    		buildScene();
+
+    	};
     }
 
     /**
