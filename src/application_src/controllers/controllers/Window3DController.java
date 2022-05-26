@@ -413,6 +413,7 @@ public class Window3DController {
 	protected boolean renderComplete;
 	private Runnable blinkRunnerMeshViews;
 	private ScheduledFuture schfutMeshViews;
+	ObservableList<String> searchModeHitLabels;
     
     public Window3DController(
             final RootLayoutController rootLC, 
@@ -547,13 +548,21 @@ public class Window3DController {
 					if (blinkingSpheres.size()>0) {
 						if (blinkOn){
 							for (int b=0; b<blinkingSpheres.size(); b++)
-								if (blinkingSpheres.get(b) != null)
-									blinkingSpheres.get(b).setMaterial(colorHash.getBlinkMaterial(blinkingSpheres.get(b).getColors()));
+								if (blinkingSpheres.get(b) != null) {
+									if (isInSearchMode && searchModeHitLabels.contains(blinkingSpheres.get(b).getCellName()))
+										blinkingSpheres.get(b).setMaterial(colorHash.getHighlightBlinkMaterial());
+									else
+										blinkingSpheres.get(b).setMaterial(colorHash.getBlinkMaterial(blinkingSpheres.get(b).getColors()));
+								}
 							blinkOn = false;
 						} else {
 							for (int b=0; b<blinkingSpheres.size(); b++)
-								if (blinkingSpheres.get(b) != null)
-									blinkingSpheres.get(b).setMaterial(colorHash.getMaterial(blinkingSpheres.get(b).getColors()));
+								if (blinkingSpheres.get(b) != null) {
+									if (isInSearchMode && searchModeHitLabels.contains(blinkingSpheres.get(b).getCellName()))
+										blinkingSpheres.get(b).setMaterial(colorHash.getHighlightMaterial());
+									else
+										blinkingSpheres.get(b).setMaterial(colorHash.getMaterial(blinkingSpheres.get(b).getColors()));
+								}
 							blinkOn =true;
 						}                        			
 					}
@@ -600,6 +609,7 @@ public class Window3DController {
         this.blinkingSpheres = FXCollections.observableArrayList();
         this.currentBlinkNames = FXCollections.observableArrayList();
         this.currentBlinkNamesMeshViews = FXCollections.observableArrayList();
+        this.searchModeHitLabels = FXCollections.observableArrayList();
        
         isCellSearchedFlags = new boolean[1];
         isMeshSearchedFlags = new boolean[1];
@@ -1432,7 +1442,7 @@ public class Window3DController {
 
                     	
                     	if (currentBlinkNames.contains(name)) {
-                    		removeLabelFor(name);
+//                    		removeLabelFor(name);
 //                			if (schfut != null) {
 //                				schfut.cancel(true);
 //                			}
@@ -1445,19 +1455,25 @@ public class Window3DController {
 //                    			blinkingSceneElementMeshViews.get(0).setMaterial(colorHash.getMaterial(blinkingSceneElementMeshViews.get(0).getColors()));
 //                    		}
 //                    		blinkingSceneElementMeshViews.clear();
-                			currentBlinkNames.remove(name);
-                   			if (blinkingSpheres.size()>0  && blinkingSpheres.get(0) != null && blinkingSpheres.get(0).getColors() !=null && blinkingSpheres.get(0).getColors().size() >0){
-                    			for (int b=0; b<blinkingSpheres.size(); b++)
-                    				if (blinkingSpheres.get(b) != null)
-                    					blinkingSpheres.get(b).setMaterial(colorHash.getMaterial(blinkingSpheres.get(b).getColors()));
-                    		}
-                    		blinkingSpheres.clear();
-                			if (currentBlinkNames != null && currentBlinkNames.size() >0 && getSphereWithName(currentBlinkNames.get(0)) !=null) {
-                				for (int n=0; n<currentBlinkNames.size(); n++) {
-                					if (getSphereWithName(currentBlinkNames.get(n)) != null && getSphereWithName(currentBlinkNames.get(n)) instanceof Sphere)
-                						blinkingSpheres.add(0,  (NamedNucleusSphere) getSphereWithName(currentBlinkNames.get(n)));
-                				}
-                			}
+//                			currentBlinkNames.remove(name);
+//                   			if (blinkingSpheres.size()>0  && blinkingSpheres.get(0) != null && blinkingSpheres.get(0).getColors() !=null && blinkingSpheres.get(0).getColors().size() >0){
+//                    			for (int b=0; b<blinkingSpheres.size(); b++)
+//                    				if (blinkingSpheres.get(b) != null)
+//                    					blinkingSpheres.get(b).setMaterial(colorHash.getMaterial(blinkingSpheres.get(b).getColors()));
+//                    		}
+//                    		blinkingSpheres.clear();
+//                			if (currentBlinkNames != null && currentBlinkNames.size() >0 && getSphereWithName(currentBlinkNames.get(0)) !=null) {
+//                				for (int n=0; n<currentBlinkNames.size(); n++) {
+//                					if (getSphereWithName(currentBlinkNames.get(n)) != null && getSphereWithName(currentBlinkNames.get(n)) instanceof Sphere)
+//                						blinkingSpheres.add(0,  (NamedNucleusSphere) getSphereWithName(currentBlinkNames.get(n)));
+//                				}
+//                			}
+                    		currentBlinkNames.remove(picked.getCellName());
+                    		allLabels.remove(picked.getCellName());
+                    		currentLabels.remove(picked.getCellName());
+                    		undoableLabels.remove(picked.getCellName());
+
+                    		buildScene();
 
                     	} else {
                     		if (!allLabels.contains(name)) {
@@ -2725,6 +2741,17 @@ public class Window3DController {
         final Material otherNucsMaterial = colorHash.getOtherNucleiMaterial(nucOpacityProperty.get());
         final ListIterator<String> iter = cellNames.listIterator();
         int index = -1;
+        if (isInSearchMode) {
+        	if (!undoableLabels.contains(searchModeHitLabels))
+        		undoableLabels.add(searchModeHitLabels);
+        	currentBlinkNames.removeAll(searchModeHitLabels);
+        	allLabels.removeAll(searchModeHitLabels);
+        	
+        	searchModeHitLabels.clear();
+        } else {
+        	currentBlinkNames.removeAll(searchModeHitLabels);
+        	allLabels.removeAll(searchModeHitLabels);
+        }
         while (iter.hasNext()) {
             final String cellName = iter.next();
             index++;
@@ -2743,13 +2770,18 @@ public class Window3DController {
             // if in search, do highlighting
             if (isInSearchMode) {
                 if (isCellSearchedFlags[index]) {
-                    material = colorHash.getHighlightMaterial();
+//                    material = colorHash.getHighlightMaterial();
+                	searchModeHitLabels.add(cellName);
+                	currentBlinkNames.add(cellName);
+                	allLabels.add(cellName);
+                	
                 } else {
-                    material = colorHash.getTranslucentMaterial();
-                    sphere.setDisable(true);
+//                    material = colorHash.getTranslucentMaterial();
+//                    sphere.setDisable(true);
                 }
-
-            } else {
+            } 
+            
+            if (true) {
                 // if not in search (flashlight mode), consult active list of rules
                 final List<Color> colors = new ArrayList<>();
                 for (Rule rule : rulesList) {
@@ -2789,6 +2821,9 @@ public class Window3DController {
                     sphere.setColors(colors);
                     material = colorHash.getMaterial(colors);
                }
+            }
+            if (isCellSearchedFlags[index]) {
+            	material = colorHash.getHighlightMaterial();
             }
             sphere.setMaterial(material);
 
@@ -2850,15 +2885,20 @@ public class Window3DController {
                 index++;
                 sceneElement = iter.next();
                 meshView = currentSceneElementMeshViews.get(index);
-
+                String sceneElementName = sceneElement.getSceneName();
+                
                 if (isInSearchMode) {
                     if (cellBodyTicked && isMeshSearchedFlags[index]) {
-                        meshView.setMaterial(colorHash.getHighlightMaterial());
+//                        meshView.setMaterial(colorHash.getHighlightMaterial());
+                    	currentBlinkNamesMeshViews.add(sceneElementName);
+                    	allLabels.add(sceneElementName);
+
                     } else {
-                        meshView.setMaterial(colorHash.getTranslucentMaterial());
-                        meshView.setDisable(true);
+//                        meshView.setMaterial(colorHash.getTranslucentMaterial());
+//                        meshView.setDisable(true);
                     }
-                } else {
+                } 
+                if (true) {
                     // in regular viewing mode
                     final List<String> structureCells = sceneElement.getAllCells();
                     final List<Color> colors = new ArrayList<>();
@@ -3953,6 +3993,8 @@ public class Window3DController {
 
     private EventHandler<ActionEvent> getClearAllLabelsButtonListener() {
     	return event -> {
+    		if(this.undoableLabels == null || undoableLabels.size() <1)
+    			return;
     		List<String> lastSelection = this.undoableLabels.get(0);
     		currentBlinkNames.removeAll(lastSelection);
     		allLabels.removeAll(lastSelection);

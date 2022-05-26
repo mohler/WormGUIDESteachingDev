@@ -44,6 +44,7 @@ public class ColorHash {
     private final Map<Set<Color>, Material> trueMaterialHash;
     private final Map<Material, Double> opacityHash;
     private final Material highlightMaterial;
+    private final Material highlightBlinkMaterial;
     private final Material translucentMaterial;
     private final Material noteMaterial;
 
@@ -61,6 +62,7 @@ public class ColorHash {
         makeOthersMaterial(1.0);
 
         highlightMaterial = makeMaterial(GOLD);
+        highlightBlinkMaterial = makeMaterial(GOLD.darker().darker());
         translucentMaterial = makeMaterial(web("#555555", 0.40));
         makeMaterial(WHITE);   //// why?
         noteMaterial = makeMaterial(web("#749bc9"));
@@ -218,6 +220,10 @@ public class ColorHash {
     public Material getHighlightMaterial() {
         return highlightMaterial;
     }
+	public Material getHighlightBlinkMaterial() {
+        return highlightBlinkMaterial;
+	}
+
 
     public Material getTranslucentMaterial() {
         return translucentMaterial;
@@ -249,5 +255,6 @@ public class ColorHash {
         }
         return blinkMaterialHash.get(colorSet);
     }
+
 
 }
