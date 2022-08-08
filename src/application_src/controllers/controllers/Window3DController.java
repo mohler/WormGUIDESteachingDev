@@ -1303,7 +1303,7 @@ public class Window3DController {
                     			for (int so = 0; so<rule.getOptions().length; so++)
                     				optionsString = optionsString + rule.getOptions()[so].name();
                     			                   	
-                    			String ruleString = "\n"+"• "+ rule.getSearchedText() + optionsString.replace("ANCESTOR", "<")
+                    			String ruleString = "\n"+"• "+ rule.getSearchedText() +" "+ optionsString.replace("ANCESTOR", "<")
                     																					.replace("CELL_NUCLEUS", "N")
                     																					.replace("DESCENDANT", ">");
                     			Text ruleText = new Text(ruleString);
