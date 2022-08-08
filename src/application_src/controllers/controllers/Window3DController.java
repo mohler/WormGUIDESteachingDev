@@ -105,6 +105,7 @@ import application_src.application_model.threeD.subscenegeometry.SceneElementsLi
 import application_src.application_model.threeD.subscenegeometry.StructureTreeNode;
 import application_src.application_model.resources.ProductionInfo;
 import application_src.application_model.resources.utilities.AppFont;
+import application_src.application_model.search.SearchConfiguration.SearchOption;
 import application_src.application_model.annotation.stories.Note;
 import application_src.application_model.annotation.stories.Note.Display;
 import application_src.application_model.annotation.color.ColorComparator;
@@ -167,6 +168,7 @@ import static application_src.application_model.annotation.stories.Note.Display.
 import static application_src.application_model.resources.utilities.AppFont.getBillboardFont;
 import static application_src.application_model.resources.utilities.AppFont.getOrientationIndicatorFont;
 import static application_src.application_model.resources.utilities.AppFont.getSpriteAndOverlayFont;
+import static application_src.application_model.resources.utilities.AppFont.getBolderFont;
 import static application_src.application_model.resources.utilities.AppFont.getFont;
 import static application_src.application_model.threeD.subsceneparameters.Parameters.getBillboardScale;
 import static application_src.application_model.threeD.subsceneparameters.Parameters.getCameraFarClip;
@@ -396,7 +398,7 @@ public class Window3DController {
 	private double oldrotate = 90;
 	private Point3D counterAxis;
 	private Group orientationIndicatorGroup;
-	private TextFlow transientLabelTextFlow;
+	private VBox transientLabelVBox;
 	private Point3D cumRotShiftCoords;
 	private Point3D cumShiftCoords;
 	private Point3D xform1Pivot;
@@ -1022,13 +1024,13 @@ public class Window3DController {
             }
         });
         if (defaultEmbryoFlag) {
-            this.tractOpacityProperty.setValue(getDefaultOthersOpacity());
+            this.tractOpacityProperty.setValue(0.15);
         } else {
             /*
              * if a non-default model has been loaded, set the opacity cutoff at the level where labels will
              * appear by default
              */
-            this.tractOpacityProperty.set(0.26);
+            this.tractOpacityProperty.set(0.15);
 
         }
 
@@ -1052,13 +1054,13 @@ public class Window3DController {
             }
         });
         if (defaultEmbryoFlag) {
-            this.structureOpacityProperty.setValue(getDefaultOthersOpacity());
+            this.structureOpacityProperty.setValue(0.15);
         } else {
             /*
              * if a non-default model has been loaded, set the opacity cutoff at the level where labels will
              * appear by default
              */
-            this.structureOpacityProperty.set(0.26);
+            this.structureOpacityProperty.set(0.15);
 
         }
 
@@ -1292,22 +1294,33 @@ public class Window3DController {
                     }
 					String fullTextString = /* ""+ (entity instanceof Sphere?"n":"")+ */ goName;
                     transientLabelText = new Text(fullTextString);
-                    transientLabelTextFlow = new TextFlow(transientLabelText);
+                    transientLabelVBox = new VBox(transientLabelText);
                     if (longForm) {
                     	for (Rule rule : rulesList) {
                     		//System.out.println("checking rule: " + rule.getSearchedText());
                     		if (rule.appliesToCellNucleus(name)) {
-                    			String ruleString = "\n"+"• "+rule.getSearchedText();
+                    			String optionsString = "";
+                    			for (int so = 0; so<rule.getOptions().length; so++)
+                    				optionsString = optionsString + rule.getOptions()[so].name();
+                    			                   	
+                    			String ruleString = "\n"+"• "+ rule.getSearchedText() + optionsString.replace("ANCESTOR", "<")
+                    																					.replace("CELL_NUCLEUS", "N")
+                    																					.replace("DESCENDANT", ">");
                     			Text ruleText = new Text(ruleString);
-                    			ruleText.setFill(rule.getColor());
+                    			ruleText.setFill(rule.getColor().invert());
                     			ruleText.setWrappingWidth(-1);
                     			ruleText.setOnMouseEntered(Event::consume);
                     			ruleText.setOnMouseClicked(Event::consume);
                     			ruleText.setDisable(true);
-                    			ruleText.setFont(getSpriteAndOverlayFont());
-                    			ruleText.setStrokeWidth(0.25);
+                    			ruleText.setFont(getBolderFont());
+                    			ruleText.setStrokeWidth(0.4);
                     			ruleText.setStroke(Color.BLACK);
-                    			transientLabelTextFlow.getChildren().add(ruleText);
+                    			TextFlow ruleTextFlow = new TextFlow(ruleText);
+                    			ruleTextFlow.setBackground(new Background(new BackgroundFill(Color.color(rule.getColor().getRed(), 
+                    																			rule.getColor().getGreen(), 
+                    																			rule.getColor().getBlue(),
+                    																			0.8), null, null)));
+                    			transientLabelVBox.getChildren().add(ruleTextFlow);
                     			//                            //System.out.println("rule applies to: " + cellName);
                     			//                            colors.add(web(rule.getColor().toString()));
                     			//                            // check if opacity of rule is below cutoff, then it's not selectable
@@ -1329,17 +1342,19 @@ public class Window3DController {
                     		- rootLC.modelAnchorPane.localToScreen(0,0).getY();
 
                     y -= getLabelSpriteYOffset();
-                    transientLabelTextFlow.getTransforms().add(new Translate(x+10, y+10));
-                    if (longForm) 
-                    	transientLabelTextFlow.setBackground(new Background(new BackgroundFill(Color.valueOf("0x88888888"), null, null)));
+                    transientLabelVBox.getTransforms().add(new Translate(x+10, y+10));
+//                    if (longForm) 
+//                    	transientLabelTextFlow.setBackground(new Background(new BackgroundFill(Color.valueOf("0x88888888"), null, null)));
+
                     // disable text to take away label flickering when mouse is on top top of it
                     transientLabelText.setDisable(true);
                     transientLabelText.setFont(getSpriteAndOverlayFont());
-                    transientLabelText.setStrokeWidth(0.25);
+                    transientLabelText.setStrokeWidth(0.5);
                     transientLabelText.setStroke(Color.BLACK);
                     transientLabelText.setFill(Color.WHITE);
 
-                    spritesPane.getChildren().add(transientLabelTextFlow);
+                    spritesPane.getChildren().add(transientLabelVBox);
+                    spritesPane.toFront();
                 }
 //            }
         }
@@ -1349,7 +1364,7 @@ public class Window3DController {
      * Removes transient label from sprites pane.
      */
     private void removeTransientLabel() {
-        spritesPane.getChildren().remove(transientLabelTextFlow);
+        spritesPane.getChildren().remove(transientLabelVBox);
     }
 
     /**

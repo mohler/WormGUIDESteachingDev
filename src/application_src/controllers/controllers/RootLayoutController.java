@@ -55,6 +55,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -130,8 +131,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
     @FXML
     private BorderPane rootBorderPane;
     @FXML
-    private VBox displayVBox;
-    @FXML AnchorPane modelAnchorPane;
+    private GridPane displayGridPane;
+    @FXML 
+    AnchorPane modelAnchorPane;
     @FXML
     private ScrollPane infoPane;
     @FXML
@@ -1034,7 +1036,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
      * Binds the widths and heights of components in the information panel below the subscene so that it scales nicely
      */
     private void sizeInfoPane() {
-        infoPane.prefHeightProperty().bind(displayVBox.heightProperty().divide(6.5));
+        infoPane.prefHeightProperty().bind(displayGridPane.heightProperty().divide(6.5));
         displayedDescription.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
         displayedStory.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
         displayedStoryDescription.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
@@ -1332,8 +1334,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
         colorAndDisplayTab = colorAndDisplayDragTab;
 
         mainTabPaneLeft.getTabs().add(storiesTab);
+        mainTabPaneLeft.toBack();
         mainTabPaneRight.getTabs().add(colorAndDisplayTab);
-//        mainTabPaneLeft.toFront();
+        mainTabPaneRight.toBack();
     }
 
     public IntegerProperty getTimeProperty() {
@@ -1449,8 +1452,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
         sizeInfoPane();
 
         initWindow3DController();
-
+        
         setLabels();
+
     }
 
     private void initSharedVariables() {

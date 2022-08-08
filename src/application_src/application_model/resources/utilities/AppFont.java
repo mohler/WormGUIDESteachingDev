@@ -11,6 +11,7 @@ import static javafx.scene.text.FontWeight.BOLD;
 import static javafx.scene.text.FontWeight.EXTRA_BOLD;
 import static javafx.scene.text.FontWeight.NORMAL;
 import static javafx.scene.text.FontWeight.SEMI_BOLD;
+import static javafx.scene.text.FontWeight.BLACK;  //STUPID NAME, but boldest...
 
 /**
  * Fonts used throughout the application
@@ -29,7 +30,7 @@ public class AppFont {
 
     private static final Font ORIENTATION_INDICATOR_FONT = font(SYSTEM, SEMI_BOLD, 12);
 
-    private static final Font SPRITE_AND_OVERLAY_FONT = font(SYSTEM, EXTRA_BOLD, 24);
+    private static final Font SPRITE_AND_OVERLAY_FONT = font(SYSTEM, BLACK, 24);
 
     public static Font getSpriteAndOverlayFont() {
         return SPRITE_AND_OVERLAY_FONT;
