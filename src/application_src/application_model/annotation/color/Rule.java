@@ -14,6 +14,7 @@ import application_src.application_model.data.OrganismDataType;
 import application_src.application_model.search.CElegansSearch.CElegansSearch;
 import application_src.application_model.search.CElegansSearch.CElegansSearchResults;
 import application_src.application_model.search.ModelSearch.ModelSpecificSearchOps.ModelSpecificSearchUtil;
+import application_src.application_model.search.ModelSearch.ModelSpecificSearchOps.StructuresSearch;
 import application_src.application_model.search.SearchConfiguration.SearchOption;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -529,6 +530,38 @@ public class Rule {
                 return false;
             }
         }
+        return false;
+    }
+
+    /**
+     * @param name
+     *         scene name of multicellular structure
+     *
+     * @return true if the rule is visible and it applies to multicellcular structure with the specified name, false
+     * otherwise
+     */
+    public boolean appliesToStructureWithSceneNameOrContent(String name) {
+    	if (visible /* && (isStructureRuleBySceneName() || isStructureRuleByHeading()) */) {
+    		if (!text.contains("'"))
+    			return false;
+    		final String structureName = text.substring(1, text.lastIndexOf("'"));
+    		if (isLineageName(name)) {
+    			// translate the rule's lineage name to its functional name because the rule itself uses
+    			// functional names for legibility
+    			name = getFunctionalNameByLineageName(name);
+    			return name.trim().toLowerCase().equals(structureName.toLowerCase());
+    		}
+
+    		List<String> cellsInQuery = StructuresSearch.getCellsInMulticellularStructure(name);
+    		for (String ruleCell : cells) {
+    			for (String queryCell: cellsInQuery) {
+    				if (queryCell.trim().toLowerCase().equals(ruleCell.toLowerCase())) {
+    					return true;
+    				}
+    			}
+    		}
+			return name.trim().toLowerCase().contains(structureName.toLowerCase());
+    	}
         return false;
     }
 

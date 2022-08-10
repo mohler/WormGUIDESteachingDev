@@ -1302,7 +1302,10 @@ public class Window3DController {
                     	for (Rule rule : rulesList) {
                     		//System.out.println("checking rule: " + rule.getSearchedText());
                     		if (rule.appliesToCellNucleus(name) || rule.appliesToCellBody(name)) {
-                    			directNameHitRules.add(rule);
+                    			if (directNameHitRules.contains(rule)) {
+                    				continue;
+                    			}                   				
+                     			directNameHitRules.add(rule);
                     			String optionsString = "";
                     			for (int so = 0; so<rule.getOptions().length; so++)
                     				optionsString = optionsString + rule.getOptions()[so].name();
@@ -1331,31 +1334,43 @@ public class Window3DController {
                     				entity.setDisable(true);
                     			}
                     		}
-                    		if (rule.appliesToStructureWithSceneName(name)) {
-                    			ArrayList<String> sceneNames = new ArrayList<String>();
-                    			sceneNames.add(name);
+                    		if (rule.appliesToStructureWithSceneNameOrContent(name)) {
+                    			if (directNameHitRules.contains(rule)) {
+                    				continue;
+                    			}                   				
+                    			directNameHitRules.add(rule);
+                    			ArrayList<String> containedNames = new ArrayList<String>();
+                    			containedNames.add(name);
                     			List<String> contentNames = StructuresSearch.getCellsInMulticellularStructure(name);
-                    			sceneNames.addAll(contentNames); 
-                    			for (String sceneName:sceneNames) {
+                    			containedNames.addAll(contentNames); 
+                    			for (String sceneName:containedNames) {
                     				boolean sceneTitleHit;
                     				Rule useRule = rule;
                     				
                     				if (getFunctionalNameByLineageName(sceneName) == null || getFunctionalNameByLineageName(sceneName).equals("")) {
                     					sceneTitleHit = true;
-                    				} else {
+                            		} else {
                     					sceneTitleHit = false;
-                                    	for (Rule assocRule: rulesList) {
-                                    		if (assocRule.appliesToCellNucleus(sceneName) || assocRule.appliesToCellBody(sceneName)) {
-                                    			if (directNameHitRules.contains(assocRule)) {
-                                    				continue;
-                                    			} else {
-                                    				useRule = assocRule;
-                                    			}
-                                    		} else {
-                                    			continue;                                    			
-                                    		}
-                                    	}
-                    				}
+                    					for (Rule assocRule: rulesList) {
+                    						if (!assocRule.isVisible()) {
+                    							continue;
+                    						}else {
+                    							if (assocRule.appliesToCellNucleus(sceneName) || assocRule.appliesToCellBody(sceneName)) {
+                    								if (directNameHitRules.contains(assocRule)) {
+                    									continue;
+                    								} else {
+                    									useRule = assocRule;
+                                            			directNameHitRules.add(useRule);
+                    								}
+                    							} else {
+                    								continue;                                    			
+                    							}
+                    						} 
+                    					}
+                    					if (useRule == rule) {
+                    						continue;
+                    					}
+                            		}
                     				String optionsString = "";
                     				for (int so = 0; so<useRule.getOptions().length; so++) {
                     					optionsString = optionsString + useRule.getOptions()[so].name();
@@ -1385,7 +1400,7 @@ public class Window3DController {
                     					entity.setDisable(true);
                     				}
                     			}
-                    			
+
                     		}
                     	}
                     }
