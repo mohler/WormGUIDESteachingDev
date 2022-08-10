@@ -519,10 +519,10 @@ public class Rule {
                     // functional names for legibility
                     name = getFunctionalNameByLineageName(name);
                 }
-                return structureName.equalsIgnoreCase(name.trim());
+                return name.trim().toLowerCase().contains(structureName.toLowerCase());
             } else if (isStructureRuleByHeading()) {
                 for (String structure : cells) {
-                    if (structure.equalsIgnoreCase(name.trim())) {
+                    if (name.trim().toLowerCase().contains(structureName.toLowerCase())) {
                         return true;
                     }
                 }
