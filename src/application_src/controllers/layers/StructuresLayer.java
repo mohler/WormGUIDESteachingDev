@@ -134,7 +134,8 @@ public class StructuresLayer {
             } else {
                 // otherwise add rule(s) for all structures in the search results
                 for (String string : searchStructuresResultsList) {
-                    annotationManager.addStructureRuleBySceneName(string, selectedColor);
+                	if (getLineageNamesByFunctionalName(string)==null || getLineageNamesByFunctionalName(string).size()==0)
+                		annotationManager.addStructureRuleBySceneName(string, selectedColor);
                 }
                 searchField.clear();
             }

@@ -105,6 +105,7 @@ import application_src.application_model.threeD.subscenegeometry.SceneElementsLi
 import application_src.application_model.threeD.subscenegeometry.StructureTreeNode;
 import application_src.application_model.resources.ProductionInfo;
 import application_src.application_model.resources.utilities.AppFont;
+import application_src.application_model.search.ModelSearch.ModelSpecificSearchOps.StructuresSearch;
 import application_src.application_model.search.SearchConfiguration.SearchOption;
 import application_src.application_model.annotation.stories.Note;
 import application_src.application_model.annotation.stories.Note.Display;
@@ -154,6 +155,7 @@ import static javafx.scene.transform.Rotate.Z_AXIS;
 import static com.sun.javafx.scene.CameraHelper.project;
 import static javax.imageio.ImageIO.write;
 import static application_src.application_model.data.CElegansData.PartsList.PartsList.getFunctionalNameByLineageName;
+import static application_src.application_model.data.CElegansData.PartsList.PartsList.getLineageNamesByFunctionalName;
 import static application_src.application_model.search.SearchConfiguration.SearchType.LINEAGE;
 import static application_src.application_model.search.SearchConfiguration.SearchType.NEIGHBOR;
 import static application_src.application_model.loaders.NoteImageLoader.createImageView;
@@ -1296,15 +1298,18 @@ public class Window3DController {
                     transientLabelText = new Text(fullTextString);
                     transientLabelVBox = new VBox(transientLabelText);
                     if (longForm) {
+                    	List<Rule> directNameHitRules = new ArrayList<Rule>();
                     	for (Rule rule : rulesList) {
                     		//System.out.println("checking rule: " + rule.getSearchedText());
-                    		if (rule.appliesToCellNucleus(name)) {
+                    		if (rule.appliesToCellNucleus(name) || rule.appliesToCellBody(name)) {
+                    			directNameHitRules.add(rule);
                     			String optionsString = "";
                     			for (int so = 0; so<rule.getOptions().length; so++)
                     				optionsString = optionsString + rule.getOptions()[so].name();
                     			                   	
                     			String ruleString = "\n"+"• "+ rule.getSearchedText() +" "+ optionsString.replace("ANCESTOR", "<")
                     																					.replace("CELL_NUCLEUS", "N")
+                    																					.replace("CELL_BODY", "C")
                     																					.replace("DESCENDANT", ">");
                     			Text ruleText = new Text(ruleString);
                     			ruleText.setFill(rule.getColor().invert());
@@ -1321,12 +1326,66 @@ public class Window3DController {
                     																			rule.getColor().getBlue(),
                     																			0.8), null, null)));
                     			transientLabelVBox.getChildren().add(ruleTextFlow);
-                    			//                            //System.out.println("rule applies to: " + cellName);
-                    			//                            colors.add(web(rule.getColor().toString()));
-                    			//                            // check if opacity of rule is below cutoff, then it's not selectable
+
                     			if (rule.getColor().getOpacity() <= getSelectabilityVisibilityCutoff()) {
                     				entity.setDisable(true);
                     			}
+                    		}
+                    		if (rule.appliesToStructureWithSceneName(name)) {
+                    			ArrayList<String> sceneNames = new ArrayList<String>();
+                    			sceneNames.add(name);
+                    			List<String> contentNames = StructuresSearch.getCellsInMulticellularStructure(name);
+                    			sceneNames.addAll(contentNames); 
+                    			for (String sceneName:sceneNames) {
+                    				boolean sceneTitleHit;
+                    				Rule useRule = rule;
+                    				
+                    				if (getFunctionalNameByLineageName(sceneName) == null || getFunctionalNameByLineageName(sceneName).equals("")) {
+                    					sceneTitleHit = true;
+                    				} else {
+                    					sceneTitleHit = false;
+                                    	for (Rule assocRule: rulesList) {
+                                    		if (assocRule.appliesToCellNucleus(sceneName) || assocRule.appliesToCellBody(sceneName)) {
+                                    			if (directNameHitRules.contains(assocRule)) {
+                                    				continue;
+                                    			} else {
+                                    				useRule = assocRule;
+                                    			}
+                                    		} else {
+                                    			continue;                                    			
+                                    		}
+                                    	}
+                    				}
+                    				String optionsString = "";
+                    				for (int so = 0; so<useRule.getOptions().length; so++) {
+                    					optionsString = optionsString + useRule.getOptions()[so].name();
+                    				}
+                    				String ruleString = "\n"+"• "+ useRule.getSearchedText() 
+                    												+(sceneTitleHit?"":" "+ optionsString.replace("ANCESTOR", "<")
+																										.replace("CELL_NUCLEUS", "N")
+																										.replace("CELL_BODY", "C")
+																										.replace("DESCENDANT", ">"));
+                    				Text ruleText = new Text(ruleString);
+                    				ruleText.setFill(useRule.getColor().invert());
+                    				ruleText.setWrappingWidth(-1);
+                    				ruleText.setOnMouseEntered(Event::consume);
+                    				ruleText.setOnMouseClicked(Event::consume);
+                    				ruleText.setDisable(true);
+                    				ruleText.setFont(getBolderFont());
+                    				ruleText.setStrokeWidth(0.4);
+                    				ruleText.setStroke(Color.BLACK);
+                    				TextFlow ruleTextFlow = new TextFlow(ruleText);
+                    				ruleTextFlow.setBackground(new Background(new BackgroundFill(Color.color(useRule.getColor().getRed(), 
+                    						useRule.getColor().getGreen(), 
+                    						useRule.getColor().getBlue(),
+                    						0.8), null, null)));
+                    				transientLabelVBox.getChildren().add(ruleTextFlow);
+
+                    				if (sceneTitleHit && useRule.getColor().getOpacity() <= getSelectabilityVisibilityCutoff()) {
+                    					entity.setDisable(true);
+                    				}
+                    			}
+                    			
                     		}
                     	}
                     }
