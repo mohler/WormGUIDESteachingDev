@@ -1310,10 +1310,20 @@ public class Window3DController {
                     			for (int so = 0; so<rule.getOptions().length; so++)
                     				optionsString = optionsString + rule.getOptions()[so].name();
                     			                   	
-                    			String ruleString = "\n"+"• "+ rule.getSearchedText() +" "+ optionsString.replace("ANCESTOR", "<")
-                    																					.replace("CELL_NUCLEUS", "N")
-                    																					.replace("CELL_BODY", "C")
-                    																					.replace("DESCENDANT", ">");
+                    			String ruleString = ("\n"+"• "+ rule.getSearchedText() +" "+ optionsString).replace("ANCESTOR", "<")
+																											.replace("CELL_NUCLEUS", "N")
+																											.replace("CELL_BODY", "C")
+																											.replace("DESCENDANT", ">")
+																											.replace("LINEAGE", "")
+																											.replace("Functional", "Func")
+																											.replace("\"PartsList\" Description", "PartDesc")
+																											.replace("Gene", "Gene")
+																											.replace("Connectome", "Cnx")
+																											.replace("Multicellular Structure Cells", "MCSc")
+																											.replace("Structure Scene Name", "MCSn")
+																											.replace("Structures Heading", "MCSh")
+																											.replace("Neighbor", "Nbr");
+                    			
                     			Text ruleText = new Text(ruleString);
                     			ruleText.setFill(rule.getColor().invert());
                     			ruleText.setWrappingWidth(-1);
