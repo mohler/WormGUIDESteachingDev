@@ -213,7 +213,7 @@ public class Rule {
     }
 
     public void resetLabel(final String labelText) {
-        graphic.resetLabel(labelText);
+        setSearchedText(labelText);
         graphic.setColorButton(color);
     }
 
@@ -645,7 +645,7 @@ public class Rule {
                     setOptions(editController.getOptions());
                 }
                 final String fullRuleString = toStringFull();
-                graphic.resetLabel(fullRuleString);
+                setSearchedText(getSearchedText());
                 graphic.resetTooltip(fullRuleString);
 
                 ruleChanged.set(true);
