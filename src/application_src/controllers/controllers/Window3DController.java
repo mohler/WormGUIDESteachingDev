@@ -1321,7 +1321,7 @@ public class Window3DController {
                     			ruleText.setOnMouseClicked(Event::consume);
                     			ruleText.setDisable(true);
                     			ruleText.setFont(getBolderFont());
-                    			ruleText.setStrokeWidth(0.4);
+                    			ruleText.setStrokeWidth(0.1);
                     			ruleText.setStroke(Color.BLACK);
                     			TextFlow ruleTextFlow = new TextFlow(ruleText);
                     			ruleTextFlow.setBackground(new Background(new BackgroundFill(Color.color(rule.getColor().getRed(), 
@@ -1387,7 +1387,7 @@ public class Window3DController {
                     				ruleText.setOnMouseClicked(Event::consume);
                     				ruleText.setDisable(true);
                     				ruleText.setFont(getBolderFont());
-                    				ruleText.setStrokeWidth(0.4);
+                    				ruleText.setStrokeWidth(0.1);
                     				ruleText.setStroke(Color.BLACK);
                     				TextFlow ruleTextFlow = new TextFlow(ruleText);
                     				ruleTextFlow.setBackground(new Background(new BackgroundFill(Color.color(useRule.getColor().getRed(), 

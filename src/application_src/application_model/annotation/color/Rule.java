@@ -206,12 +206,15 @@ public class Rule {
         visible = true;
 
         setColor(color);
+        resetLabel(searched);
+
         setSearchedText(searched);
         graphic.resetTooltip(toStringFull());
     }
 
     public void resetLabel(final String labelText) {
         graphic.resetLabel(labelText);
+        graphic.setColorButton(color);
     }
 
     /**
@@ -376,7 +379,25 @@ public class Rule {
     public void setSearchedText(final String name) {
         if (name != null) {
             text = name;
-            graphic.resetLabel(toStringFull());
+			String optionsString = "";
+			SearchOption[] options = getOptions();
+			for (int so = 0; so<options.length; so++)
+				optionsString = optionsString + options[so].name();
+			                   	
+			String ruleString = (text +" "+ optionsString).replace("ANCESTOR", "<")
+														.replace("CELL_NUCLEUS", "N")
+														.replace("CELL_BODY", "C")
+														.replace("DESCENDANT", ">")
+														.replace("LINEAGE", "")
+														.replace("Functional", "Func")
+														.replace("\"PartsList\" Description", "PartDesc")
+														.replace("Gene", "Gene")
+														.replace("Connectome", "Cnx")
+														.replace("Multicellular Structure Cells", "MCSc")
+														.replace("Structure Scene Name", "MCSn")
+														.replace("Structures Heading", "MCSh")
+														.replace("Neighbor", "Nbr");
+            graphic.resetLabel(ruleString);
         }
     }
 
@@ -560,7 +581,10 @@ public class Rule {
     				}
     			}
     		}
-			return name.trim().toLowerCase().contains(structureName.toLowerCase());
+    		if (structureName.length()>5)
+    			return name.trim().toLowerCase().contains(structureName.toLowerCase());
+    		else 
+    			return name.trim().toLowerCase().equals(structureName.toLowerCase());
     	}
         return false;
     }

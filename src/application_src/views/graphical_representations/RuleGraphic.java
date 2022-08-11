@@ -5,16 +5,20 @@
 package application_src.views.graphical_representations;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import application_src.application_model.annotation.color.Rule;
 import application_src.application_model.search.SearchConfiguration.SearchType;
 
@@ -26,11 +30,13 @@ import static javafx.scene.control.OverrunStyle.ELLIPSIS;
 import static javafx.scene.layout.Priority.ALWAYS;
 import static javafx.scene.layout.Priority.SOMETIMES;
 import static javafx.scene.paint.Color.LIGHTGREY;
+import static javafx.scene.paint.Color.web;
 
 import static application_src.application_model.loaders.IconImageLoader.getCloseIcon;
 import static application_src.application_model.loaders.IconImageLoader.getEditIcon;
 import static application_src.application_model.loaders.IconImageLoader.getEyeIcon;
 import static application_src.application_model.loaders.IconImageLoader.getEyeInvertIcon;
+import static application_src.application_model.resources.utilities.AppFont.getBolderFont;
 import static application_src.application_model.resources.utilities.AppFont.getFont;
 
 /**
@@ -41,8 +47,8 @@ public class RuleGraphic extends HBox {
     /** Length and width (in pixels) of color rule UI buttons */
     public static final int UI_SIDE_LENGTH = 22;
 
-    private final Label label;
-    private final Rectangle colorRectangle;
+    private final Button label;
+    private final Button colorRectangle;
     private final Button editBtn;
     private final Button visibleBtn;
     private final Button deleteBtn;
@@ -50,14 +56,18 @@ public class RuleGraphic extends HBox {
     private final ImageView eyeIcon;
     private final ImageView eyeIconInverted;
 
+	private Text lText;
+
+	private TextFlow lTextFlow;
+
     public RuleGraphic(final Rule rule, final BooleanProperty ruleChanged) {
         super();
 
         requireNonNull(rule);
         requireNonNull(ruleChanged);
 
-        label = new Label();
-        colorRectangle = new Rectangle(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
+        label = new Button();
+        colorRectangle = new Button();
         editBtn = new Button();
         visibleBtn = new Button();
         deleteBtn = new Button();
@@ -68,19 +78,38 @@ public class RuleGraphic extends HBox {
         setPrefWidth(275);
         setMinWidth(getPrefWidth());
 
+        
         label.setFont(getFont());
         label.setPrefHeight(UI_SIDE_LENGTH);
-        label.setMaxHeight(UI_SIDE_LENGTH);
+        label.setMaxHeight(UI_SIDE_LENGTH *5);
         label.setMinHeight(UI_SIDE_LENGTH);
         setHgrow(label, ALWAYS);
+        label.setPadding(EMPTY);
         label.textOverrunProperty().set(ELLIPSIS);
+        label.setOnAction(event -> rule.showEditStage(null));
+    	lText = new Text(rule.getSearchedText()); 				//Weird that this always receives null value, must be reset later...
+    	lTextFlow = new TextFlow(lText);
+		lText.setWrappingWidth(-1);
+		lText.setOnMouseEntered(Event::consume);
+		lText.setOnMouseClicked(Event::consume);
+		lText.setDisable(true);
+		lText.setFont(getBolderFont());
+		lText.setStrokeWidth(0.1);
+		lText.setStroke(Color.BLACK);
+		
+        label.setGraphic(lTextFlow);
 
         final Region r = new Region();
         setHgrow(r, SOMETIMES);
 
-        colorRectangle.setHeight(UI_SIDE_LENGTH);
-        colorRectangle.setWidth(UI_SIDE_LENGTH);
-        colorRectangle.setStroke(LIGHTGREY);
+        colorRectangle.setPrefSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
+        colorRectangle.setMaxSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
+        colorRectangle.setMinSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
+        colorRectangle.setContentDisplay(GRAPHIC_ONLY);
+        colorRectangle.setPadding(EMPTY);
+        colorRectangle.setBackground(new Background(new BackgroundFill(rule.getColor(), null, null)));
+        colorRectangle.setGraphicTextGap(0);
+        colorRectangle.setOnAction(event -> rule.showEditStage(null));
 
         editBtn.setPrefSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
         editBtn.setMaxSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
@@ -122,7 +151,7 @@ public class RuleGraphic extends HBox {
         	editBtn.setDisable(true);
         }
 
-        getChildren().addAll(label, r, colorRectangle, editBtn, visibleBtn, deleteBtn);
+		getChildren().addAll(label, r, /* colorRectangle, editBtn, */visibleBtn, deleteBtn);
     }
 
     /**
@@ -153,8 +182,9 @@ public class RuleGraphic extends HBox {
      *         color that the rectangle in the graphical representation of the rule should be changed to
      */
     public void setColorButton(final Color color) {
-        if (color != null) {
-            colorRectangle.setFill(color);
+        if (label.getGraphic() != null) {
+            lTextFlow.setBackground(new Background(new BackgroundFill(color, null, null)));
+    		lText.setFill(color.invert());
         }
     }
 
@@ -166,7 +196,7 @@ public class RuleGraphic extends HBox {
      */
     public void resetLabel(final String labelText) {
         if (labelText != null) {
-            label.setText(labelText);
+        	lText.setText(labelText);
         }
     }
 
