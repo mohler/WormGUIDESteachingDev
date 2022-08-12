@@ -6,6 +6,7 @@ package application_src.application_model.annotation.color;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -381,8 +382,13 @@ public class Rule {
             text = name;
 			String optionsString = "";
 			SearchOption[] options = getOptions();
+			String[] optNames = new String[options.length];
+			for (int o=0; o< optNames.length ;o++)
+				optNames[o] = options[o].name();
+			
+			Arrays.sort(optNames);
 			for (int so = 0; so<options.length; so++)
-				optionsString = optionsString + options[so].name();
+				optionsString = optionsString + optNames[so];
 			                   	
 			String ruleString = (text +" "+ optionsString).replace("ANCESTOR", "<")
 														.replace("CELL_NUCLEUS", "N")
@@ -444,7 +450,9 @@ public class Rule {
     }
 
     public SearchOption[] getOptions() {
-        return currentOptions.toArray(new SearchOption[currentOptions.size()]);
+    	SearchOption[] options = new SearchOption[currentOptions.size()];
+        options = currentOptions.toArray(options);
+        return options;
     }
 
     public void setOptions(final List<SearchOption> options) {

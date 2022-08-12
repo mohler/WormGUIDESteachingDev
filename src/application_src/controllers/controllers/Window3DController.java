@@ -11,6 +11,7 @@ import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1307,8 +1308,15 @@ public class Window3DController {
                     			}                   				
                      			directNameHitRules.add(rule);
                     			String optionsString = "";
-                    			for (int so = 0; so<rule.getOptions().length; so++)
-                    				optionsString = optionsString + rule.getOptions()[so].name();
+                    			SearchOption[] options = rule.getOptions();
+                    			String[] optNames = new String[options.length];
+                    			for (int o=0; o< optNames.length ;o++)
+                    				optNames[o] = options[o].name();
+                    			
+                    			Arrays.sort(optNames);
+                    			for (int so = 0; so<options.length; so++)
+                    				optionsString = optionsString + optNames[so];
+                    			                   	
                     			                   	
                     			String ruleString = ("\n"+"• "+ rule.getSearchedText() +" "+ optionsString).replace("ANCESTOR", "<")
 																											.replace("CELL_NUCLEUS", "N")
