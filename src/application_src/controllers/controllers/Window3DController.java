@@ -1334,6 +1334,18 @@ public class Window3DController {
                     			
                     			Text ruleText = new Text(ruleString);
                     			ruleText.setFill(rule.getColor().invert());
+                	    		String lTextFillString = ruleText.getFill().toString();
+//                				if (lTextFillString.matches(   "(0x[6-9].[6-9].[6-9]...)"
+//								+ "|(0x..[6-9].[6-9]...)"
+//								+ "|(0x[6-9].[6-9].....)"
+//								+ "|(0x[6-9]...[6-9]...)")) {
+                	    		int darknessSum= (Integer.parseInt(lTextFillString.substring(2, 4), 16))
+                	    				+(Integer.parseInt(lTextFillString.substring(4, 6), 16))
+                	    				+(Integer.parseInt(lTextFillString.substring(6, 8), 16));
+                	    		ruleText.setFill((darknessSum < 382/* ||color.getOpacity()>0.3 */)?Color.BLACK:Color.WHITE);
+//	}
+
+//}
                     			ruleText.setWrappingWidth(-1);
                     			ruleText.setOnMouseEntered(Event::consume);
                     			ruleText.setOnMouseClicked(Event::consume);
@@ -1400,6 +1412,18 @@ public class Window3DController {
 																										.replace("DESCENDANT", ">"));
                     				Text ruleText = new Text(ruleString);
                     				ruleText.setFill(useRule.getColor().invert());
+                    	    		String lTextFillString = ruleText.getFill().toString();
+//                    				if (lTextFillString.matches(   "(0x[6-9].[6-9].[6-9]...)"
+//									+ "|(0x..[6-9].[6-9]...)"
+//									+ "|(0x[6-9].[6-9].....)"
+//									+ "|(0x[6-9]...[6-9]...)")) {
+                    	    		int darknessSum= (Integer.parseInt(lTextFillString.substring(2, 4), 16))
+                    	    				+(Integer.parseInt(lTextFillString.substring(4, 6), 16))
+                    	    				+(Integer.parseInt(lTextFillString.substring(6, 8), 16));
+                    	    		ruleText.setFill((darknessSum < 382/* ||color.getOpacity()>0.3 */)?Color.BLACK:Color.WHITE);
+//		}
+
+//    }
                     				ruleText.setWrappingWidth(-1);
                     				ruleText.setOnMouseEntered(Event::consume);
                     				ruleText.setOnMouseClicked(Event::consume);

@@ -185,7 +185,18 @@ public class RuleGraphic extends HBox {
         if (label.getGraphic() != null) {
             lTextFlow.setBackground(new Background(new BackgroundFill(color, null, null)));
     		lText.setFill(color.invert());
-        }
+    		String lTextFillString = lText.getFill().toString();
+//			if (lTextFillString.matches(   "(0x[6-9].[6-9].[6-9]...)"
+//										+ "|(0x..[6-9].[6-9]...)"
+//										+ "|(0x[6-9].[6-9].....)"
+//										+ "|(0x[6-9]...[6-9]...)")) {
+				int darknessSum= (Integer.parseInt(lTextFillString.substring(2, 4), 16))
+								+(Integer.parseInt(lTextFillString.substring(4, 6), 16))
+								+(Integer.parseInt(lTextFillString.substring(6, 8), 16));
+				lText.setFill((darknessSum < 382/* ||color.getOpacity()>0.3 */)?Color.BLACK:Color.WHITE);
+			}
+
+//        }
     }
 
     /**
