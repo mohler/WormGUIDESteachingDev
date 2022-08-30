@@ -27,6 +27,8 @@ public class AppFont {
     private static final Font BOLDER_FONT = font(SYSTEM, EXTRA_BOLD, 14);
 
     private static final Font BILLBOARD_FONT = font(SYSTEM, SEMI_BOLD, 11);
+    
+    private static final Font CLICKED_CONTENT_LABEL_FONT = font(SYSTEM, SEMI_BOLD, 110); 
 
     private static final Font ORIENTATION_INDICATOR_FONT = font(SYSTEM, SEMI_BOLD, 12);
 
@@ -38,6 +40,10 @@ public class AppFont {
 
     public static Font getBillboardFont() {
         return BILLBOARD_FONT;
+    }
+
+    public static Font getClickedContentLabelFont() {
+        return CLICKED_CONTENT_LABEL_FONT;
     }
 
     public static Font getOrientationIndicatorFont() {

@@ -149,6 +149,7 @@ import static javafx.scene.paint.Color.RED;
 import static javafx.scene.paint.Color.WHITE;
 import static javafx.scene.paint.Color.web;
 import static javafx.scene.text.FontSmoothingType.LCD;
+import static javafx.scene.text.FontSmoothingType.GRAY;
 import static javafx.scene.transform.Rotate.X_AXIS;
 import static javafx.scene.transform.Rotate.Y_AXIS;
 import static javafx.scene.transform.Rotate.Z_AXIS;
@@ -169,6 +170,7 @@ import static application_src.application_model.annotation.stories.Note.Display.
 import static application_src.application_model.annotation.stories.Note.Display.OVERLAY;
 import static application_src.application_model.annotation.stories.Note.Display.SPRITE;
 import static application_src.application_model.resources.utilities.AppFont.getBillboardFont;
+import static application_src.application_model.resources.utilities.AppFont.getClickedContentLabelFont;
 import static application_src.application_model.resources.utilities.AppFont.getOrientationIndicatorFont;
 import static application_src.application_model.resources.utilities.AppFont.getSpriteAndOverlayFont;
 import static application_src.application_model.resources.utilities.AppFont.getBolderFont;
@@ -419,6 +421,7 @@ public class Window3DController {
 	private Runnable blinkRunnerMeshViews;
 	private ScheduledFuture schfutMeshViews;
 	ObservableList<String> searchModeHitLabels;
+	private double sceneOverallScale = 10;
     
     public Window3DController(
             final RootLayoutController rootLC, 
@@ -490,9 +493,9 @@ public class Window3DController {
         this.xform1 = new XformBox();
         this.xform2 = new XformBox();
         this.xform1Pivot = new Point3D(0,0,0);
-        this.offsetX = offsetX;
-        this.offsetY = offsetY;
-        this.offsetZ = offsetZ;
+        this.offsetX = offsetX * sceneOverallScale;
+        this.offsetY = offsetY * sceneOverallScale;
+        this.offsetZ = offsetZ * sceneOverallScale;
 
         this.startTime = startTime;
         this.endTime = endTime;
@@ -804,14 +807,10 @@ public class Window3DController {
         this.zoomProperty.set(getInitialZoom());
 //        this.zoomProperty.set(0.3);
         this.zoomProperty.addListener((observable, oldValue, newValue) -> {
-            xform1.setScaleX(zoomProperty.get());
-            xform1.setScaleY(zoomProperty.get());
-            xform1.setScaleZ(zoomProperty.get());
+            xform1.getTransforms().add(new Scale(zoomProperty.get(),zoomProperty.get(),zoomProperty.get()));
             repositionNotes();
         });
-        xform1.setScaleX(zoomProperty.get());
-        xform1.setScaleY(zoomProperty.get());
-        xform1.setScaleZ(zoomProperty.get());
+        xform1.getTransforms().add(new Scale(zoomProperty.get(),zoomProperty.get(),zoomProperty.get()));
 
         localSearchResults = new ArrayList<>();
 
@@ -851,7 +850,7 @@ public class Window3DController {
         this.translateYProperty.set(getInitialTranslateY());
         this.translateZProperty = requireNonNull(translateZProperty);
         this.translateZProperty.addListener(getTranslateZListener());
-        this.translateZProperty.set(getInitialTranslateZ());
+        this.translateZProperty.set(getInitialTranslateZ() * sceneOverallScale);
 
         this.colorHash = requireNonNull(colorHash);
         colorComparator = new ColorComparator();
@@ -2894,6 +2893,7 @@ public class Window3DController {
             } else {
                 radius = getSizeScale() * getUniformRadius();
             }
+            radius = radius *sceneOverallScale;
             final NamedNucleusSphere sphere = new NamedNucleusSphere(cellName, radius, null);
 
             // create the color material
@@ -2962,9 +2962,9 @@ public class Window3DController {
             sphere.getTransforms().addAll(rotateX, rotateY, rotateZ);
             final Double[] position = positions.get(index);
             sphere.getTransforms().add(new Translate(
-                    position[X_COR_INDEX] * xScale,
-                    position[Y_COR_INDEX] * yScale,
-                    position[Z_COR_INDEX] * zScale));
+                    position[X_COR_INDEX] * xScale*sceneOverallScale,
+                    position[Y_COR_INDEX] * yScale*sceneOverallScale,
+                    position[Z_COR_INDEX] * zScale*sceneOverallScale));
             sphere.getTransforms().add(new Rotate(90, sphere.getBoundsInLocal().getWidth()/2 
             											, sphere.getBoundsInLocal().getHeight()/2 
             											, sphere.getBoundsInLocal().getDepth()/2 
@@ -3120,6 +3120,7 @@ public class Window3DController {
                 } else {
                     meshView.setDisable(true);
                 }
+                meshView.getTransforms().add(new Scale(sceneOverallScale,sceneOverallScale,sceneOverallScale));
                 entities.add(meshView);
             }
         }
@@ -3170,6 +3171,7 @@ public class Window3DController {
                     } else {
                         radius = getSizeScale() * getUniformRadius();
                     }
+                    radius = radius *sceneOverallScale;
                     final NamedNucleusSphere sphere = new NamedNucleusSphere(cellName, radius, null);
 
                     colors.sort(colorComparator);
@@ -3190,9 +3192,9 @@ public class Window3DController {
                     sphere.getTransforms().addAll(rotateX, rotateY, rotateZ);
                     final Double[] position = positions.get(index);
                     sphere.getTransforms().add(new Translate(
-                            position[X_COR_INDEX] * xScale,
-                            position[Y_COR_INDEX] * yScale,
-                            position[Z_COR_INDEX] * zScale));
+                            position[X_COR_INDEX] * xScale*sceneOverallScale,
+                            position[Y_COR_INDEX] * yScale*sceneOverallScale,
+                            position[Z_COR_INDEX] * zScale*sceneOverallScale));
                     sphere.getTransforms().add(new Rotate(90, sphere.getBoundsInLocal().getWidth()/2 
 							, sphere.getBoundsInLocal().getHeight()/2 
 							, sphere.getBoundsInLocal().getDepth()/2 
@@ -3286,9 +3288,9 @@ public class Window3DController {
         final String funcName = getFunctionalNameByLineageName(name);
         final Text text;
         if (funcName != null) {
-            text = makeNoteSpriteText(funcName);
+            text = makeClickedContentTagText(funcName);
         } else {
-            text = makeNoteSpriteText(name);
+            text = makeClickedContentTagText(name);
         }
         text.setOnMouseEntered(event -> text.setCursor(HAND));
         text.setOnMouseExited(event -> text.setCursor(DEFAULT));
@@ -3702,6 +3704,18 @@ public class Window3DController {
         text.setWrappingWidth(getNoteSpriteTextWidth());
         return text;
     }
+
+    private Text makeClickedContentTagText(final String title) {
+        final Text text = new Text(title);
+
+        text.setFill(web(SPRITE_COLOR_HEX));
+        text.setSmooth(true);
+        text.setFontSmoothingType(LCD);
+        text.setWrappingWidth(storyOverlayVBox.getWidth());
+        text.setFont(getClickedContentLabelFont());
+        return text;
+    }
+
 
     /**
      * Creates the text for the orientation indicator
