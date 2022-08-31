@@ -4,6 +4,7 @@
 
 package application_src.views.graphical_representations;
 
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -11,6 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
@@ -19,6 +21,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import application_src.MainApp;
 import application_src.application_model.annotation.color.Rule;
 import application_src.application_model.search.SearchConfiguration.SearchType;
 
@@ -86,7 +89,20 @@ public class RuleGraphic extends HBox {
         setHgrow(label, ALWAYS);
         label.setPadding(EMPTY);
         label.textOverrunProperty().set(ELLIPSIS);
-        label.setOnAction(event -> rule.showEditStage(null));
+        label.setOnAction(event -> {
+        	Platform.runLater(new Runnable() {
+        	    @Override
+        	    public void run() {
+        	    	if (!MainApp.controller.getWindow3DController().blinkingRules.contains(rule))
+        	    		MainApp.controller.getWindow3DController().blinkingRules.add(rule);
+        	    	else
+        	    		MainApp.controller.getWindow3DController().blinkingRules.remove(rule);
+        	    }
+        	});        });
+        label.setOnMouseClicked(event -> {
+        	if (event.getButton() == MouseButton.SECONDARY)
+        		rule.showEditStage(null);
+        });
     	lText = new Text(rule.getSearchedText()); 				//Weird that this always receives null value, must be reset later...
     	lTextFlow = new TextFlow(lText);
 		lText.setWrappingWidth(-1);

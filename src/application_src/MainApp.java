@@ -47,7 +47,7 @@ public class MainApp extends Application implements ObserveWormGUIDES {
     private BorderPane rootLayout;
 
 
-    public  RootLayoutController controller;
+    public static  RootLayoutController controller;
     public  static int externallySetStartTime = -1;
     public  static IntegerProperty timePropertyMainApp = new SimpleIntegerProperty(1);
     public  static BooleanProperty isPlayButtonEnabled = new SimpleBooleanProperty(false);

@@ -77,7 +77,7 @@ public class Rule {
 
     private List<SearchOption> currentOptions;
     private List<SearchOption> previousOptions;
-    private BooleanProperty ruleChanged;
+    public BooleanProperty ruleChanged;
     private boolean visible;
     private Color color;
 
@@ -228,7 +228,7 @@ public class Rule {
      *         true if the visibility button should be blacked out, false otherwise. The visibility button is blacked
      *         out when the rule is not applied to the subscene entities
      */
-    private void blackOutVisibleButton(final boolean isBlackedOut) {
+    public void blackOutVisibleButton(final boolean isBlackedOut) {
         runLater(() -> graphic.blackOutVisibleButton(isBlackedOut));
     }
 
@@ -241,6 +241,8 @@ public class Rule {
     public void setVisible(final boolean isVisible) {
     	if (this.getSearchType() != SearchType.ALL_RULES_IN_LIST) {
     		visible = isVisible;
+			blackOutVisibleButton(!isVisible());
+			ruleChanged.set(true);
     	} else {
     		visible = isVisible;
     		if (annotationManager != null) {
@@ -248,7 +250,6 @@ public class Rule {
     				if (nextRule != this) {
     					nextRule.setVisible(isVisible());
     					nextRule.blackOutVisibleButton(!isVisible());
-    					nextRule.rebuildSubsceneFlag.set(true);
     					nextRule.ruleChanged.set(true);
     				}
     			}

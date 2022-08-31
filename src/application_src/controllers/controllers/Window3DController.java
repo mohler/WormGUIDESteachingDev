@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 //import com.interactivemesh.jfx.importer.obj.ObjModelImporter;
 import application_src.MainApp;
+import javafx.application.Platform;
 import javafx.beans.binding.DoubleExpression;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -409,7 +410,9 @@ public class Window3DController {
 	private Point3D xform1Pivot;
     private static ScheduledThreadPoolExecutor blinkService;
     private static ScheduledThreadPoolExecutor blinkServiceMeshViews;
+    private static ScheduledThreadPoolExecutor blinkServiceRules;
 	private ScheduledFuture schfut;
+	private ScheduledFuture schfutMeshViews;
 	private boolean blinkOn;
 	private boolean blinkOnMeshViews;
 	private Runnable blinkRunner;
@@ -419,7 +422,12 @@ public class Window3DController {
     ObservableList<String> currentBlinkNamesMeshViews;
 	protected boolean renderComplete;
 	private Runnable blinkRunnerMeshViews;
-	private ScheduledFuture schfutMeshViews;
+	private ScheduledFuture schfutRules;
+	private boolean blinkOnRules;
+	private Runnable blinkRunnerRules;
+    public ObservableList<Rule> blinkingRules;
+    ObservableList<String> currentBlinkRuleNames;
+	
 	ObservableList<String> searchModeHitLabels;
 	private double sceneOverallScale = 10;
     
@@ -548,6 +556,10 @@ public class Window3DController {
 			blinkServiceMeshViews = new ScheduledThreadPoolExecutor(1);
 		}
 
+		if (blinkServiceRules ==null){
+			blinkServiceRules = new ScheduledThreadPoolExecutor(1);
+		}
+
 		blinkRunner = new Runnable() {
 
 			public void run()
@@ -598,6 +610,45 @@ public class Window3DController {
 
 		schfutMeshViews = blinkServiceMeshViews.scheduleAtFixedRate(blinkRunnerMeshViews, 0, 500, TimeUnit.MILLISECONDS);
 
+		
+		blinkRunnerRules = new Runnable() {
+
+			public void run()
+			{
+				if (blinkingRules.size()>0  ) {
+					if (blinkOnRules){
+						for (int b=0; b<blinkingRules.size(); b++)
+							if (blinkingRules.get(b) != null) {
+								final int bFinal = b;
+								Platform.runLater(new Runnable() {
+								    @Override
+								    public void run() {
+								    	blinkingRules.get(bFinal).setVisible(blinkOnRules);	
+								    }
+								});
+							}
+
+						blinkOnRules = false;
+					} else {
+						for (int b=0; b<blinkingRules.size(); b++)
+							if (blinkingRules.get(b) != null) {
+								final int bFinal = b;
+								Platform.runLater(new Runnable() {
+								    @Override
+								    public void run() {
+								    	blinkingRules.get(bFinal).setVisible(blinkOnRules);	
+								    }
+								});
+							}
+
+						blinkOnRules = true;
+					}                        			
+				}
+			}
+		};
+
+		schfutRules = blinkServiceRules.scheduleAtFixedRate(blinkRunnerRules, 0, 500, TimeUnit.MILLISECONDS);
+
 
         // set orientation indicator frames and rotation from production info
         keyFramesRotate = productionInfo.getKeyFramesRotate();
@@ -615,6 +666,7 @@ public class Window3DController {
         
         this.blinkingSceneElementMeshViews = FXCollections.observableArrayList();
         this.blinkingSpheres = FXCollections.observableArrayList();
+        this.blinkingRules = FXCollections.observableArrayList();
         this.currentBlinkNames = FXCollections.observableArrayList();
         this.currentBlinkNamesMeshViews = FXCollections.observableArrayList();
         this.searchModeHitLabels = FXCollections.observableArrayList();
