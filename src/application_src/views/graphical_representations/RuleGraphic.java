@@ -96,7 +96,7 @@ public class RuleGraphic extends HBox {
 		lText.setFont(getBolderFont());
 		lText.setStrokeWidth(0.1);
 		lText.setStroke(Color.BLACK);
-		
+		label.setText(lText.getText());
         label.setGraphic(lTextFlow);
 
         final Region r = new Region();

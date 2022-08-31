@@ -4,6 +4,7 @@
 
 package application_src.application_model.annotation.color;
 
+import java.awt.Point;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -266,8 +267,12 @@ public class Rule {
             initEditStage(stage, rebuildSubsceneFlag);
         }
         editController.setHeading(graphic.getLabelText());
-        editStage.show();
         ((Stage) editStage.getScene().getWindow()).toFront();
+        Point mouse = java.awt.MouseInfo.getPointerInfo().getLocation();
+        
+        ((Stage) editStage.getScene().getWindow()).setX(mouse.x);
+        ((Stage) editStage.getScene().getWindow()).setY(mouse.y);
+        editStage.show();
     }
 
     /**
@@ -293,7 +298,7 @@ public class Rule {
                 node.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
             }
 
-            editStage.setTitle("Edit Rule");
+            editStage.setTitle("Edit Rule: "+text);
             if (stage != null) {
                 editStage.initOwner(stage);
             }
