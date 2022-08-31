@@ -41,7 +41,8 @@ import static java.util.stream.Collectors.toList;
 
 import static javafx.application.Platform.runLater;
 import static javafx.stage.Modality.NONE;
-
+import static javafx.stage.Modality.WINDOW_MODAL;
+import static javafx.stage.Modality.APPLICATION_MODAL;
 
 
 import static application_src.application_model.data.CElegansData.PartsList.PartsList.getFunctionalNameByLineageName;
@@ -302,7 +303,7 @@ public class Rule {
             if (stage != null) {
                 editStage.initOwner(stage);
             }
-            editStage.initModality(NONE);
+            editStage.initModality(APPLICATION_MODAL);
 
             editController.setHeading(text);
             editController.setSubmitHandler(submitHandler);
