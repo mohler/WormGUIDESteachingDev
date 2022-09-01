@@ -202,8 +202,8 @@ public class RuleGraphic extends HBox {
      */
     public void setColorButton(final Color color) {
         if (label.getGraphic() != null) {
-            lTextFlow.setBackground(new Background(new BackgroundFill(color, null, null)));
-    		lText.setFill(color.invert());
+            lTextFlow.setBackground(new Background(new BackgroundFill(color!=null?color:Color.WHITE, null, null)));
+    		lText.setFill(color!=null?color.invert():Color.BLACK);
     		String lTextFillString = lText.getFill().toString();
 //			if (lTextFillString.matches(   "(0x[6-9].[6-9].[6-9]...)"
 //										+ "|(0x..[6-9].[6-9]...)"

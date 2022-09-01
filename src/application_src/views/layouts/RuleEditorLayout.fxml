@@ -15,6 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
+<?import javafx.scene.control.Slider?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="AnchorPane" xmlns="http://javafx.com/javafx/8">
    <children>
       <VBox layoutX="26.0" layoutY="62.0" spacing="5.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -100,6 +101,15 @@
             <Region maxWidth="1.7976931348623157E308" prefHeight="0.0" />
             <ColorPicker fx:id="colorPicker" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="70.0" />
             <Region layoutX="20.0" layoutY="172.0" maxWidth="1.7976931348623157E308" prefHeight="0.0" />
+            
+            <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Transparency of Paint:">
+			    <font>
+			        <Font size="14.0" />
+			    </font>
+			</Label>
+			<Slider fx:id="opacitySlider" minorTickCount="5" value="100" VBox.vgrow="ALWAYS" />
+        
+            
             <HBox maxWidth="1.7976931348623157E308">
                <children>
                   <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />

@@ -134,7 +134,7 @@ public class Rule {
         ruleChanged.addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 if (editController != null) {
-                    graphic.setColorButton(editController.getColor());
+                    graphic.setColorButton(this.getColor());
                 }
 
                 // if the ancestors or descendants options change, we need to rerun the search
@@ -309,6 +309,7 @@ public class Rule {
             editController.setHeading(text);
             editController.setSubmitHandler(submitHandler);
             editController.setColor(color);
+            editController.opacitySlider.setValue(color.getOpacity()*100);
             editController.setCellTicked(isCellSelected());
             editController.setCellBodyTicked(isCellBodySelected());
             editController.setAncestorsTicked(isAncestorSelected());
@@ -427,8 +428,13 @@ public class Rule {
      */
     public void setColor(final Color color) {
         if (color != null) {
-            this.color = color;
-            graphic.setColorButton(color);
+        	if (editController != null)
+        		this.color = new Color(color.getRed(), color.getGreen(), color.getBlue(), editController.opacitySlider.getValue()/100);
+        	else
+        		this.color = color;
+        	if (this.getSearchType() == SearchType.ALL_RULES_IN_LIST) {
+        		this.graphic.setColorButton(this.color);
+        	}
         }
     }
 
@@ -650,21 +656,39 @@ public class Rule {
     private class SubmitHandler implements EventHandler<ActionEvent> {
         @Override
         public void handle(ActionEvent event) {
-            if (editController != null) {
-                setColor(editController.getColor());
-                editStage.hide();
+        	if (Rule.this.getSearchType() != SearchType.ALL_RULES_IN_LIST) {
+        		if (editController != null) {
+        			setColor(editController.getColor());
+        			editStage.hide();
 
-                // because the multicellular name based rule is not a check option, we need to override this function
-                // to avoid overwriting the multicellular search option
-                if (searchType != STRUCTURE_BY_SCENE_NAME) {
-                    setOptions(editController.getOptions());
-                }
-                final String fullRuleString = toStringFull();
-                setSearchedText(getSearchedText());
-                graphic.resetTooltip(fullRuleString);
+        			// because the multicellular name based rule is not a check option, we need to override this function
+        			// to avoid overwriting the multicellular search option
+        			if (searchType != STRUCTURE_BY_SCENE_NAME) {
+        				setOptions(editController.getOptions());
+        			}
+        			final String fullRuleString = toStringFull();
+        			setSearchedText(getSearchedText());
+        			graphic.resetTooltip(fullRuleString);
 
-                ruleChanged.set(true);
-            }
+        			ruleChanged.set(true);
+        		}
+        	} else {
+        		if (annotationManager != null) {
+        			for (Rule nextRule:annotationManager.getRulesList()) {
+        				if (nextRule != Rule.this) {
+        					if (editController.getColor() == Color.BLACK) {
+        						nextRule.editController = Rule.this.editController;
+        						nextRule.setColor(nextRule.getColor());
+        					} else {
+        						nextRule.setColor(editController.getColor());
+        					}
+        					nextRule.ruleChanged.set(true);
+        				}
+        			}
+        		}
+    			editStage.hide();
+
+        	}
         }
     }
 }
