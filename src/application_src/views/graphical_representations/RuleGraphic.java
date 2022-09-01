@@ -91,14 +91,17 @@ public class RuleGraphic extends HBox {
         label.textOverrunProperty().set(ELLIPSIS);
         label.setOnAction(event -> {
         	Platform.runLater(new Runnable() {
-        	    @Override
-        	    public void run() {
-        	    	if (!MainApp.controller.getWindow3DController().blinkingRules.contains(rule))
-        	    		MainApp.controller.getWindow3DController().blinkingRules.add(rule);
-        	    	else
-        	    		MainApp.controller.getWindow3DController().blinkingRules.remove(rule);
-        	    }
-        	});        });
+        		@Override
+        		public void run() {
+        			if (!MainApp.controller.getWindow3DController().blinkingRules.contains(rule)) {
+        				MainApp.controller.getWindow3DController().blinkingRules.add(rule);
+        			}else {
+        				MainApp.controller.getWindow3DController().blinkingRules.remove(rule);
+        				rule.setVisible(true);
+        			}
+        		}
+        	});        
+        });
         label.setOnMouseClicked(event -> {
         	if (event.getButton() == MouseButton.SECONDARY)
         		rule.showEditStage(null);
