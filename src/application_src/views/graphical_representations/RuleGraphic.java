@@ -81,11 +81,16 @@ public class RuleGraphic extends HBox {
         setPrefWidth(275);
         setMinWidth(getPrefWidth());
 
-        
+        colorRectangle.setPrefSize(150, UI_SIDE_LENGTH);
+        colorRectangle.setMaxSize(500, UI_SIDE_LENGTH);
+        colorRectangle.setMinSize(150, UI_SIDE_LENGTH);
+        colorRectangle.setContentDisplay(GRAPHIC_ONLY);
+        colorRectangle.setPadding(new Insets(0,2,0,2));
+
         label.setFont(getFont());
-        label.setPrefHeight(UI_SIDE_LENGTH);
-        label.setMaxHeight(UI_SIDE_LENGTH *5);
-        label.setMinHeight(UI_SIDE_LENGTH);
+        label.setPrefSize(150, UI_SIDE_LENGTH);
+        label.setMaxSize(500, UI_SIDE_LENGTH);
+        label.setMinSize(150, UI_SIDE_LENGTH);
         setHgrow(label, ALWAYS);
         label.setPadding(EMPTY);
         label.textOverrunProperty().set(ELLIPSIS);
@@ -191,7 +196,7 @@ public class RuleGraphic extends HBox {
      * @return the rule label text
      */
     public String getLabelText() {
-        return label.getText();
+        return label.getText().trim();
     }
 
     /**
@@ -226,7 +231,7 @@ public class RuleGraphic extends HBox {
      */
     public void resetLabel(final String labelText) {
         if (labelText != null) {
-        	lText.setText(labelText);
+        	lText.setText("  "+labelText);
         }
     }
 

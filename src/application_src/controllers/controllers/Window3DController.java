@@ -1873,8 +1873,8 @@ public class Window3DController {
 
         			double shiftX = ((mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
         			double shiftY = ((mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
-        			xform1.setTranslateX(xform1.getTranslateX()+ shiftX);
-        			xform1.setTranslateY(xform1.getTranslateY()+ shiftY);
+        			xform1.setTranslateX(xform1.getTranslateX()+ shiftX*10);
+        			xform1.setTranslateY(xform1.getTranslateY()+ shiftY*10);
 
         			xform1Pivot = new Point3D(xform1Pivot.getX()-shiftX, xform1Pivot.getY()-shiftY,xform1Pivot.getZ());
 
