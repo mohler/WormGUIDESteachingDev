@@ -26,8 +26,8 @@ public class GeneSearchManager extends Service<Void> {
     private static String searchTerm;
 
     /** search options that are required by the gene search function defined in {@Link OrganismSearch} */
-    private static boolean includeAncestors;
-    private static boolean includeDescendants;
+    public static boolean includeAncestors;
+    public static boolean includeDescendants;
     private static boolean isSearchTermGene;
     private static boolean isSearchTermAnatomy;
     private static OrganismDataType intendedResultsType;
@@ -81,7 +81,7 @@ public class GeneSearchManager extends Service<Void> {
         return new Task<Void>() {
             @Override
             protected Void call() throws Exception {
-                if (!geneResultsCache.containsKey(searchTerm)) {
+                if (!geneResultsCache.containsKey(searchTerm + (includeAncestors?"_anc":"") +(includeDescendants?"_des":""))) {
 
                     final AbstractMap.SimpleEntry<OrganismDataType, List<String>> results = cElegansSearchPipeline.executeGeneSearch(searchTerm,
                             includeAncestors,
@@ -92,7 +92,7 @@ public class GeneSearchManager extends Service<Void> {
 
                     // save results in cache
                     results.getValue().sort(String.CASE_INSENSITIVE_ORDER);
-                    geneResultsCache.put(searchTerm.toLowerCase(), results);
+                    geneResultsCache.put((searchTerm  + (includeAncestors?"_anc":"") +(includeDescendants?"_des":"")).toLowerCase(), results);
                 }
                 return null;
             }

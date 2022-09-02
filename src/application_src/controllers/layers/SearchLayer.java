@@ -380,7 +380,7 @@ public class SearchLayer {
                     break;
                 case GENE: // C Elegans data
                     if (CElegansSearch.isGeneFormat(searchedTerm)) {
-                        AbstractMap.SimpleEntry<OrganismDataType, List<String>> geneSearchResults = geneSearchManager.getPreviouslyFetchedGeneResults(searchedTerm);
+                        AbstractMap.SimpleEntry<OrganismDataType, List<String>> geneSearchResults = geneSearchManager.getPreviouslyFetchedGeneResults(searchedTerm + (areAncestorsFetched?"_anc":"") + (areDescendantsFetched?"_des":""));
                         if (geneSearchResults == null) {
                             // necessary to handle the search that will start with genes that have the format abc-##
                             // i.e. more than 1 digit because a search will begin on the first digit

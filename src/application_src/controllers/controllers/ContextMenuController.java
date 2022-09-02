@@ -216,7 +216,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
                             loadingService.cancel();
                             resetLoadingMenuItem();
 
-                            final List<String> results = geneSearchManager.getPreviouslyFetchedGeneResults(cellName).getValue();
+                            final List<String> results = geneSearchManager.getPreviouslyFetchedGeneResults(cellName + (GeneSearchManager.includeAncestors?"_anc":"") + (GeneSearchManager.includeDescendants?"_des":"")).getValue();
                             if (results != null) {
                                 for (String res : results) {
                                     final MenuItem item = new MenuItem(res);
@@ -225,7 +225,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
                                         options.add(CELL_NUCLEUS);
 
                                         geneSearchManager.setSearchTerm(res);
-                                        geneSearchManager.setSearchOptions(false, false, true, false, OrganismDataType.LINEAGE);
+                                        geneSearchManager.setSearchOptions(GeneSearchManager.includeAncestors, GeneSearchManager.includeDescendants, true, false, OrganismDataType.LINEAGE);
                                         geneSearchManager.restart();
 
                                         // this is an unsafe practice. for now, we know this will generate results
@@ -233,9 +233,9 @@ public class ContextMenuController extends AnchorPane implements Initializable {
                                         // regardless, this is an unsafe practice and a better solution should be implemented
                                         // --> this is instead of doing a nested listener for the geneSearchManager's state,
                                         // because that's a nightmare that doesn't have a clear management strategy
-                                        while (geneSearchManager.getPreviouslyFetchedGeneResults(res) == null) { }
+                                        while (geneSearchManager.getPreviouslyFetchedGeneResults(res+ (GeneSearchManager.includeAncestors?"_anc":"") + (GeneSearchManager.includeDescendants?"_des":"")) == null) { }
 
-                                        List<String> r = geneSearchManager.getPreviouslyFetchedGeneResults(res).getValue();
+                                        List<String> r = geneSearchManager.getPreviouslyFetchedGeneResults(res+ (GeneSearchManager.includeAncestors?"_anc":"") + (GeneSearchManager.includeDescendants?"_des":"")).getValue();
                                         if (r != null) {
                                             final Rule rule = annotationManager.addGeneColorRule(res,
                                                     DEFAULT_COLOR,
