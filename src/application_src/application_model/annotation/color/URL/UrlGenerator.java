@@ -220,7 +220,7 @@ public class UrlGenerator {
 
                 // ancestry modifiers
                 // descendant
-                if (rule.isDescendantSelected()) {
+                if (rule.isAncestorSelected()) {
                     builder.append("<");
                 }
                 // cell
@@ -232,7 +232,7 @@ public class UrlGenerator {
                     builder.append("@");
                 }
                 // ancestor
-                if (rule.isAncestorSelected()) {
+                if (rule.isDescendantSelected()) {
                     builder.append(">");
                 }
             }

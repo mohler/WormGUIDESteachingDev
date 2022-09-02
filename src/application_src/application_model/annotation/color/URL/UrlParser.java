@@ -145,13 +145,13 @@ public class UrlParser {
 
                 options.clear();
                 int i;
-                if (sb.indexOf("%3C") > -1) {
+                if (sb.indexOf("%3E") > -1) {
                     options.add(ANCESTOR);
-                    i = sb.indexOf("%3C");
+                    i = sb.indexOf("%3E");
                     sb.replace(i, i + 3, "");
-                } else if (sb.indexOf(">") > -1) {
+                } else if (sb.indexOf("<") > -1) {
                     options.add(ANCESTOR);
-                    i = sb.indexOf(">");
+                    i = sb.indexOf("<");
                     sb.replace(i, i + 1, "");
                 }
                 if (sb.indexOf("$") > -1) {
@@ -159,14 +159,14 @@ public class UrlParser {
                     i = sb.indexOf("$");
                     sb.replace(i, i + 1, "");
                 }
-                if (ruleString.contains("%3E")) {
+                if (ruleString.contains("%3C")) {
                     options.add(DESCENDANT);
-                    i = sb.indexOf("%3E");
+                    i = sb.indexOf("%3C");
                     sb.replace(i, i + 3, "");
                 }
-                if (sb.indexOf("<") > -1) {
+                if (sb.indexOf(">") > -1) {
                     options.add(DESCENDANT);
-                    i = sb.indexOf("<");
+                    i = sb.indexOf(">");
                     sb.replace(i, i + 1, "");
                 }
                 if (sb.indexOf("@") > -1) {
