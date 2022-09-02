@@ -26,6 +26,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -305,7 +307,20 @@ public class Rule {
                 editStage.initOwner(stage);
             }
             editStage.initModality(APPLICATION_MODAL);
+            editStage.requestFocus();
+            editStage.setAlwaysOnTop(true);
+            editStage.addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
 
+            	@Override
+            	public void handle(KeyEvent t) {
+            		if(t.getCode()==KeyCode.ESCAPE) {
+            			Stage sb = (Stage) editStage.getScene().getWindow();//use any one object
+            			sb.close();
+            		}
+            	}
+            	
+            });
+            
             editController.setHeading(text);
             editController.setSubmitHandler(submitHandler);
             editController.setColor(color);
