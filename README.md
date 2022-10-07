@@ -1,4 +1,9 @@
-# WormGUIDES
+# WormGUIDESteachingDev
+A forked project specifically tuned to the goals of teaching and learning Developmental Biology.
+Modified UI and interactive experience compared to the main branch WormGUIDES desktop app.
+Retains GPL3 license of the original codebase:
+
+WormGUIDES
 Desktop version of the WormGUIDES iPad and Android apps.
 
 Source code can be found at https://github.com/tangydoris/WormGUIDES.
