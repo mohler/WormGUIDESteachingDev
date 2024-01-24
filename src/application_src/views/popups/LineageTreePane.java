@@ -443,48 +443,48 @@ public class LineageTreePane extends ScrollPane {
     private void setUpDefaultView() {
         // empty lines indicate a different level of the lineage tree
         if (lineageData.isSulstonMode()) {
-            hiddenNodes.add("ABalaa");
-            hiddenNodes.add("ABalap");
-            hiddenNodes.add("ABalpa");
-            hiddenNodes.add("ABalpp");
-            hiddenNodes.add("ABaraa");
-            hiddenNodes.add("ABarap");
-            hiddenNodes.add("ABarpa");
-            hiddenNodes.add("ABarpp");
-            hiddenNodes.add("ABplaa");
-            hiddenNodes.add("ABplap");
-            hiddenNodes.add("ABplpa");
-
-            hiddenNodes.add("ABplppaa");
-            hiddenNodes.add("ABplpppp");
-
-            hiddenNodes.add("ABpraa");
-            hiddenNodes.add("ABprap");
-
-            hiddenNodes.add("ABprpaaa");
-            hiddenNodes.add("ABprppaa");
-
-            hiddenNodes.add("ABprpapaa");
-
-            hiddenNodes.add("Abprppaa");
-
-            hiddenNodes.add("ABprppp");
-
-            hiddenNodes.add("MSaa");
-            hiddenNodes.add("MSap");
-            hiddenNodes.add("MSpa");
-            hiddenNodes.add("MSpp");
-
-            hiddenNodes.add("Ea");
-            hiddenNodes.add("Ep");
-
-            hiddenNodes.add("Caa");
-            hiddenNodes.add("Cap");
-            hiddenNodes.add("Cpa");
-            hiddenNodes.add("Cpp");
-
-            hiddenNodes.add("D");
-            hiddenNodes.add("P4");
+//            hiddenNodes.add("ABalaa");
+//            hiddenNodes.add("ABalap");
+//            hiddenNodes.add("ABalpa");
+//            hiddenNodes.add("ABalpp");
+//            hiddenNodes.add("ABaraa");
+//            hiddenNodes.add("ABarap");
+//            hiddenNodes.add("ABarpa");
+//            hiddenNodes.add("ABarpp");
+//            hiddenNodes.add("ABplaa");
+//            hiddenNodes.add("ABplap");
+//            hiddenNodes.add("ABplpa");
+//
+//            hiddenNodes.add("ABplppaa");
+//            hiddenNodes.add("ABplpppp");
+//
+//            hiddenNodes.add("ABpraa");
+//            hiddenNodes.add("ABprap");
+//
+//            hiddenNodes.add("ABprpaaa");
+//            hiddenNodes.add("ABprppaa");
+//
+//            hiddenNodes.add("ABprpapaa");
+//
+//            hiddenNodes.add("Abprppaa");
+//
+//            hiddenNodes.add("ABprppp");
+//
+//            hiddenNodes.add("MSaa");
+//            hiddenNodes.add("MSap");
+//            hiddenNodes.add("MSpa");
+//            hiddenNodes.add("MSpp");
+//
+//            hiddenNodes.add("Ea");
+//            hiddenNodes.add("Ep");
+//
+//            hiddenNodes.add("Caa");
+//            hiddenNodes.add("Cap");
+//            hiddenNodes.add("Cpa");
+//            hiddenNodes.add("Cpp");
+//
+//            hiddenNodes.add("D");
+//            hiddenNodes.add("P4");
         } else {
             //hide random cells for aesthetic purpose
             //comment out the following snippet to show all cells by default
@@ -809,7 +809,7 @@ public class LineageTreePane extends ScrollPane {
             final int rootStart) {
         // Recursively draws each cell in the tree
         // not sure what rootstart is note returns the midpoint of the sublineage just drawn
-
+    	double lineWidth = 1.5;
         boolean done = false;
         final String cellName = cell.getValue();
 
@@ -874,6 +874,7 @@ public class LineageTreePane extends ScrollPane {
             // terminal case line drawn
             maxX = max(x, maxX);
             final Line lcell = new Line(x, yStartUse, x, yStartUse + length);
+            lcell.setStrokeWidth(lineWidth);
             if (lcolor != null) {
                 lcell.setStroke(lcolor); // first for now
             }
@@ -944,6 +945,7 @@ public class LineageTreePane extends ScrollPane {
         if (!(lcolor == null)) {
             lcell.setStroke(lcolor); // first for now
         }
+        lcell.setStrokeWidth(lineWidth);
         // lines with child names
 
         lcell.setId(cellName);// set division line to parent id to aid
@@ -956,6 +958,7 @@ public class LineageTreePane extends ScrollPane {
         if (!(lcolor == null)) {
             lcell.setStroke(lcolor); // first for now
         }
+        lcell.setStrokeWidth(lineWidth);
 
         final Line lcellTemp = lcell;
         lcellTemp.setOnMousePressed(clickHandler);// handler for collapse
