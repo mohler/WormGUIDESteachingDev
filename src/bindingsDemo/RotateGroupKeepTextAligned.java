@@ -64,7 +64,7 @@ public class RotateGroupKeepTextAligned extends Application {
 
         root.setBottom(controls);
 
-        Scene scene = new Scene(root, 600, 600);
+        Scene scene = new Scene(root, 600, 600, true);
         primaryStage.setScene(scene);
         primaryStage.show();
     }

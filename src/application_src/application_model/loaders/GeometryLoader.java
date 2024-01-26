@@ -29,6 +29,10 @@ public class GeometryLoader {
     private static final String OBJ_EXTENSION = ".obj";
     private static final String VERTEX_LINE = "v";
     private static final String FACE_LINE = "f";
+	private static final String NAME_LINE = "g";
+	private static final String S_LINE = "s";
+	private static final String USEMTL_LINE = "usemtl";
+	private static final String MTLLIB_LINE = "mtllib";
 
     /**
      * Checks to see if a spefified resource exists in the shapes archive.
@@ -87,17 +91,39 @@ public class GeometryLoader {
             StringTokenizer tokenizer;
             String v;
             String f;
+            String g = "";
+            String s;
+            String usemtl;
+            String mtllib;
             String lineType;
             while ((line = reader.readLine()) != null) {
                 // processUrl each line in the obj file
                 if (line.length() < 2) {
                     continue;
                 }
-                lineType = line.substring(0, 1);
+                lineType = line.split(" ")[0];
                 switch (lineType) {
+	                case MTLLIB_LINE: {
+
+	                	mtllib = line.replaceAll("^"+lineType+" (.*)", "$1");
+	                	break;
+	                }
+	                case NAME_LINE: {
+
+	                	g = line.replaceAll("^"+lineType+" (.*)", "$1");
+	                	break;
+	                }
+	                case USEMTL_LINE: {
+
+	                	usemtl = line.replaceAll("^"+lineType+" (.*)", "$1");
+	                	break;
+	                }
+	                case S_LINE: {
+
+	                }
                     case VERTEX_LINE: {
                         // processUrl vertex lines
-                        v = line.substring(2);
+                        v = line.replaceAll("^"+lineType+" (.*)", "$1");
                         double[] vertices = new double[3];
                         int counter = 0;
                         tokenizer = new StringTokenizer(v);
@@ -112,7 +138,7 @@ public class GeometryLoader {
                     }
                     case FACE_LINE: {
                         // processUrl face lines
-                        f = line.substring(2);
+                        f = line.replaceAll("^"+lineType+" (.*)", "$1");
 
                         tokenizer = new StringTokenizer(f);
 
@@ -134,6 +160,7 @@ public class GeometryLoader {
                 }
             }
             meshView = new SceneElementMeshView(createMesh(coords, faces));
+            meshView.setCellName(g);
             meshView.pickOutMarkerPoints(coords);
         } catch (IOException e) {
             System.out.println("The file " + url.toString() + " wasn't found on the system.");

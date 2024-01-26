@@ -441,7 +441,7 @@ public class InfoWindow {
             
             VBox root = new VBox();
             root.getChildren().addAll(cellShapesIndexWebView);
-            Scene scene = new Scene(new Group());
+            Scene scene = new Scene(new Group(), -1, -1, true);
             scene.setRoot(root);
 
             cellShapesIndexStage.setScene(scene);
@@ -464,7 +464,7 @@ public class InfoWindow {
 
             VBox root = new VBox();
             root.getChildren().addAll(partsListWebView);
-            Scene scene = new Scene(new Group());
+            Scene scene = new Scene(new Group(), -1, -1, true);
             scene.setRoot(root);
 
             partsListStage.setScene(scene);
@@ -485,7 +485,7 @@ public class InfoWindow {
 
             VBox root = new VBox();
             root.getChildren().addAll(connectomeHTML);
-            Scene scene = new Scene(new Group());
+            Scene scene = new Scene(new Group(), -1, -1, true);
             scene.setRoot(root);
 
             connectomeStage.setScene(scene);
@@ -505,7 +505,7 @@ public class InfoWindow {
 
             VBox root = new VBox();
             root.getChildren().addAll(cellDeathsWebView);
-            Scene scene = new Scene(new Group());
+            Scene scene = new Scene(new Group(), -1, -1, true);
             scene.setRoot(root);
 
             cellDeathsStage.setScene(scene);
@@ -530,7 +530,7 @@ public class InfoWindow {
 
             final VBox root = new VBox();
             root.getChildren().addAll(productionInfoWebView);
-            final Scene scene = new Scene(new Group());
+            final Scene scene = new Scene(new Group(), -1, -1, true);
             scene.setRoot(root);
 
             productionInfoStage.setScene(scene);

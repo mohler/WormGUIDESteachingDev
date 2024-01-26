@@ -314,7 +314,7 @@ public class TimelineChart<X,Y> extends XYChart<X,Y> {
 
 
         chart.getStylesheets().add(MainApp.class.getResource("/application_src/views/style/TimelineChartStyle.css").toExternalForm());
-        return new Scene(chart, 1000, 400);
+        return new Scene(chart, 1000, 400, true);
     }
 
     private static void clearData() {

@@ -802,7 +802,7 @@ public class StoriesLayer {
             loader.setRoot(editController);
 
             try {
-                editStage.setScene(new Scene(loader.load()));
+                editStage.setScene(new Scene(loader.load(), -1, -1, true));
 
                 editStage.setTitle("Story/Note Editor");
                 editStage.setResizable(true);

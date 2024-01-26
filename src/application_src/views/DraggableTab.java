@@ -43,7 +43,7 @@ public class DraggableTab extends Tab {
         Rectangle dummy = new Rectangle(3, 10, Color.web("#555555"));
         StackPane markerStack = new StackPane();
         markerStack.getChildren().add(dummy);
-        markerStage.setScene(new Scene(markerStack));
+        markerStage.setScene(new Scene(markerStack, -1, -1, true));
     }
 
     private Label nameLabel;
@@ -75,7 +75,7 @@ public class DraggableTab extends Tab {
         dragText = new Text(text);
         StackPane.setAlignment(dragText, Pos.CENTER);
         dragStagePane.getChildren().add(dragText);
-        dragStage.setScene(new Scene(dragStagePane));
+        dragStage.setScene(new Scene(dragStagePane, -1, -1, true));
         nameLabel.setOnMouseDragged(new EventHandler<MouseEvent>() {
 
             @Override
@@ -153,7 +153,7 @@ public class DraggableTab extends Tab {
                             newStage.hide();
                         }
                     });
-                    newStage.setScene(new Scene(pane));
+                    newStage.setScene(new Scene(pane, -1, -1, true));
                     newStage.initStyle(StageStyle.UTILITY);
                     // redock tab on new window close
                     newStage.setOnCloseRequest(event -> Platform.runLater(() -> {

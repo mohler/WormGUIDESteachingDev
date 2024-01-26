@@ -296,7 +296,7 @@ public class Rule {
 
         try {
             editStage = new Stage();
-            editStage.setScene(new Scene(loader.load()));
+            editStage.setScene(new Scene(loader.load(), -1, -1, true));
 
             for (Node node : editStage.getScene().getRoot().getChildrenUnmodifiable()) {
                 node.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");

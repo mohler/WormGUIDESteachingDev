@@ -27,10 +27,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.SceneAntialiasing;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 /**
@@ -122,7 +124,7 @@ public class MainApp extends Application implements ObserveWormGUIDES {
         try {
             rootLayout = loader.load();
 
-            scene = new Scene(rootLayout);
+            scene = new Scene(rootLayout, -1, -1, true);
             primaryStage.setScene(scene);
             primaryStage.setResizable(true);
             primaryStage.centerOnScreen();

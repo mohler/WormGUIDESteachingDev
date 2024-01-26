@@ -381,7 +381,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
     public void menuAboutAction() {
         if (aboutStage == null) {
             aboutStage = new Stage();
-            aboutStage.setScene(new Scene(new AboutPane()));
+            aboutStage.setScene(new Scene(new AboutPane(), -1, -1, true));
             aboutStage.setTitle("About WormGUIDES");
             aboutStage.initModality(NONE);
             aboutStage.setHeight(400.0);
@@ -409,7 +409,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
                     rebuildSubsceneFlag,
                     defaultEmbryoFlag,
                     annotationManager);
-            sulstonTreeStage.setScene(new Scene(treePane));
+            sulstonTreeStage.setScene(new Scene(treePane, -1, -1, true));
             sulstonTreeStage.setTitle("LineageTree");
             sulstonTreeStage.initModality(NONE);
             sulstonTreeStage.setOnCloseRequest(event -> {
@@ -453,7 +453,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
                     tractOpacityProperty,
                     structureOpacityProperty);
             urlShareWindow.getCloseButton().setOnAction(event -> urlDisplayStage.hide());
-            urlDisplayStage.setScene(new Scene(urlShareWindow));
+            urlDisplayStage.setScene(new Scene(urlShareWindow, -1, -1, true));
             urlDisplayStage.setTitle("Share Scene");
             urlDisplayStage.setResizable(false);
             urlDisplayStage.initModality(NONE);
@@ -521,7 +521,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
             });
             urlLoadWindow.getCancelButton().setOnAction(event -> urlLoadStage.hide());
 
-            urlLoadStage.setScene(new Scene(urlLoadWindow));
+            urlLoadStage.setScene(new Scene(urlLoadWindow, -1, -1, true));
             urlLoadStage.setTitle("Load Scene");
             urlLoadStage.setResizable(false);
             urlLoadStage.initModality(NONE);
@@ -683,7 +683,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
             loader.setController(rotationController);
 
             try {
-                rotationControllerStage.setScene(new Scene(loader.load()));
+                rotationControllerStage.setScene(new Scene(loader.load(), -1, -1, true));
 
                 rotationControllerStage.setTitle("Rotation Controller");
                 rotationControllerStage.initOwner(mainStage);
@@ -1523,7 +1523,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 
             try {
-                contextMenuStage.setScene(new Scene(loader.load()));
+                contextMenuStage.setScene(new Scene(loader.load(), -1, -1, true));
                 contextMenuStage.initModality(NONE);
                 contextMenuStage.setResizable(false);
                 contextMenuStage.setTitle("Menu");
