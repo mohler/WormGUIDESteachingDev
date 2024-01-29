@@ -5,21 +5,31 @@
 package application_src.application_model.loaders;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import javax.vecmath.Color4f;
+
 import com.interactivemesh.jfx.importer.obj.ObjModelImporter;
+
+import javafx.scene.paint.Material;
+import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 
 import application_src.MainApp;
 import application_src.application_model.threeD.subscenegeometry.SceneElementMeshView;
+import customnode.WavefrontLoader;
 
 import static java.lang.Integer.MIN_VALUE;
+
+import java.awt.Color;
 
 /**
  * Builder for scene element mesh geometries to be placed in the 3D subscene
@@ -73,8 +83,8 @@ public class GeometryLoader {
         final URL url = MainApp.class.getResource(resourcePath);
 
         if (url != null) {
-//            return createMeshFromManualLoader(url);
-            return createMeshFromLibraryLoader(url);
+            return createMeshFromManualLoader(url);
+//            return createMeshFromLibraryLoader(url);
         } else {
             return meshView;
         }
@@ -93,9 +103,11 @@ public class GeometryLoader {
             String f;
             String g = "";
             String s;
-            String usemtl;
-            String mtllib;
+            String usemtl="";
+            String mtllib = "";
             String lineType;
+            HashMap<String, Color4f> colorHashMap = new HashMap<String, Color4f>();
+            Color4f c4f;
             while ((line = reader.readLine()) != null) {
                 // processUrl each line in the obj file
                 if (line.length() < 2) {
@@ -105,7 +117,13 @@ public class GeometryLoader {
                 switch (lineType) {
 	                case MTLLIB_LINE: {
 
-	                	mtllib = line.replaceAll("^"+lineType+" (.*)", "$1");
+	                	mtllib = line.replaceAll("^"+lineType+" (.*)", "$1").trim();
+
+	                	File mtlFile = new File(new File(url.getFile()).getParent() + File.separator + mtllib);
+	                	
+	                    HashMap<String, Color4f> chm = WavefrontLoader.readMaterials(mtlFile);
+	                    colorHashMap.putAll(chm);
+	                	
 	                	break;
 	                }
 	                case NAME_LINE: {
@@ -115,7 +133,8 @@ public class GeometryLoader {
 	                }
 	                case USEMTL_LINE: {
 
-	                	usemtl = line.replaceAll("^"+lineType+" (.*)", "$1");
+	                	usemtl = line.replaceAll("^"+lineType+" (.*)", "$1").trim();
+	                	
 	                	break;
 	                }
 	                case S_LINE: {
@@ -161,9 +180,22 @@ public class GeometryLoader {
             }
             meshView = new SceneElementMeshView(createMesh(coords, faces));
             meshView.setCellName(g);
+            if (!mtllib.equals("") && !usemtl.equals("")) {
+            	double redD = (double)(colorHashMap.get(usemtl).x);
+            	double grnD = (double)(colorHashMap.get(usemtl).y);
+            	double bluD = (double)(colorHashMap.get(usemtl).z);
+            	double opaD = 1.0-(double)(colorHashMap.get(usemtl).w);
+            	javafx.scene.paint.Color mtlColor = javafx.scene.paint.Color.color(redD, grnD, bluD, opaD);
+            	Material pm = new PhongMaterial();
+            	meshView.setMaterial(pm);
+//            	((PhongMaterial)pm).setSpecularColor(mtlColor);
+            	((PhongMaterial)meshView.getMaterial()).setDiffuseColor(mtlColor);
+            	((PhongMaterial)meshView.getMaterial()).setSpecularColor(mtlColor);
+            }
             meshView.pickOutMarkerPoints(coords);
+            
         } catch (IOException e) {
-            System.out.println("The file " + url.toString() + " wasn't found on the system.");
+            e.printStackTrace();
         }
 
         return meshView;

@@ -3097,24 +3097,28 @@ public class Window3DController {
                             }
                         }
                     } else {
-                        for (Rule rule : rulesList) {
-                            if (rule.appliesToStructureWithSceneName(sceneElement.getSceneName())) {
-                                colors.add(rule.getColor());
+                    	if (((PhongMaterial)meshView.getMaterial()).getDiffuseColor() != Color.WHITE) {
+                    		colors.add(((PhongMaterial)meshView.getMaterial()).getDiffuseColor());
+                    	} else {
+                    		for (Rule rule : rulesList) {
+                    			if (rule.appliesToStructureWithSceneName(sceneElement.getSceneName())) {
+                    				colors.add(rule.getColor());
 
-                                if (rule.getColor().getOpacity() <= getSelectabilityVisibilityCutoff()) {
-                                    meshView.setDisable(true);
-                                }
-                            } else {
-                                for (int g = 0; g < structureCells.size(); g++) {
-                                    if (rule.appliesToCellBody(structureCells.get(g))) {
-                                        colors.add(rule.getColor());
-                                        if (rule.getColor().getOpacity() <= getSelectabilityVisibilityCutoff()) {
-                                            meshView.setDisable(true);
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                    				if (rule.getColor().getOpacity() <= getSelectabilityVisibilityCutoff()) {
+                    					meshView.setDisable(true);
+                    				}
+                    			} else {
+                    				for (int g = 0; g < structureCells.size(); g++) {
+                    					if (rule.appliesToCellBody(structureCells.get(g))) {
+                    						colors.add(rule.getColor());
+                    						if (rule.getColor().getOpacity() <= getSelectabilityVisibilityCutoff()) {
+                    							meshView.setDisable(true);
+                    						}
+                    					}
+                    				}
+                    			}
+                    		}
+                    	}
                     }
 
                     // if no rules applied
