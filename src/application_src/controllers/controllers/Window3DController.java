@@ -109,6 +109,7 @@ import application_src.application_model.resources.ProductionInfo;
 import application_src.application_model.resources.utilities.AppFont;
 import application_src.application_model.search.ModelSearch.ModelSpecificSearchOps.StructuresSearch;
 import application_src.application_model.search.SearchConfiguration.SearchOption;
+import application_src.application_model.search.SearchConfiguration.SearchType;
 import application_src.application_model.annotation.stories.Note;
 import application_src.application_model.annotation.stories.Note.Display;
 import application_src.application_model.annotation.color.ColorComparator;
@@ -2628,7 +2629,18 @@ public class Window3DController {
                 if (meshView != null) {
                 	meshView.setCellName(se.getSceneName());
                     meshView.getTransforms().addAll(rotateX, rotateY, rotateZ);
-
+                    ArrayList<String> foundNames = new ArrayList<String>();
+                    foundNames.add(meshView.getCellName());
+                    boolean alreadyRuled = false;
+                    for (Rule rule:rootLC.getAnnotationManager().getRulesList()) {
+                    	if (rule.getSearchType() == SearchType.STRUCTURE_BY_SCENE_NAME 
+//                    			&& rule.getColor() == ((PhongMaterial)meshView.getMaterial()).getDiffuseColor() 
+                    			&& rule.getSearchedText().equals("\'"+meshView.getCellName()+"\' "+SearchType.STRUCTURE_BY_SCENE_NAME)) {
+                    		alreadyRuled = true;
+                    	}
+                    }
+                    if (!alreadyRuled)
+                    	rootLC.getAnnotationManager().addColorRule(SearchType.STRUCTURE_BY_SCENE_NAME, meshView.getCellName(), ((PhongMaterial)meshView.getMaterial()).getDiffuseColor(), foundNames,null);
                     // TRANSFORMS FOR LIBRARY LOADER
                     //mesh.getTransforms().add(new Rotate(180., new Point3D(1, 0, 0)));
 //                    mesh.getTransforms().add(new Translate(
@@ -3097,28 +3109,29 @@ public class Window3DController {
                             }
                         }
                     } else {
-                    	if (((PhongMaterial)meshView.getMaterial()).getDiffuseColor() != Color.WHITE) {
-                    		colors.add(((PhongMaterial)meshView.getMaterial()).getDiffuseColor());
-                    	} else {
-                    		for (Rule rule : rulesList) {
-                    			if (rule.appliesToStructureWithSceneName(sceneElement.getSceneName())) {
-                    				colors.add(rule.getColor());
+//                    	if (((PhongMaterial)meshView.getMaterial()).getDiffuseColor() != Color.WHITE) {
+//                    		colors.add(((PhongMaterial)meshView.getMaterial()).getDiffuseColor());
+//                    	} 
+//
+                    	for (Rule rule : rulesList) {
+                    		if (rule.appliesToStructureWithSceneName(sceneElement.getSceneName())) {
+                    			colors.add(rule.getColor());
 
-                    				if (rule.getColor().getOpacity() <= getSelectabilityVisibilityCutoff()) {
-                    					meshView.setDisable(true);
-                    				}
-                    			} else {
-                    				for (int g = 0; g < structureCells.size(); g++) {
-                    					if (rule.appliesToCellBody(structureCells.get(g))) {
-                    						colors.add(rule.getColor());
-                    						if (rule.getColor().getOpacity() <= getSelectabilityVisibilityCutoff()) {
-                    							meshView.setDisable(true);
-                    						}
+                    			if (rule.getColor().getOpacity() <= getSelectabilityVisibilityCutoff()) {
+                    				meshView.setDisable(true);
+                    			}
+                    		} else {
+                    			for (int g = 0; g < structureCells.size(); g++) {
+                    				if (rule.appliesToCellBody(structureCells.get(g))) {
+                    					colors.add(rule.getColor());
+                    					if (rule.getColor().getOpacity() <= getSelectabilityVisibilityCutoff()) {
+                    						meshView.setDisable(true);
                     					}
                     				}
                     			}
                     		}
                     	}
+
                     }
 
                     // if no rules applied

@@ -188,7 +188,6 @@ public class GeometryLoader {
             	javafx.scene.paint.Color mtlColor = javafx.scene.paint.Color.color(redD, grnD, bluD, opaD);
             	Material pm = new PhongMaterial();
             	meshView.setMaterial(pm);
-//            	((PhongMaterial)pm).setSpecularColor(mtlColor);
             	((PhongMaterial)meshView.getMaterial()).setDiffuseColor(mtlColor);
             	((PhongMaterial)meshView.getMaterial()).setSpecularColor(mtlColor);
             }
