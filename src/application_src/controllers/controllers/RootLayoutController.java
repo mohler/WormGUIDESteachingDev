@@ -1546,4 +1546,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	public Window3DController getWindow3DController() {
 		return window3DController;
 	}
+
+	public AnnotationManager getAnnotationManager() {
+		return annotationManager;
+	}
 }
