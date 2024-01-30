@@ -107,7 +107,7 @@ public class GeometryLoader {
             String mtllib = "";
             String lineType;
             HashMap<String, Color4f> colorHashMap = new HashMap<String, Color4f>();
-            Color4f c4f;
+
             while ((line = reader.readLine()) != null) {
                 // processUrl each line in the obj file
                 if (line.length() < 2) {
