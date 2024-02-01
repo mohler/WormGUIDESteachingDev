@@ -345,6 +345,8 @@ public class Window3DController {
     private List<SceneElementMeshView> currentSceneElementMeshViews;
 //    private List<MeshView> currentSceneElementMeshes;
     private List<SceneElement> currentSceneElements;
+    private List<String> previouslyShownSEMVnames;
+
     private PerspectiveCamera camera;
     private XformBox xform1;
     private XformBox xform2;
@@ -913,6 +915,7 @@ public class Window3DController {
             currentSceneElementMeshViews = new ArrayList<>();
             currentSceneElements = new ArrayList<>();
         }
+        previouslyShownSEMVnames = new ArrayList<String>();
 
         currentNotes = new ArrayList<>();
         currentGraphicsToNotesMap = new HashMap<>();
@@ -2616,15 +2619,26 @@ public class Window3DController {
             if (sceneElementsList != null) {
                 meshNames = new LinkedList<>(asList(sceneElementsList.getSceneElementNamesAtTime(requestedTime)));
             }
+            
+        	for (SceneElementMeshView semv : currentSceneElementMeshViews) {
+        		previouslyShownSEMVnames.add(semv.getCellName());        		
+        	}
 
-            if (!currentSceneElementMeshViews.isEmpty()) {
-                currentSceneElementMeshViews.clear();
-                currentSceneElements.clear();
-            }
+        	if (!currentSceneElementMeshViews.isEmpty()) {
+        		currentSceneElementMeshViews.clear();
+        		currentSceneElements.clear();
+        	}
 
 
             sceneElementsAtCurrentTime = sceneElementsList.getSceneElementsAtTime(requestedTime);
             for (SceneElement se : sceneElementsAtCurrentTime) {
+            	boolean seAlreadyMTLapplied = false;
+            	for (String semvstr : previouslyShownSEMVnames) {
+            		String sestr = se.getSceneName();
+            		if (sestr.equals(semvstr)){
+            			seAlreadyMTLapplied = true;
+            		}
+            	}
                 final SceneElementMeshView meshView = se.buildGeometry(requestedTime - getShapesIndexPad());
                 if (meshView != null) {
                 	meshView.setCellName(se.getSceneName());
@@ -2633,14 +2647,14 @@ public class Window3DController {
                     foundNames.add(meshView.getCellName());
                     boolean alreadyRuled = false;
                     for (Rule rule:rootLC.getAnnotationManager().getRulesList()) {
+                    	String ruleSearchText = rule.getSearchedText();
                     	if (rule.getSearchType() == SearchType.STRUCTURE_BY_SCENE_NAME 
-//                    			&& rule.getColor() == ((PhongMaterial)meshView.getMaterial()).getDiffuseColor() 
-                    			&& rule.getSearchedText().equals("\'"+meshView.getCellName()+"\' "+SearchType.STRUCTURE_BY_SCENE_NAME)) {
+                    			&& ruleSearchText.equals("\'"+meshView.getCellName()+"\' "+SearchType.STRUCTURE_BY_SCENE_NAME)) {
                     		alreadyRuled = true;
                     	}
                     }
-                    if (!alreadyRuled)
-                    	rootLC.getAnnotationManager().addColorRule(SearchType.STRUCTURE_BY_SCENE_NAME, meshView.getCellName(), ((PhongMaterial)meshView.getMaterial()).getDiffuseColor(), foundNames,null);
+                    if (!seAlreadyMTLapplied && !alreadyRuled)
+                    	rootLC.getAnnotationManager().addColorRule(SearchType.STRUCTURE_BY_SCENE_NAME, meshView.getCellName(), meshView.getColors().get(0), foundNames,null);
                     // TRANSFORMS FOR LIBRARY LOADER
                     //mesh.getTransforms().add(new Rotate(180., new Point3D(1, 0, 0)));
 //                    mesh.getTransforms().add(new Translate(

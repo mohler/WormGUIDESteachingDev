@@ -180,16 +180,14 @@ public class GeometryLoader {
             }
             meshView = new SceneElementMeshView(createMesh(coords, faces));
             meshView.setCellName(g);
+            meshView.setColors(new ArrayList<javafx.scene.paint.Color>());
             if (!mtllib.equals("") && !usemtl.equals("")) {
             	double redD = (double)(colorHashMap.get(usemtl).x);
             	double grnD = (double)(colorHashMap.get(usemtl).y);
             	double bluD = (double)(colorHashMap.get(usemtl).z);
             	double opaD = 1.0-(double)(colorHashMap.get(usemtl).w);
             	javafx.scene.paint.Color mtlColor = javafx.scene.paint.Color.color(redD, grnD, bluD, opaD);
-            	Material pm = new PhongMaterial();
-            	meshView.setMaterial(pm);
-            	((PhongMaterial)meshView.getMaterial()).setDiffuseColor(mtlColor);
-            	((PhongMaterial)meshView.getMaterial()).setSpecularColor(mtlColor);
+            	meshView.getColors().add(mtlColor);
             }
             meshView.pickOutMarkerPoints(coords);
             
