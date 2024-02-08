@@ -62,6 +62,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.PickResult;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
@@ -433,7 +434,15 @@ public class Window3DController {
 	
 	ObservableList<String> searchModeHitLabels;
 	private double sceneOverallScale = 10;
-    
+	public static final String ANSI_RESET = "\u001B[0m";
+	public static final String ANSI_RED = "\u001B[31m";
+	public static final String ANSI_YELLOW = "\u001B[33m";
+	public static final String ANSI_CYAN = "\u001B[36m";
+	public static final String ANSI_BLUE = "\u001B[34m";
+	public static final String ANSI_GREEN = "\u001B[32m";
+	public static final String ANSI_MAGENTA = "\u001B[35m";
+	public static final String ANSI_BRIGHTBLUE = "\u001B[94m";
+
     public Window3DController(
             final RootLayoutController rootLC, 
             final Stage parentStage,
@@ -1586,8 +1595,26 @@ public class Window3DController {
         	if (!me.isStillSincePress())
         		return;
         	
-        	if(me.getClickCount() > 1) {
+        	if(me.getClickCount() > 2) {
         		this.playingMovieProperty.set(!this.playingMovieProperty.get());
+        	} else if(me.getClickCount() == 2) {
+        		if (me.isShiftDown()) {
+    				System.out.println(ANSI_RESET+"xform1Pivot = "+ xform1Pivot.toString());
+        			PickResult pkres = me.getPickResult();
+        			Node pickedNode = pkres.getIntersectedNode();
+    				System.out.println(ANSI_RED+"pickedNode = "+ pickedNode.toString() +" "+ (pickedNode instanceof NamedNucleusSphere?((NamedNucleusSphere)pickedNode).getCellName():"not sphere"));
+    				    				
+    				Bounds pickedNodeLocalToSceneBounds = pickedNode.localToScene(pickedNode.getBoundsInLocal());   
+    				Point3D pickedNodeLocalToSceneCtr = new Point3D((pickedNodeLocalToSceneBounds.getMaxX()+pickedNodeLocalToSceneBounds.getMinX())/2,
+										    						(pickedNodeLocalToSceneBounds.getMaxY()+pickedNodeLocalToSceneBounds.getMinY())/2,
+										    						(pickedNodeLocalToSceneBounds.getMaxZ()+pickedNodeLocalToSceneBounds.getMinZ())/2);
+    				
+    				System.out.println(ANSI_BRIGHTBLUE+"pickedNodeLocalToSceneCtr = "+ pickedNodeLocalToSceneCtr.toString());
+
+    				xform1Pivot = pickedNodeLocalToSceneCtr;
+    				System.out.println(ANSI_GREEN+"xform1Pivot_new = "+ xform1Pivot.toString());
+    				System.out.println("");
+        		}
         	} else {
                 spritesPane.setCursor(DEFAULT);
                 hideContextPopups();
@@ -1873,14 +1900,15 @@ public class Window3DController {
         		if (me.isShiftDown()) {
 
 
-        			//// THIS CODE SHIFTS THE CONTENTS TO A NEW PIVOT POINT if rightclick/shiftdown...
+        			//// THIS CODE SHIFTS THE CONTENTS TO A NEW PIVOT POINT if leftclick/shiftdown...
+        				//actually...does now seem to do so as of fixes 02012024...
 
         			double shiftX = ((mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
         			double shiftY = ((mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
         			xform1.setTranslateX(xform1.getTranslateX()+ shiftX*10);
         			xform1.setTranslateY(xform1.getTranslateY()+ shiftY*10);
 
-        			xform1Pivot = new Point3D(xform1Pivot.getX()-shiftX, xform1Pivot.getY()-shiftY,xform1Pivot.getZ());
+        			xform1Pivot = new Point3D(xform1Pivot.getX()-shiftX*10, xform1Pivot.getY()-shiftY*10,xform1Pivot.getZ());
 
         		} else {
 
@@ -2004,8 +2032,8 @@ public class Window3DController {
         	} else {
         		//// THIS CODE SHIFTS xform1 within the scene, but does not affect PIVOT POINT if rightclick alone...
 
-        		xform1.setTranslateX(xform1.getTranslateX()+(mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
-        		xform1.setTranslateY(xform1.getTranslateY()+(mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
+        		xform1.setTranslateX(xform1.getTranslateX()+(mouseDeltaX * 10 * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
+        		xform1.setTranslateY(xform1.getTranslateY()+(mouseDeltaY * 10 * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
         	}
         });
 
