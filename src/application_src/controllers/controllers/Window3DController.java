@@ -1603,15 +1603,17 @@ public class Window3DController {
         			PickResult pkres = me.getPickResult();
         			Node pickedNode = pkres.getIntersectedNode();
     				System.out.println(ANSI_RED+"pickedNode = "+ pickedNode.toString() +" "+ (pickedNode instanceof NamedNucleusSphere?((NamedNucleusSphere)pickedNode).getCellName():"not sphere"));
-    				    				
-    				Bounds pickedNodeLocalToSceneBounds = pickedNode.localToScene(pickedNode.getBoundsInLocal());   
-    				Point3D pickedNodeLocalToSceneCtr = new Point3D((pickedNodeLocalToSceneBounds.getMaxX()+pickedNodeLocalToSceneBounds.getMinX())/2,
-										    						(pickedNodeLocalToSceneBounds.getMaxY()+pickedNodeLocalToSceneBounds.getMinY())/2,
-										    						(pickedNodeLocalToSceneBounds.getMaxZ()+pickedNodeLocalToSceneBounds.getMinZ())/2);
+    				System.out.println(ANSI_RED+"pickedNodeParent = "+ pickedNode.getParent().toString() );
+    				System.out.println(ANSI_RED+"pickedNodeGrandParent = "+ pickedNode.getParent().getParent().toString() );
     				
-    				System.out.println(ANSI_BRIGHTBLUE+"pickedNodeLocalToSceneCtr = "+ pickedNodeLocalToSceneCtr.toString());
-
-    				xform1Pivot = pickedNodeLocalToSceneCtr;
+    				Bounds pickTfmedBounds = pickedNode.getBoundsInLocal();
+    				Point3D pickTfmed = pickedNode.localToParent((pickTfmedBounds.getMaxX()+pickTfmedBounds.getMinX())/2,
+									    						(pickTfmedBounds.getMaxY()+pickTfmedBounds.getMinY())/2,
+									    						(pickTfmedBounds.getMaxZ()+pickTfmedBounds.getMinZ())/2);
+    				
+    				xform1Pivot = pickTfmed;
+    				xform1.getTransforms().set(0,(new Rotate(0.0,xform1Pivot.getX(),xform1Pivot.getY(),xform1Pivot.getZ(), Rotate.X_AXIS)).createConcatenation(xform1.getTransforms().get(0)));
+    				
     				System.out.println(ANSI_GREEN+"xform1Pivot_new = "+ xform1Pivot.toString());
     				System.out.println("");
         		}
