@@ -1599,22 +1599,39 @@ public class Window3DController {
         		this.playingMovieProperty.set(!this.playingMovieProperty.get());
         	} else if(me.getClickCount() == 2) {
         		if (me.isShiftDown()) {
-    				System.out.println(ANSI_RESET+"xform1Pivot = "+ xform1Pivot.toString());
         			PickResult pkres = me.getPickResult();
         			Node pickedNode = pkres.getIntersectedNode();
     				System.out.println(ANSI_RED+"pickedNode = "+ pickedNode.toString() +" "+ (pickedNode instanceof NamedNucleusSphere?((NamedNucleusSphere)pickedNode).getCellName():"not sphere"));
     				System.out.println(ANSI_RED+"pickedNodeParent = "+ pickedNode.getParent().toString() );
     				System.out.println(ANSI_RED+"pickedNodeGrandParent = "+ pickedNode.getParent().getParent().toString() );
+        			Scene mainScene = pickedNode.getScene();
+//        			System.out.println(ANSI_GREEN + "pickedNodeToParentTfm = "+pickedNode.getLocalToParentTransform().toString());
+//        			System.out.println(ANSI_BRIGHTBLUE + "pickedNodeToSceneTfm = "+pickedNode.getLocalToSceneTransform().toString());
+     				Bounds pickTfmedBounds = pickedNode.getBoundsInParent();
+     				Point3D pickParentBoundsCtr = new Point3D((pickTfmedBounds.getMaxX()+pickTfmedBounds.getMinX())/2,
+									    						(pickTfmedBounds.getMaxY()+pickTfmedBounds.getMinY())/2,
+									    						(pickTfmedBounds.getMaxZ()+pickTfmedBounds.getMinZ())/2);
+     				Point3D pickLocalToSceneTnfmed = pickedNode.getLocalToSceneTransform().transform(xform1Pivot);
+     				Point3D pickLocalToParentTnfmed = pickedNode.getLocalToParentTransform().transform(xform1Pivot);
+
+     				System.out.println(ANSI_RESET+"xform1Pivot =             "+ xform1Pivot.toString().replace("= ", "= +").replace("= +-", "= -"));
+
+        			System.out.println(ANSI_GREEN + "pickLocalToParentTnfmed = "+pickLocalToParentTnfmed.toString().replace("= ", "= +").replace("= +-", "= -"));
+        			System.out.println(ANSI_BRIGHTBLUE + "pickLocalToSceneTnfmed =  "+pickLocalToSceneTnfmed.toString().replace("= ", "= +").replace("= +-", "= -"));
+
+        		
     				
-    				Bounds pickTfmedBounds = pickedNode.getBoundsInLocal();
     				Point3D pickTfmed = pickedNode.localToParent((pickTfmedBounds.getMaxX()+pickTfmedBounds.getMinX())/2,
 									    						(pickTfmedBounds.getMaxY()+pickTfmedBounds.getMinY())/2,
 									    						(pickTfmedBounds.getMaxZ()+pickTfmedBounds.getMinZ())/2);
+//    				xform1Pivot = pickLocalToSceneTnfmed;
+//    				xform1Pivot = pickLocalToParentTnfmed;
+//    				xform1Pivot = pickTfmed;
+    				xform1Pivot = pickParentBoundsCtr;
     				
-    				xform1Pivot = pickTfmed;
-    				xform1.getTransforms().set(0,(new Rotate(0.0,xform1Pivot.getX(),xform1Pivot.getY(),xform1Pivot.getZ(), Rotate.X_AXIS)).createConcatenation(xform1.getTransforms().get(0)));
+//    				xform1.getTransforms().set(0,(new Rotate(0.0,xform1Pivot.getX(),xform1Pivot.getY(),xform1Pivot.getZ(), Rotate.X_AXIS)).createConcatenation(xform1.getTransforms().get(0)));
     				
-    				System.out.println(ANSI_GREEN+"xform1Pivot_new = "+ xform1Pivot.toString());
+    				System.out.println(ANSI_GREEN+"xform1Pivot_new =         "+ xform1Pivot.toString().replace("= ", "= +").replace("= +-", "= -"));
     				System.out.println("");
         		}
         	} else {
