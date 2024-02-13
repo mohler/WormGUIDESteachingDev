@@ -1605,34 +1605,42 @@ public class Window3DController {
     				System.out.println(ANSI_RED+"pickedNodeParent = "+ pickedNode.getParent().toString() );
     				System.out.println(ANSI_RED+"pickedNodeGrandParent = "+ pickedNode.getParent().getParent().toString() );
         			Scene mainScene = pickedNode.getScene();
-//        			System.out.println(ANSI_GREEN + "pickedNodeToParentTfm = "+pickedNode.getLocalToParentTransform().toString());
-//        			System.out.println(ANSI_BRIGHTBLUE + "pickedNodeToSceneTfm = "+pickedNode.getLocalToSceneTransform().toString());
+        			
+     				System.out.println(ANSI_RESET+"xform1Pivot =          "+ xform1Pivot.toString().replace("= ", "= +").replace("= +-", "= -"));
+
+//     				Point3D pickLocalToSceneTnfmed = pickedNode.getLocalToSceneTransform().transform(xform1Pivot);
+//     				Point3D pickLocalToParentTnfmed = pickedNode.getLocalToParentTransform().transform(xform1Pivot);
+
+//        			System.out.println(ANSI_BRIGHTBLUE + "pickLocalToSceneTnfmed =  "+pickLocalToSceneTnfmed.toString().replace("= ", "= +").replace("= +-", "= -"));
+     				
+     				Bounds pickLocalBounds = pickedNode.getBoundsInLocal();
      				Bounds pickTfmedBounds = pickedNode.getBoundsInParent();
+
      				Point3D pickParentBoundsCtr = new Point3D((pickTfmedBounds.getMaxX()+pickTfmedBounds.getMinX())/2,
 									    						(pickTfmedBounds.getMaxY()+pickTfmedBounds.getMinY())/2,
 									    						(pickTfmedBounds.getMaxZ()+pickTfmedBounds.getMinZ())/2);
-     				Point3D pickLocalToSceneTnfmed = pickedNode.getLocalToSceneTransform().transform(xform1Pivot);
-     				Point3D pickLocalToParentTnfmed = pickedNode.getLocalToParentTransform().transform(xform1Pivot);
-
-     				System.out.println(ANSI_RESET+"xform1Pivot =             "+ xform1Pivot.toString().replace("= ", "= +").replace("= +-", "= -"));
-
-        			System.out.println(ANSI_GREEN + "pickLocalToParentTnfmed = "+pickLocalToParentTnfmed.toString().replace("= ", "= +").replace("= +-", "= -"));
-        			System.out.println(ANSI_BRIGHTBLUE + "pickLocalToSceneTnfmed =  "+pickLocalToSceneTnfmed.toString().replace("= ", "= +").replace("= +-", "= -"));
-
-        		
+        			System.out.println(ANSI_RED + " pickParentBoundsCtr = "+pickParentBoundsCtr.toString().replace("= ", "= +").replace("= +-", "= -"));
+     		
     				
-    				Point3D pickTfmed = pickedNode.localToParent((pickTfmedBounds.getMaxX()+pickTfmedBounds.getMinX())/2,
-									    						(pickTfmedBounds.getMaxY()+pickTfmedBounds.getMinY())/2,
-									    						(pickTfmedBounds.getMaxZ()+pickTfmedBounds.getMinZ())/2);
+    				Point3D pickTfmed = pickedNode.localToParent((pickLocalBounds.getMaxX()+pickLocalBounds.getMinX())/2,
+									    						(pickLocalBounds.getMaxY()+pickLocalBounds.getMinY())/2,
+									    						(pickLocalBounds.getMaxZ()+pickLocalBounds.getMinZ())/2);
+        			System.out.println(ANSI_BRIGHTBLUE + "*pickTfmed =            "+pickTfmed.toString().replace("= ", "= +").replace("= +-", "= -"));
+
 //    				xform1Pivot = pickLocalToSceneTnfmed;
 //    				xform1Pivot = pickLocalToParentTnfmed;
-//    				xform1Pivot = pickTfmed;
-    				xform1Pivot = pickParentBoundsCtr;
-    				
-//    				xform1.getTransforms().set(0,(new Rotate(0.0,xform1Pivot.getX(),xform1Pivot.getY(),xform1Pivot.getZ(), Rotate.X_AXIS)).createConcatenation(xform1.getTransforms().get(0)));
-    				
-    				System.out.println(ANSI_GREEN+"xform1Pivot_new =         "+ xform1Pivot.toString().replace("= ", "= +").replace("= +-", "= -"));
+    				xform1Pivot = pickTfmed;
+//    				xform1Pivot = pickParentBoundsCtr;
+    				    				
+    				System.out.println(ANSI_GREEN+"xform1Pivot_new =      "+ xform1Pivot.toString().replace("= ", "= +").replace("= +-", "= -"));
     				System.out.println("");
+
+    				Point3D xform1Pivot_newToScene = pickedNode.getParent().localToScene(xform1Pivot).subtract(new Point3D(0,0, getInitialTranslateZ()*10));
+    				
+    				System.out.println(ANSI_MAGENTA+"xform1Pivot_newToScene= "+ xform1Pivot_newToScene.toString().replace("= ", "= +").replace("= +-", "= -"));
+    				System.out.println("");
+
+    				xform1Pivot = xform1Pivot_newToScene;
         		}
         	} else {
                 spritesPane.setCursor(DEFAULT);
@@ -1936,7 +1944,7 @@ public class Window3DController {
 
         			double angleY = -mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED;
         			double angleX = mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED;
-        			//Hey fix!!																  //vv I HAD THIS WRONG vv
+        			//Hey fixed this!!																  //vv I HAD THIS WRONG vv
         			xform1.addRotation(angleY, (int)xform1Pivot.getX(), (int)xform1Pivot.getY(), (int)xform1Pivot.getZ(), Rotate.Y_AXIS);
         			xform1.addRotation(angleX, (int)xform1Pivot.getX(), (int)xform1Pivot.getY(), (int)xform1Pivot.getZ(), Rotate.X_AXIS);
         			
