@@ -746,7 +746,7 @@ public class Window3DController {
 
 					}
 				}
-				xform2.setTranslateZ(600);
+				xform2.setTranslateZ(translateZProperty.get()/10);
 				repositionNotes();
 
 				if (blinkingSceneElementMeshViews.size()>0  && blinkingSceneElementMeshViews.get(0) != null && blinkingSceneElementMeshViews.get(0).getColors() !=null && blinkingSceneElementMeshViews.get(0).getColors().size() >0){
@@ -1924,18 +1924,22 @@ public class Window3DController {
 
         			double shiftX = ((mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
         			double shiftY = ((mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
-        			xform1.setTranslateX(xform1.getTranslateX()+ shiftX*10);
-        			xform1.setTranslateY(xform1.getTranslateY()+ shiftY*10);
 
-        			xform1Pivot = new Point3D(xform1Pivot.getX()-shiftX*10, xform1Pivot.getY()-shiftY*10,xform1Pivot.getZ());
+        			xform1.getTransforms().set(0, new Translate(shiftX*10, shiftY*10, 0).createConcatenation(xform1.getTransforms().get(0)));
+        			
+//        			xform1.setTranslateX(xform1.getTranslateX()+ shiftX*10);
+//        			xform1.setTranslateY(xform1.getTranslateY()+ shiftY*10);
+
+//        			xform1Pivot = new Point3D(xform1Pivot.getX()-shiftX*10, xform1Pivot.getY()-shiftY*10,xform1Pivot.getZ());
 
         		} else {
 
         			double angleY = -mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED;
         			double angleX = mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED;
-
-        			xform1.addRotation(angleY, (int)xform1Pivot.getX(), (int)xform1Pivot.getY(), (int)xform1Pivot.getY(), Rotate.Y_AXIS);
-        			xform1.addRotation(angleX, (int)xform1Pivot.getX(), (int)xform1Pivot.getY(), (int)xform1Pivot.getY(), Rotate.X_AXIS);
+        			//Hey fix!!																  //vv I HAD THIS WRONG vv
+        			xform1.addRotation(angleY, (int)xform1Pivot.getX(), (int)xform1Pivot.getY(), (int)xform1Pivot.getZ(), Rotate.Y_AXIS);
+        			xform1.addRotation(angleX, (int)xform1Pivot.getX(), (int)xform1Pivot.getY(), (int)xform1Pivot.getZ(), Rotate.X_AXIS);
+        			
         			for (Node thingy:xform1.getChildren()) {
         				if (!(thingy instanceof Text)) {
         					Text thingyLabel = entityLabelMap.get(thingy);
@@ -4389,7 +4393,7 @@ public class Window3DController {
 							getCellSceneData(i);
 							addEntitiesNoNotesWithColorRule();
 						}
-
+						double tzp = translateZProperty.get();
 						xform1.setTranslateZ(translateZProperty.get());
 						if (cumRotShiftCoords != null) {
 							for (Node content:xform1.getChildren()) {
@@ -4407,7 +4411,7 @@ public class Window3DController {
 
 							}
 						}
-						xform2.setTranslateZ(600);
+						xform2.setTranslateZ(translateZProperty.get()/10);
 						repositionNotes();
 
 						renderComplete = true;
