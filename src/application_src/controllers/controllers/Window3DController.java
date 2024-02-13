@@ -431,6 +431,7 @@ public class Window3DController {
 	private Runnable blinkRunnerRules;
     public ObservableList<Rule> blinkingRules;
     ObservableList<String> currentBlinkRuleNames;
+    double initialTranslateZ;
 	
 	ObservableList<String> searchModeHitLabels;
 	private double sceneOverallScale = 10;
@@ -746,7 +747,7 @@ public class Window3DController {
 
 					}
 				}
-				xform2.setTranslateZ(translateZProperty.get()/10);
+				xform2.setTranslateZ(this.initialTranslateZ);
 				repositionNotes();
 
 				if (blinkingSceneElementMeshViews.size()>0  && blinkingSceneElementMeshViews.get(0) != null && blinkingSceneElementMeshViews.get(0).getColors() !=null && blinkingSceneElementMeshViews.get(0).getColors().size() >0){
@@ -906,6 +907,8 @@ public class Window3DController {
 //        this.rotateYAngleProperty.addListener(getRotateYAngleListener());
 //        this.rotateZAngleProperty.addListener(getRotateZAngleListener());
 //
+        this.initialTranslateZ = getInitialTranslateZ();
+        
         this.translateXProperty = requireNonNull(translateXProperty);
         this.translateXProperty.addListener(getTranslateXListener());
         this.translateXProperty.set(getInitialTranslateX());
@@ -1608,39 +1611,39 @@ public class Window3DController {
         			
      				System.out.println(ANSI_RESET+"xform1Pivot =          "+ xform1Pivot.toString().replace("= ", "= +").replace("= +-", "= -"));
 
-//     				Point3D pickLocalToSceneTnfmed = pickedNode.getLocalToSceneTransform().transform(xform1Pivot);
-//     				Point3D pickLocalToParentTnfmed = pickedNode.getLocalToParentTransform().transform(xform1Pivot);
-
-//        			System.out.println(ANSI_BRIGHTBLUE + "pickLocalToSceneTnfmed =  "+pickLocalToSceneTnfmed.toString().replace("= ", "= +").replace("= +-", "= -"));
      				
      				Bounds pickLocalBounds = pickedNode.getBoundsInLocal();
-     				Bounds pickTfmedBounds = pickedNode.getBoundsInParent();
-
-     				Point3D pickParentBoundsCtr = new Point3D((pickTfmedBounds.getMaxX()+pickTfmedBounds.getMinX())/2,
-									    						(pickTfmedBounds.getMaxY()+pickTfmedBounds.getMinY())/2,
-									    						(pickTfmedBounds.getMaxZ()+pickTfmedBounds.getMinZ())/2);
-        			System.out.println(ANSI_RED + " pickParentBoundsCtr = "+pickParentBoundsCtr.toString().replace("= ", "= +").replace("= +-", "= -"));
-     		
-    				
-    				Point3D pickTfmed = pickedNode.localToParent((pickLocalBounds.getMaxX()+pickLocalBounds.getMinX())/2,
-									    						(pickLocalBounds.getMaxY()+pickLocalBounds.getMinY())/2,
-									    						(pickLocalBounds.getMaxZ()+pickLocalBounds.getMinZ())/2);
-        			System.out.println(ANSI_BRIGHTBLUE + "*pickTfmed =            "+pickTfmed.toString().replace("= ", "= +").replace("= +-", "= -"));
-
+     				
+/////////////   This block does the sequential stepping from local to Parent to Scene in order to get correct affect, but one-liner below does same using localToScene!!
+//   				
+//    				Point3D pick1stStepToParent = pickedNode.localToParent((pickLocalBounds.getMaxX()+pickLocalBounds.getMinX())/2,
+//									    						(pickLocalBounds.getMaxY()+pickLocalBounds.getMinY())/2,
+//									    						(pickLocalBounds.getMaxZ()+pickLocalBounds.getMinZ())/2);
+//        			System.out.println(ANSI_BRIGHTBLUE + "pick1stStepToParent =            "+pick1stStepToParent.toString().replace("= ", "= +").replace("= +-", "= -"));
+//
 //    				xform1Pivot = pickLocalToSceneTnfmed;
 //    				xform1Pivot = pickLocalToParentTnfmed;
-    				xform1Pivot = pickTfmed;
+//    				xform1Pivot = pick1stStepToParent;
 //    				xform1Pivot = pickParentBoundsCtr;
-    				    				
-    				System.out.println(ANSI_GREEN+"xform1Pivot_new =      "+ xform1Pivot.toString().replace("= ", "= +").replace("= +-", "= -"));
-    				System.out.println("");
+//  				    				
+//    				System.out.println(ANSI_GREEN+"xform1Pivot_new =      "+ xform1Pivot.toString().replace("= ", "= +").replace("= +-", "= -"));
+//    				System.out.println("");
+//
+//    				Point3D xform1Pivot_2ndStepToScene = pickedNode.getParent().localToScene(xform1Pivot).subtract(new Point3D(0,0, getInitialTranslateZ()*10));    				
+//
+//    				System.out.println(ANSI_BRIGHTBLUE+"xform1Pivot_newToScene= "+ xform1Pivot_2ndStepToScene.toString().replace("= ", "= +").replace("= +-", "= -"));
+//    				xform1Pivot = xform1Pivot_2ndStepToScene;
 
-    				Point3D xform1Pivot_newToScene = pickedNode.getParent().localToScene(xform1Pivot).subtract(new Point3D(0,0, getInitialTranslateZ()*10));
+ 
+//!!!!!!  WHEN WRITTEN RIGHT, THIS ACTUALLY DOES THE MAGIC IT IS SUPPOSED TO!!!!!!
+     				Point3D xform1Pivot_NewDoubleStepPickToScene = pickedNode.localToScene((pickLocalBounds.getMaxX()+pickLocalBounds.getMinX())/2,
+															    						(pickLocalBounds.getMaxY()+pickLocalBounds.getMinY())/2,
+															    						(pickLocalBounds.getMaxZ()+pickLocalBounds.getMinZ())/2)
+    																					.subtract(new Point3D(0,0, getInitialTranslateZ()*sceneOverallScale));
+    				System.out.println(ANSI_MAGENTA+"*xform1Pivot_DoubleStepPickToScene= "+ xform1Pivot_NewDoubleStepPickToScene.toString().replace("= ", "= +").replace("= +-", "= -"));
+    				System.out.println("");
+    				xform1Pivot = xform1Pivot_NewDoubleStepPickToScene;
     				
-    				System.out.println(ANSI_MAGENTA+"xform1Pivot_newToScene= "+ xform1Pivot_newToScene.toString().replace("= ", "= +").replace("= +-", "= -"));
-    				System.out.println("");
-
-    				xform1Pivot = xform1Pivot_newToScene;
         		}
         	} else {
                 spritesPane.setCursor(DEFAULT);
@@ -1932,14 +1935,11 @@ public class Window3DController {
 
         			double shiftX = ((mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
         			double shiftY = ((mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
-
+        			
+//  SOMETHING ABOUT BELOW APPROACH BLOWS UP NICE XFORM1PIVOT BEHAVIOR AS SOON AS THE SCENE IS SHIFT-DRAGGED.  MUST RESET SOME PROPERTY WRONGLY
+//	THE PROBLEM ONLY OCCURS AFTER ZOOMING WITH MOUSEWHEEL, AND THEN SHIFT DRAGGING, AND THEN SHIFT2CLICKING.  HMMMMMM....        			
         			xform1.getTransforms().set(0, new Translate(shiftX*10, shiftY*10, 0).createConcatenation(xform1.getTransforms().get(0)));
         			
-//        			xform1.setTranslateX(xform1.getTranslateX()+ shiftX*10);
-//        			xform1.setTranslateY(xform1.getTranslateY()+ shiftY*10);
-
-//        			xform1Pivot = new Point3D(xform1Pivot.getX()-shiftX*10, xform1Pivot.getY()-shiftY*10,xform1Pivot.getZ());
-
         		} else {
 
         			double angleY = -mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED;
@@ -4419,7 +4419,7 @@ public class Window3DController {
 
 							}
 						}
-						xform2.setTranslateZ(translateZProperty.get()/10);
+						xform2.setTranslateZ(initialTranslateZ);
 						repositionNotes();
 
 						renderComplete = true;
