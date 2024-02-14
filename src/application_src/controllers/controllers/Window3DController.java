@@ -1643,7 +1643,8 @@ public class Window3DController {
 															    						(pickLocalBounds.getMaxZ()+pickLocalBounds.getMinZ())/2)
     																					.subtract(new Point3D(translateXProperty.get(),translateYProperty.get(), translateZProperty.get()));
 //above line WAS one of two cases of sceneOverallScale being multiplied by tlZ but not tlX and tlY...  
-//NOW trying here to call the property set in the other such line, instead... THAT WORKS!!  //but still some residual "losability" of the pivot sync, so now attempting .subtract of all three tlProperties here^^.
+//NOW trying here to call the property set in the other such line, instead... THAT WORKS!!  
+//but still some residual "losability" of the pivot sync, so now attempting .subtract of all three tlProperties here^^...seems OK.
      				
      				System.out.println(ANSI_MAGENTA+"*xform1Pivot_DoubleStepPickToScene= "+ xform1Pivot_NewDoubleStepPickToScene.toString().replace("= ", "= +").replace("= +-", "= -"));
     				System.out.println("");
@@ -1941,8 +1942,6 @@ public class Window3DController {
         			double shiftX = ((mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
         			double shiftY = ((mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
         			
-//  SOMETHING ABOUT BELOW APPROACH BLOWS UP NICE XFORM1PIVOT BEHAVIOR AS SOON AS THE SCENE IS SHIFT-DRAGGED.  MUST RESET SOME PROPERTY WRONGLY
-//	THE PROBLEM ONLY OCCURS AFTER ZOOMING WITH MOUSEWHEEL, AND THEN SHIFT DRAGGING, AND THEN SHIFT2CLICKING.  HMMMMMM....        			
         			xform1.getTransforms().set(0, new Translate(shiftX*10, shiftY*10, 0).createConcatenation(xform1.getTransforms().get(0)));
         			
         		} else {
@@ -2065,11 +2064,24 @@ public class Window3DController {
         			}
 
         		}
-        	} else {
+        	} else { //rightclick case
         		//// THIS CODE SHIFTS xform1 within the scene, but does not affect PIVOT POINT if rightclick alone...
+        		
+        		//complex symptom (prob easy fix?):  if an object has been shift2xLclicked to set as pivot point, then this right-drag preserves that pivot nicely
+        		//But after right-drag, any new shift2xLclick appears to have pivot misplaced (perhaps by an additional length of previous right drag event.
 
-        		xform1.setTranslateX(xform1.getTranslateX()+(mouseDeltaX * 10 * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
-        		xform1.setTranslateY(xform1.getTranslateY()+(mouseDeltaY * 10 * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
+//        		xform1.setTranslateX(xform1.getTranslateX()+(mouseDeltaX * 10 * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
+//        		xform1.setTranslateY(xform1.getTranslateY()+(mouseDeltaY * 10 * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
+        		
+
+// next 3 lines copied from shiftleftdrag case above to compare/use here...
+        		
+    			double shiftX = ((mouseDeltaX * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
+    			double shiftY = ((mouseDeltaY * MoleculeSampleApp.MOUSE_SPEED * MoleculeSampleApp.ROTATION_SPEED));
+    			xform1.getTransforms().set(0, new Translate(shiftX*10, shiftY*10, 0).createConcatenation(xform1.getTransforms().get(0)));
+// new line to countershift...I hope.  Yes this works!, but not sure why I needed subtract method and negative arguments...
+    			xform1Pivot = this.xform1Pivot.subtract(new Point3D(-shiftX*10, -shiftY*10, 0));
+
         	}
         });
 
