@@ -918,6 +918,7 @@ public class Window3DController {
         this.translateZProperty = requireNonNull(translateZProperty);
         this.translateZProperty.addListener(getTranslateZListener());
         this.translateZProperty.set(getInitialTranslateZ() * sceneOverallScale);
+      //above line is one of two cases of sceneOverallScale being multiplied by tlZ but not tlX and tlY...
 
         this.colorHash = requireNonNull(colorHash);
         colorComparator = new ColorComparator();
@@ -1587,7 +1588,8 @@ public class Window3DController {
                 // zoom in
              	z = (z / 1.125);
             }
-             translateZProperty.set(z);
+            translateZProperty.set(z);
+
         }
     }
 
@@ -1639,8 +1641,11 @@ public class Window3DController {
      				Point3D xform1Pivot_NewDoubleStepPickToScene = pickedNode.localToScene((pickLocalBounds.getMaxX()+pickLocalBounds.getMinX())/2,
 															    						(pickLocalBounds.getMaxY()+pickLocalBounds.getMinY())/2,
 															    						(pickLocalBounds.getMaxZ()+pickLocalBounds.getMinZ())/2)
-    																					.subtract(new Point3D(0,0, getInitialTranslateZ()*sceneOverallScale));
-    				System.out.println(ANSI_MAGENTA+"*xform1Pivot_DoubleStepPickToScene= "+ xform1Pivot_NewDoubleStepPickToScene.toString().replace("= ", "= +").replace("= +-", "= -"));
+    																					.subtract(new Point3D(translateXProperty.get(),translateYProperty.get(), translateZProperty.get()));
+//above line WAS one of two cases of sceneOverallScale being multiplied by tlZ but not tlX and tlY...  
+//NOW trying here to call the property set in the other such line, instead... THAT WORKS!!  //but still some residual "losability" of the pivot sync, so now attempting .subtract of all three tlProperties here^^.
+     				
+     				System.out.println(ANSI_MAGENTA+"*xform1Pivot_DoubleStepPickToScene= "+ xform1Pivot_NewDoubleStepPickToScene.toString().replace("= ", "= +").replace("= +-", "= -"));
     				System.out.println("");
     				xform1Pivot = xform1Pivot_NewDoubleStepPickToScene;
     				
