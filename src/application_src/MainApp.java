@@ -40,9 +40,9 @@ import javafx.stage.Stage;
  */
 public class MainApp extends Application implements ObserveWormGUIDES {
 
-    private  Stage primaryStage;
+    private  static Stage primaryStage;
 
-    private  NucleiMgrAdapterResource nucleiMgrAdapterResource;
+    private  static NucleiMgrAdapterResource nucleiMgrAdapterResource;
 
     private  Scene scene;
 
@@ -58,7 +58,7 @@ public class MainApp extends Application implements ObserveWormGUIDES {
 	private  EventHandler<KeyEvent> keyHandler;
 
 
-
+    
     public  void startProgramatically(final String[] args, final NucleiMgrAdapterResource nmar) {
         nucleiMgrAdapterResource = nmar;
         launch(args);
@@ -74,8 +74,8 @@ public class MainApp extends Application implements ObserveWormGUIDES {
 
         loadImages();
 
-        this.primaryStage = primaryStage;
-        primaryStage.setTitle("WormGUIDESteachingDev");
+        MainApp.primaryStage = primaryStage;
+        MainApp.primaryStage.setTitle("WormGUIDESteachingDev");
 
         final Instant start = now();
         initRootLayout();
@@ -124,7 +124,7 @@ public class MainApp extends Application implements ObserveWormGUIDES {
         try {
             rootLayout = loader.load();
 
-            scene = new Scene(rootLayout, -1, -1, true);
+            scene = new Scene(rootLayout);
             primaryStage.setScene(scene);
             primaryStage.setResizable(true);
             primaryStage.centerOnScreen();
@@ -191,7 +191,7 @@ public class MainApp extends Application implements ObserveWormGUIDES {
             	node.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
             	node.setFocusTraversable(false);
             }
-
+ 
         } catch (IOException e) {
             System.out.println("Could not initialize root layout");
             e.printStackTrace();

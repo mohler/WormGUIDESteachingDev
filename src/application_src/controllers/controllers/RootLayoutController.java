@@ -39,6 +39,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -130,6 +131,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
     // Panels stuff
     @FXML
     private BorderPane rootBorderPane;
+    @FXML
+    private SplitPane mainSplitPane;
     @FXML
     private GridPane displayGridPane;
     @FXML 
@@ -354,6 +357,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
     private SubScene subscene;
     private Group rootEntitiesGroup;
 	public LineageTreePane treePane;
+	private double[] splitDividerPos;
 
     @FXML
     public void menuLoadStory() {
@@ -1300,6 +1304,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
      * @see DraggableTab
      */
     private void replaceTabsWithDraggableTabs() {
+    	
         final DraggableTab cellsDragTab = new DraggableTab(cellsTab.getText());
         cellsDragTab.setCloseable(false);
         cellsDragTab.setContent(cellsTab.getContent());
@@ -1335,8 +1340,32 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
         mainTabPaneLeft.getTabs().add(storiesTab);
         mainTabPaneLeft.toBack();
+        
+        splitDividerPos = null;
+
+        mainTabPaneLeft.getTabs().addListener((ListChangeListener<Tab>) change -> {
+        	if (mainTabPaneLeft.getTabs().isEmpty()) {
+            	splitDividerPos = mainSplitPane.getDividerPositions();
+            	mainTabPaneLeft.setMinWidth(5);
+            	mainSplitPane.setDividerPosition(0, 0.02);
+            } else {
+            	mainTabPaneLeft.setPrefWidth(175);
+            	mainSplitPane.setDividerPosition(0, splitDividerPos[0]);
+          }
+        });
+
         mainTabPaneRight.getTabs().add(colorAndDisplayTab);
         mainTabPaneRight.toBack();
+        mainTabPaneRight.getTabs().addListener((ListChangeListener<Tab>) change -> {
+            if (mainTabPaneRight.getTabs().isEmpty()) {
+            	splitDividerPos = mainSplitPane.getDividerPositions();
+            	mainTabPaneRight.setMinWidth(5);
+            	mainSplitPane.setDividerPosition(1, 0.98);
+            } else {
+            	mainTabPaneRight.setPrefWidth(175);
+            	mainSplitPane.setDividerPosition(1, splitDividerPos[1]);
+           }
+        });
     }
 
     public IntegerProperty getTimeProperty() {

@@ -108,6 +108,7 @@ public class DraggableTab extends Tab {
                 }
             }
         });
+        
         nameLabel.setOnMouseReleased(new EventHandler<MouseEvent>() {
 
             @Override
