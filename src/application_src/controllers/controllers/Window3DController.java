@@ -1606,12 +1606,12 @@ public class Window3DController {
         		if (me.isShiftDown()) {
         			PickResult pkres = me.getPickResult();
         			Node pickedNode = pkres.getIntersectedNode();
-    				System.out.println(ANSI_RED+"pickedNode = "+ pickedNode.toString() +" "+ (pickedNode instanceof NamedNucleusSphere?((NamedNucleusSphere)pickedNode).getCellName():"not sphere"));
-    				System.out.println(ANSI_RED+"pickedNodeParent = "+ pickedNode.getParent().toString() );
-    				System.out.println(ANSI_RED+"pickedNodeGrandParent = "+ pickedNode.getParent().getParent().toString() );
+//    				System.out.println(ANSI_RED+"pickedNode = "+ pickedNode.toString() +" "+ (pickedNode instanceof NamedNucleusSphere?((NamedNucleusSphere)pickedNode).getCellName():"not sphere"));
+//    				System.out.println(ANSI_RED+"pickedNodeParent = "+ pickedNode.getParent().toString() );
+//    				System.out.println(ANSI_RED+"pickedNodeGrandParent = "+ pickedNode.getParent().getParent().toString() );
         			Scene mainScene = pickedNode.getScene();
         			
-     				System.out.println(ANSI_RESET+"xform1Pivot =          "+ xform1Pivot.toString().replace("= ", "= +").replace("= +-", "= -"));
+//     				System.out.println(ANSI_RESET+"xform1Pivot =          "+ xform1Pivot.toString().replace("= ", "= +").replace("= +-", "= -"));
 
      				
      				Bounds pickLocalBounds = pickedNode.getBoundsInLocal();
@@ -1646,8 +1646,8 @@ public class Window3DController {
 //NOW trying here to call the property set in the other such line, instead... THAT WORKS!!  
 //but still some residual "losability" of the pivot sync, so now attempting .subtract of all three tlProperties here^^...seems OK.
      				
-     				System.out.println(ANSI_MAGENTA+"*xform1Pivot_DoubleStepPickToScene= "+ xform1Pivot_NewDoubleStepPickToScene.toString().replace("= ", "= +").replace("= +-", "= -"));
-    				System.out.println("");
+//     				System.out.println(ANSI_MAGENTA+"*xform1Pivot_DoubleStepPickToScene= "+ xform1Pivot_NewDoubleStepPickToScene.toString().replace("= ", "= +").replace("= +-", "= -"));
+//    				System.out.println("");
     				xform1Pivot = xform1Pivot_NewDoubleStepPickToScene;
     				
         		}
