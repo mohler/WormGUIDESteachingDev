@@ -2729,7 +2729,7 @@ public class Window3DController {
                     		alreadyRuled = true;
                     	}
                     }
-                    if (!seAlreadyMTLapplied && !alreadyRuled)
+                    if (!seAlreadyMTLapplied && !alreadyRuled && rootLC.getAnnotationManager().getRulesList().size()>1)
                     	rootLC.getAnnotationManager().addColorRule(SearchType.STRUCTURE_BY_SCENE_NAME, meshView.getCellName(), meshView.getColors().get(0), foundNames,null);
                     // TRANSFORMS FOR LIBRARY LOADER
                     //mesh.getTransforms().add(new Rotate(180., new Point3D(1, 0, 0)));
