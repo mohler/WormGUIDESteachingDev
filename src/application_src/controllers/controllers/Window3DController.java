@@ -3436,11 +3436,28 @@ public class Window3DController {
     private void insertLabelFor(final String name, final Node entity) {
     	//***THIS METHOD SEEMS TO BREAK (MAYBE) WHEN PREVIOUS TIMEPOINTS ARE TRACED...
     	//...issue may now be solved
-    	
-         if (entity == null)
-        	return;
+    	Node altEntity = null;
+         if (entity == null) {
+//        	return;
+        	altEntity = new NamedNucleusSphere(name, 1, null); 
+        	Point3D labelPoint = null;
+        	for (SceneElement se : currentSceneElements) {
+        		if (se.getSceneName().trim().equals("Embryo Outline")) {
+        			Bounds embBounds = se.buildGeometry((startTime+endTime)/2).getBoundsInLocal();
+        			labelPoint = new Point3D  (embBounds.getMinX()*1.8,embBounds.getMaxY()*1.8,embBounds.getMaxZ()*1.8);
+        		}
+        	}
+        	if (labelPoint != null) {
+        		altEntity.setTranslateX(labelPoint.getX());
+        		altEntity.setTranslateY(labelPoint.getY());
+        		altEntity.setTranslateZ(labelPoint.getZ());
+        	}
+        	xform1.getChildren().add(altEntity);
+          } else {
+        	 altEntity = entity;
+         }
        // if label is already in scene, make all labels white and highlight that one
-    	final Text label = entityLabelMap.get(entity);
+    	final Text label = entityLabelMap.get(altEntity);
         if (label != null) {
             for (Node shape : entityLabelMap.keySet()) {
                 entityLabelMap.get(shape).setFill(web(SPRITE_COLOR_HEX));
@@ -3464,13 +3481,13 @@ public class Window3DController {
         text.setOnMouseClicked(event -> removeLabelFor(tempName));
         text.setWrappingWidth(-1);
 
-        entityLabelMap.put(entity, text);
+        entityLabelMap.put(altEntity, text);
         //Put new label at head of Children roster for opacity compliance
         xform1.getChildren().add(0, text);
 
 //        spritesPane.getChildren().add(text);
 
-        alignTextWithEntity(text, entity, null);
+        alignTextWithEntity(text, altEntity, null);
 
         // set the name in MainApp so that other apps opening WormGUIDES can catch this event
         MainApp.selectedEntityLabelMainApp.set(name);
