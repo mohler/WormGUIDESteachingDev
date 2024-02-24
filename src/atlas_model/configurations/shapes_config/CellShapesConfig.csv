@@ -120,6 +120,6 @@ amphid_tip_right_tract,Tract,MCS,cnd-1,L:\shahp2\iSIM\BV293\11082016,atlas_model
 Tracts,,,,,,,,,
 Tissue Level Objects,,,,,,,,,
 Pharynx,,-,-,-,atlas_model/data/obj_files/Pharynx,200,400,Y,
-Hypoderm,,-,-,-,atlas_model/data/obj_files/Hypoderm,200,400,Y,
+Hypodermis,,-,-,-,atlas_model/data/obj_files/Hypoderm,200,400,Y,
 Embryo Outline,,-,-,-,atlas_model/data/obj_files/embryo,1,400,Y,
 Tissue Level Objects,,,,,,,,,

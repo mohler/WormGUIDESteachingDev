@@ -3436,10 +3436,12 @@ public class Window3DController {
     private void insertLabelFor(final String name, final Node entity) {
     	//***THIS METHOD SEEMS TO BREAK (MAYBE) WHEN PREVIOUS TIMEPOINTS ARE TRACED...
     	//...issue may now be solved
-    	Node altEntity = null;
+    	Node altEntity = null;    	
+    	
+		// block below is a surprisingly hacky approach to parking unspecifically-anchored notes outside the embryo volume.  Works for now.
          if (entity == null) {
 //        	return;
-        	altEntity = new NamedNucleusSphere(name, 1, null); 
+        	altEntity = new NamedNucleusSphere(name, 1, null); // a dummy node to target the positioning of the note.
         	Point3D labelPoint = null;
         	for (SceneElement se : currentSceneElements) {
         		if (se.getSceneName().trim().equals("Embryo Outline")) {
