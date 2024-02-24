@@ -1606,12 +1606,12 @@ public class Window3DController {
         		if (me.isShiftDown()) {
         			PickResult pkres = me.getPickResult();
         			Node pickedNode = pkres.getIntersectedNode();
-    				System.out.println(ANSI_RED+"pickedNode = "+ pickedNode.toString() +" "+ (pickedNode instanceof NamedNucleusSphere?((NamedNucleusSphere)pickedNode).getCellName():"not sphere"));
-    				System.out.println(ANSI_RED+"pickedNodeParent = "+ pickedNode.getParent().toString() );
-    				System.out.println(ANSI_RED+"pickedNodeGrandParent = "+ pickedNode.getParent().getParent().toString() );
-        			Scene mainScene = pickedNode.getScene();
-        			
-     				System.out.println(ANSI_RESET+"xform1Pivot =          "+ xform1Pivot.toString().replace("= ", "= +").replace("= +-", "= -"));
+//    				System.out.println(ANSI_RED+"pickedNode = "+ pickedNode.toString() +" "+ (pickedNode instanceof NamedNucleusSphere?((NamedNucleusSphere)pickedNode).getCellName():"not sphere"));
+//    				System.out.println(ANSI_RED+"pickedNodeParent = "+ pickedNode.getParent().toString() );
+//    				System.out.println(ANSI_RED+"pickedNodeGrandParent = "+ pickedNode.getParent().getParent().toString() );
+//        			Scene mainScene = pickedNode.getScene();
+//        			
+//     				System.out.println(ANSI_RESET+"xform1Pivot =          "+ xform1Pivot.toString().replace("= ", "= +").replace("= +-", "= -"));
 
      				
      				Bounds pickLocalBounds = pickedNode.getBoundsInLocal();
@@ -1646,8 +1646,8 @@ public class Window3DController {
 //NOW trying here to call the property set in the other such line, instead... THAT WORKS!!  
 //but still some residual "losability" of the pivot sync, so now attempting .subtract of all three tlProperties here^^...seems OK.
      				
-     				System.out.println(ANSI_MAGENTA+"*xform1Pivot_DoubleStepPickToScene= "+ xform1Pivot_NewDoubleStepPickToScene.toString().replace("= ", "= +").replace("= +-", "= -"));
-    				System.out.println("");
+//     				System.out.println(ANSI_MAGENTA+"*xform1Pivot_DoubleStepPickToScene= "+ xform1Pivot_NewDoubleStepPickToScene.toString().replace("= ", "= +").replace("= +-", "= -"));
+//    				System.out.println("");
     				xform1Pivot = xform1Pivot_NewDoubleStepPickToScene;
     				
         		}
@@ -2965,13 +2965,18 @@ public class Window3DController {
         insertOverlayTitles();
 
         if (!currentNotes.isEmpty()) {
-            addNoteGeometries(noteGraphics);
+//            addNoteGeometries(noteGraphics);
+            for (Note note:currentNotes) {
+            	currentLabels.add(note.getTagName()+"___"+note.getCellName());
+            }
         }
 
         // add labels
         Shape3D activeEntity = null;
         for (String name : currentLabels) {
-            insertLabelFor(name, getEntityWithName(name));
+        	String targetEntityName = name.matches(".*___.*")?name.replaceAll(".*___(.*)", "$1"):name;
+        	String labelFromName = name.split("___")[0];
+            insertLabelFor(labelFromName, getEntityWithName(targetEntityName));
 
             if (name.equalsIgnoreCase(selectedNameProperty.get())) {
                 activeEntity = getEntityWithName(name);
@@ -2984,7 +2989,7 @@ public class Window3DController {
         if (!noteGraphics.isEmpty()) {
             // insert note graphics to the beginning of the group so they can be rendered last (otherwise, the notes
             // will not be completely visible behind semi-opaque entities)
-            xform1.getChildren().addAll(0, noteGraphics);
+//            xform1.getChildren().addAll(0, noteGraphics);
         }
         xform1.setScaleX(rootEntitiesGroup.getScaleX() * getModelScaleFactor());
         xform1.setScaleY(rootEntitiesGroup.getScaleY() * getModelScaleFactor());
